@@ -9,8 +9,8 @@ pipeline {
     stages {
         stage('GIT') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/hwafa/timesheetproject.git'
+                git branch: 'ElhediMelek',
+                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
         stage('Compile Stage') {
