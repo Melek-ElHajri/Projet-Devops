@@ -13,6 +13,13 @@ pipeline {
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
+        stage('Scan') {
+            steps {
+                withSonarQubeEnv('nourhene-sq') {
+                    sh 'mvn sonar:sonar' 
+                }
+            }
+        }
         stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
