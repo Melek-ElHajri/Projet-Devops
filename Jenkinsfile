@@ -15,7 +15,7 @@ pipeline {
         }
         stage('Scan') {
             steps {
-                withSonarQubeEnv('nourhene-sq') {
+                withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar' 
                 }
             }
