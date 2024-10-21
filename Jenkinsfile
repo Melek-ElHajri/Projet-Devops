@@ -19,7 +19,11 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
-        
+         stage('Deploy to Nexus') {  // Add the deployment stage
+            steps {
+                sh 'mvn deploy'
+            }
+        }
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -29,10 +33,6 @@ pipeline {
             }
         }
 
-        stage('Deploy to Nexus') {  // Add the deployment stage
-            steps {
-                sh 'mvn deploy -DskipTests'
-            }
-        }
+        
     }
 }
