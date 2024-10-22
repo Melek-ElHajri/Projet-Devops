@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('GIT') {
             steps {
-                git branch: 'NouhaSedraoui',
+                git branch: 'nourhene-chammakhi',
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
