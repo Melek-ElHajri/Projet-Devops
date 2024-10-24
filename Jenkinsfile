@@ -1,38 +1,28 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'JAVA_HOME'
-        maven 'M2_HOME'
-    }
-
     stages {
-        stage('GIT') {
+        stage('Checkout Git') {
             steps {
-                git branch: 'nourhene-chammakhi',
-                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+                // Checkout the code from the new repository
+                git credentialsId: 'cred-github', 
+                    branch: 'nourhene-chammakhi', // Change branch name
+                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git' // New repository
             }
         }
-        
-        stage('Compile Stage') {   // Move the compile stage before the scan
+
+        stage('Compiling') {
             steps {
+                // Compile the project using Maven
                 sh 'mvn clean compile'
             }
         }
-         stage('Deploy to Nexus') {  // Add the deployment stage
-            steps {
-                sh 'mvn deploy'
-            }
-        }
-        stage('Scan') {
-            steps {
-                withSonarQubeEnv('sq1') {
-                    // Add sonar.java.binaries property to point to compiled classes
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
 
-        
+        stage('SonarQube') {
+            steps {
+                // Run SonarQube analysis using Maven
+                sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
+            }
+        }
     }
 }
