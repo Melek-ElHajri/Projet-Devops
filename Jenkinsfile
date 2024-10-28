@@ -1,4 +1,4 @@
-pipeline {
+pipeline { 
     agent any
 
     tools {
@@ -14,25 +14,40 @@ pipeline {
             }
         }
         
-        stage('Compile Stage') {   // Move the compile stage before the scan
+        stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
             }
         }
-         stage('Deploy to Nexus') {  // Add the deployment stage
+        
+        stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy'
             }
         }
+
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
-                    // Add sonar.java.binaries property to point to compiled classes
                     sh 'mvn sonar:sonar'
                 }
             }
         }
 
-        
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -trymasd29/tp-foyer:1.0.0 .' // Replace with your Docker Hub username
+            }
+        }
+
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                // Hardcoded credentials
+                sh '''
+                    docker login -u rymasd29 -p 223JFT4309
+                    docker push rymasd29/tp-foyer:1.0.0
+                '''
+            }
+        }
     }
 }
