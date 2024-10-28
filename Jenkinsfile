@@ -25,7 +25,7 @@ pipeline {
             }
         }
         
-        stage('Deploy to Nexus') {
+       /* stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy'
             }
@@ -54,5 +54,5 @@ pipeline {
                 '''
             }
         }
-    }
+    }*/
 }
