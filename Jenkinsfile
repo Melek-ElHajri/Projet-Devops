@@ -26,13 +26,13 @@ pipeline {
             }
         }
 
-        stage('Scan') {
-            steps {
-                withSonarQubeEnv('sq1') {
+       # stage('Scan') {
+           # steps {
+             #   withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
-                }
-            }
-        }
+               # }
+           # }
+       # }
           stage('Build Docker Image') {
             steps {
                 sh 'docker build -t rymasd29/tp-foyer:5.0.0 .' // Replace with your Docker Hub username
