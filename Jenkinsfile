@@ -13,12 +13,7 @@ pipeline {
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-        stage('Build JAR') {
-            steps {
-                sh 'mvn clean package'
-            }
-        }
-        
+               
         stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
