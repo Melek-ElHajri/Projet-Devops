@@ -53,7 +53,11 @@ pipeline {
             steps {
                 script {
                     // Run Docker Compose in detached mode
-                    sh 'sudo docker-compose up -d'
+                    sh '''
+                        sudo docker-compose down -v
+                        sudo docker-compose up -d
+                    '''
+                        
                 }
             }
         }
