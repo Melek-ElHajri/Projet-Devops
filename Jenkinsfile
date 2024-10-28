@@ -35,7 +35,7 @@ pipeline {
        // }
           stage('Build Docker Image') {
             steps {
-                sh 'docker build -t rymasd29/tp-foyer:5.0.0 .' // Replace with your Docker Hub username
+                sh ' sudo docker build -t rymasd29/tp-foyer:5.0.0 .' // Replace with your Docker Hub username
             }
         }
 
@@ -43,8 +43,8 @@ pipeline {
             steps {
                 // Hardcoded credentials
                 sh '''
-                    docker login -u rymasd29 -p 223JFT4309
-                    docker push rymasd29/tp-foyer:5.0.0
+                   sudo docker login -u rymasd29 -p 223JFT4309
+                   sudo docker push rymasd29/tp-foyer:5.0.0
                 '''
             }
         }
