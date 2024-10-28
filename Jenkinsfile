@@ -49,6 +49,15 @@ pipeline {
             }
         }
 
+         stage('Run Docker Compose') {
+            steps {
+                script {
+                    // Run Docker Compose in detached mode
+                    sh 'sudo docker-compose up -d'
+                }
+            }
+        }
+
       
     }
 }
