@@ -77,7 +77,7 @@ Jenkins Automation
                     sh 'mvn sonar:sonar'
                 }
             }
-        }*/
+        }
         
         stage('Build Docker Image') {
             steps {
@@ -104,13 +104,13 @@ Jenkins Automation
                 }
             }
         }
-    }
+    }*/
 
     post {
         always {
             script {
                 mail(
-                    to: "${EMAIL_RECIPIENTS}",
+                    to: "nouha.sedraoui@esprit.tn",
                     subject: "${POST_BUILD_SUBJECT}",
                     body: "${POST_BUILD_BODY}"
                 )
