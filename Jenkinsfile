@@ -44,7 +44,7 @@ Jenkins Automation
             steps {
                 script {
                     mail(
-                        to: "nouha.sedraoui@esprit.tn",
+                        to: "${EMAIL_RECIPIENTS}",
                         subject: "${PRE_BUILD_SUBJECT}",
                         body: "${PRE_BUILD_BODY}"
                     )
@@ -65,7 +65,7 @@ Jenkins Automation
             }
         }
         
-      /*  stage('Deploy to Nexus') {
+        /* stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
@@ -103,19 +103,18 @@ Jenkins Automation
                     ''' 
                 }
             }
-        }
-    }*/
+        } */
+    }
 
     post {
         always {
             script {
                 mail(
-                    to: "nouha.sedraoui@esprit.tn",
+                    to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
                     body: "${POST_BUILD_BODY}"
                 )
             }
         }
     }
-}
 }
