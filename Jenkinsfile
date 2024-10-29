@@ -24,8 +24,10 @@ pipeline {
                 sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
             }
         }
+
         stage('Deploy to Nexus') {
             steps {
+                // Deploy to Nexus repository
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
             }
         }
