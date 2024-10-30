@@ -32,7 +32,6 @@ We are sending this email as part of our security measures in compliance with in
 The automated build for ${JOB_NAME} has completed.
 
 Build Summary:
-- Build Triggered By: ${currentBuild.triggeredBy}
 - Start Time: ${new Date(currentBuild.startTime).format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 - Duration: ${currentBuild.durationString}
 - Build Status: ${currentBuild.result ?: 'SUCCESS'}
