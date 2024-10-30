@@ -27,11 +27,19 @@ Jenkins Automation
         POST_BUILD_BODY = """
 Hello Team,
 
+As part of our commitment to security management, we aim to provide you with a detailed report after each build. 
+
 The automated build for ${JOB_NAME} has completed.
 
-The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}. Its status is ${currentBuild.result ?: 'SUCCESS'}.
+The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}. 
+Its status is ${currentBuild.result == 'FAILURE' ? 'FAILURE' : 'SUCCESS'}.
 
-If the build was successful, the latest code changes have been compiled and deployed without issues. If it has failed, please review the console output for specific error messages and details regarding the failure.
+- Git Branch: ${env.GIT_BRANCH ?: 'N/A'}
+- Triggered By: ${env.BUILD_USER_ID ?: 'N/A'}
+
+${currentBuild.result == 'SUCCESS' ? 
+    'The latest code changes have been compiled and deployed successfully.' : 
+    'Please review the console output for specific error messages and details regarding the failure.'}
 
 Your attention to these details is appreciated, and if you have any questions or need further assistance, feel free to reach out.
 
@@ -52,10 +60,7 @@ Build Information:
 - Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 
 Failure Details:
-The build has failed due to the following reasons:
-- Please review the console output for specific error messages and details related to the failure. Common issues could include compilation errors, failed tests, or deployment issues.
-
-Your prompt attention to these issues is crucial, and if you require further assistance, please do not hesitate to reach out.
+- Please review the console output for specific error messages and details related to the failure. 
 
 Thank you,
 Jenkins Automation
@@ -112,8 +117,11 @@ Jenkins Automation
 
         stage('GIT') {
             steps {
-                git branch: 'NouhaSedraoui',
-                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+                script {
+                    // Checkout the code
+                    git branch: 'NouhaSedraoui',
+                        url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+                }
             }
         }
 
@@ -171,10 +179,13 @@ Jenkins Automation
     post {
         always {
             script {
+                // Update build user ID for triggered user
+                env.BUILD_USER_ID = currentBuild.getBuildCauses().collect { it.getUserId() }.find { it } ?: 'Unknown'
+
                 mail(
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
-                    body: "${POST_BUILD_BODY.replace('SUCCESS', currentBuild.result)}"
+                    body: "${POST_BUILD_BODY}"
                 )
             }
         }
