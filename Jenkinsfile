@@ -1,4 +1,4 @@
-pipeline { 
+pipeline {
     agent any
 
     tools {
@@ -55,9 +55,44 @@ Build Information:
 Thank you,
 Jenkins Automation
 """
+        ERROR_SUBJECT = "Jenkinsfile Error - ${JOB_NAME} #${BUILD_NUMBER}"
+        ERROR_BODY = """
+Hello Team,
+
+There was an error in the Jenkinsfile for the job ${JOB_NAME}.
+
+Build Information:
+- Job Name: ${JOB_NAME}
+- Job Number: ${BUILD_NUMBER}
+- Job URL: ${BUILD_URL}
+
+Please check the Jenkins logs for details.
+
+Thank you,
+Jenkins Automation
+"""
     }
 
     stages {
+        stage('Error Handling') {
+            steps {
+                script {
+                    try {
+                        // Placeholder for pipeline execution
+                        echo 'Pipeline execution begins...'
+                    } catch (Exception e) {
+                        // Send error email when there's an exception
+                        mail(
+                            to: "${EMAIL_RECIPIENTS}",
+                            subject: "${ERROR_SUBJECT}",
+                            body: "${ERROR_BODY}"
+                        )
+                        error("Pipeline aborted due to syntax error or exception: ${e}")
+                    }
+                }
+            }
+        }
+
         stage('Pre-Build Notification') {
             steps {
                 script {
@@ -89,6 +124,7 @@ Jenkins Automation
             }
         }
 
+        // Commented out the SonarQube stage
         // stage('Scan') {
         //     steps {
         //         withSonarQubeEnv('sq1') {
@@ -96,13 +132,15 @@ Jenkins Automation
         //         }
         //     }
         // }
-        
+
+        // Commented out the Docker image build stage
         // stage('Build Docker Image') {
         //     steps {
-        //         sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .' 
+        //         sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
         //     }
         // }
 
+        // Commented out the Docker image push stage
         // stage('Push Docker Image to DockerHub') {
         //     steps {
         //         sh '''
@@ -112,6 +150,7 @@ Jenkins Automation
         //     }
         // }
 
+        // Commented out the Docker Compose run stage
         // stage('Run Docker Compose') {
         //     steps {
         //         script {
