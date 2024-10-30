@@ -31,7 +31,21 @@ We are sending this email as part of our security measures in compliance with in
 
 The automated build for ${JOB_NAME} has completed.
 
-The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}. Its status is ${currentBuild.result ?: 'SUCCESS'}.
+Build Summary:
+- Build Triggered By: ${currentBuild.triggeredBy}
+- Start Time: ${new Date(currentBuild.startTime).format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
+- Duration: ${currentBuild.durationString}
+- Build Status: ${currentBuild.result ?: 'SUCCESS'}
+- Job URL: ${BUILD_URL}
+
+SCM Changes:
+${scmChanges()}
+
+Stage Status:
+${stageStatuses()}
+
+Console Output:
+${currentBuild.rawBuild.getLog(10).join('\n')}
 
 If the build was successful, the latest code changes have been compiled and deployed without issues. If it has failed, please review the console output for specific error messages and details regarding the failure.
 
@@ -56,7 +70,6 @@ Build Information:
 - Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 
 Failure Details:
-The build has failed due to the following reasons:
 - Please review the console output for specific error messages and details related to the failure. Common issues could include compilation errors, failed tests, or deployment issues.
 
 Your prompt attention to these issues is crucial, and if you require further assistance, please do not hesitate to reach out.
@@ -194,4 +207,25 @@ Jenkins Automation
             }
         }
     }
+}
+
+// Helper methods to get SCM changes and stage statuses
+def scmChanges() {
+    def changes = currentBuild.changeSets.collect { changeSet ->
+        changeSet.collect { entry ->
+            entry.items.collect { item ->
+                "- ${item.commitId}: ${item.msg} by ${item.author}"
+            }.join('\n')
+        }.join('\n')
+    }.join('\n')
+    return changes ?: 'No SCM changes detected.'
+}
+
+def stageStatuses() {
+    def statuses = currentBuild.rawBuild.getAllActions(hudson.model.Run).collect { runAction ->
+        runAction.getStageResults().collect { stage ->
+            "- ${stage.name}: ${stage.result ?: 'SUCCESS'}"
+        }.join('\n')
+    }.join('\n')
+    return statuses ?: 'No stage statuses available.'
 }
