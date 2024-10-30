@@ -27,21 +27,17 @@ Jenkins Automation
         POST_BUILD_BODY = """
 Hello Team,
 
-This email is sent to you as part of our security measures and to ensure compliance with our norms for communication.
-
 The automated build for ${JOB_NAME} has completed.
 
-The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}.
-Its status is ${currentBuild.result ?: 'SUCCESS'}.
+The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}. Its status is ${currentBuild.result ?: 'SUCCESS'}.
 
+If the build was successful, the latest code changes have been compiled and deployed without issues. If it has failed, please review the console output for specific error messages and details regarding the failure.
+
+Here are additional details regarding the build:
 - Git Branch: ${env.GIT_BRANCH ?: 'Not Specified'}
 - Triggered By: ${currentBuild.getBuildCauses()[0]?.getShortDescription() ?: 'Unknown'}
 
-${currentBuild.result == 'SUCCESS' ? 
-    'The build completed successfully. Your code changes have been compiled and deployed without issues.' : 
-    'Please review the console output for specific error messages and details regarding the failure.'}
-
-Your attention to these details is appreciated. If you have any questions or need further assistance, feel free to reach out.
+Your attention to these details is appreciated, and if you have any questions or need further assistance, feel free to reach out.
 
 Thank you,
 Jenkins Automation
@@ -60,7 +56,10 @@ Build Information:
 - Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 
 Failure Details:
-- Please review the console output for specific error messages and details related to the failure. 
+The build has failed due to the following reasons:
+- Please review the console output for specific error messages and details related to the failure. Common issues could include compilation errors, failed tests, or deployment issues.
+
+Your prompt attention to these issues is crucial, and if you require further assistance, please do not hesitate to reach out.
 
 Thank you,
 Jenkins Automation
@@ -93,9 +92,9 @@ Jenkins Automation
                     } catch (Exception e) {
                         // Send error email when there's an exception
                         mail(
-                            to: EMAIL_RECIPIENTS,
-                            subject: ERROR_SUBJECT,
-                            body: ERROR_BODY
+                            to: "${EMAIL_RECIPIENTS}",
+                            subject: "${ERROR_SUBJECT}",
+                            body: "${ERROR_BODY}"
                         )
                         error("Pipeline aborted due to syntax error or exception: ${e}")
                     }
@@ -107,9 +106,9 @@ Jenkins Automation
             steps {
                 script {
                     mail(
-                        to: EMAIL_RECIPIENTS,
-                        subject: PRE_BUILD_SUBJECT,
-                        body: PRE_BUILD_BODY
+                        to: "${EMAIL_RECIPIENTS}",
+                        subject: "${PRE_BUILD_SUBJECT}",
+                        body: "${PRE_BUILD_BODY}"
                     )
                 }
             }
@@ -134,7 +133,7 @@ Jenkins Automation
             }
         }
 
-        // Uncomment to enable SonarQube scan
+        // Commented out the SonarQube stage
         // stage('Scan') {
         //     steps {
         //         withSonarQubeEnv('sq1') {
@@ -143,24 +142,24 @@ Jenkins Automation
         //     }
         // }
 
-        // Uncomment to enable Docker image build
+        // Commented out the Docker image build stage
         // stage('Build Docker Image') {
         //     steps {
         //         sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
         //     }
         // }
 
-        // Uncomment to enable Docker image push
+        // Commented out the Docker image push stage
         // stage('Push Docker Image to DockerHub') {
         //     steps {
         //         sh '''
-        //             sudo docker login -u rymasd29 -p 223JFT4309
-        //             sudo docker push rymasd29/tp-foyer:5.0.0
+        //            sudo docker login -u rymasd29 -p 223JFT4309
+        //            sudo docker push rymasd29/tp-foyer:5.0.0
         //         '''
         //     }
         // }
 
-        // Uncomment to enable Docker Compose run
+        // Commented out the Docker Compose run stage
         // stage('Run Docker Compose') {
         //     steps {
         //         script {
@@ -177,18 +176,18 @@ Jenkins Automation
         always {
             script {
                 mail(
-                    to: EMAIL_RECIPIENTS,
-                    subject: POST_BUILD_SUBJECT,
-                    body: POST_BUILD_BODY
+                    to: "${EMAIL_RECIPIENTS}",
+                    subject: "${POST_BUILD_SUBJECT}",
+                    body: "${POST_BUILD_BODY.replace('SUCCESS', currentBuild.result)}"
                 )
             }
         }
         failure {
             script {
                 mail(
-                    to: EMAIL_RECIPIENTS,
-                    subject: FAILURE_SUBJECT,
-                    body: FAILURE_BODY
+                    to: "${EMAIL_RECIPIENTS}",
+                    subject: "${FAILURE_SUBJECT}",
+                    body: "${FAILURE_BODY}"
                 )
             }
         }
