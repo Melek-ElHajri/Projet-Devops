@@ -29,17 +29,9 @@ Hello Team,
 
 The automated build for ${JOB_NAME} has completed.
 
-Build Information:
-- Job Name: ${JOB_NAME}
-- Job Status: ${currentBuild.result ?: 'SUCCESS'}
-- Job Number: ${BUILD_NUMBER}
-- Job URL: ${BUILD_URL}
-- Completion Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
+The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}. Its status is ${currentBuild.result ?: 'SUCCESS'}.
 
-Build Summary:
-The build has finished processing, and the following points are noteworthy:
-- If the build was successful, the latest code changes have been compiled and deployed without issues.
-- If the build has failed, please review the console output for specific error messages and details regarding the failure. 
+If the build was successful, the latest code changes have been compiled and deployed without issues. If it has failed, please review the console output for specific error messages and details regarding the failure.
 
 Your attention to these details is appreciated, and if you have any questions or need further assistance, feel free to reach out.
 
@@ -54,7 +46,7 @@ The automated build for ${JOB_NAME} encountered a failure.
 
 Build Information:
 - Job Name: ${JOB_NAME}
-- Job Status: FAILURE
+- Build Status: FAILURE
 - Job Number: ${BUILD_NUMBER}
 - Job URL: ${BUILD_URL}
 - Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
