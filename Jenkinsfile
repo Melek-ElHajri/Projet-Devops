@@ -62,7 +62,7 @@ Jenkins Automation
             steps {
                 script {
                     mail(
-                        to: "${EMAIL_RECIPIENTS}",
+                        to: nouha.sedraoui@esprit.tn,
                         subject: "${PRE_BUILD_SUBJECT}",
                         body: "${PRE_BUILD_BODY}"
                     )
@@ -128,7 +128,7 @@ Jenkins Automation
         always {
             script {
                 mail(
-                    to: "${EMAIL_RECIPIENTS}",
+                    to: nouha.sedraoui@esprit.tn,
                     subject: "${POST_BUILD_SUBJECT}",
                     body: "${POST_BUILD_BODY}"
                 )
@@ -137,7 +137,7 @@ Jenkins Automation
         failure {
             script {
                 mail(
-                    to: "${EMAIL_RECIPIENTS}",
+                    to: "nouha.sedraoui@esprit.tn",
                     subject: "${FAILURE_SUBJECT}",
                     body: "${FAILURE_BODY}"
                 )
