@@ -13,24 +13,25 @@ pipeline {
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-        
+
         stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
             }
         }
-         stage('Deploy to Nexus') {  
+
+        stage('Deploy to Nexus') {  
             steps {
                 sh 'mvn deploy'
             }
         }
-       stage('Scan') {
+
+        stage('Scan') {
             steps {
                 withSonarQubeEnv('rim-sonarqube') {
                     sh 'mvn sonar:sonar'
                 }
             }
-
-        
+        }
     }
 }
