@@ -28,8 +28,8 @@ pipeline {
 
         stage('Scan') {
             steps {
-               withCredentials([string(credentialsId: 'sq1', variable: 'SONAR_TOKEN')]) {
-                    sh "mvn sonar:sonar -Dsonar.projectKey=Projet-Devops -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN"
+              withSonarQubeEnv('sq1') {
+                    sh 'mvn sonar:sonar'
                 }
             }
         }
