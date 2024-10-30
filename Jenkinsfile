@@ -36,6 +36,8 @@ Build Information:
 - Job URL: ${BUILD_URL}
 - Completion Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 
+Please check the Jenkins logs for details regarding the build process. If you have any questions or require further assistance, feel free to reach out.
+
 Thank you,
 Jenkins Automation
 """
@@ -47,10 +49,13 @@ The automated build for ${JOB_NAME} encountered a failure.
 
 Build Information:
 - Job Name: ${JOB_NAME}
-- Build Status: ${currentBuild.result ?: 'FAILURE'}
+- Build Status: FAILURE
 - Job Number: ${BUILD_NUMBER}
 - Job URL: ${BUILD_URL}
 - Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
+
+Failure Details:
+- Please review the console output for specific error messages and details related to the failure. 
 
 Thank you,
 Jenkins Automation
