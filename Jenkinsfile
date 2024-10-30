@@ -93,9 +93,9 @@ Jenkins Automation
                     } catch (Exception e) {
                         // Send error email when there's an exception
                         mail(
-                            to: "${EMAIL_RECIPIENTS}",
-                            subject: "${ERROR_SUBJECT}",
-                            body: "${ERROR_BODY}"
+                            to: EMAIL_RECIPIENTS,
+                            subject: ERROR_SUBJECT,
+                            body: ERROR_BODY
                         )
                         error("Pipeline aborted due to syntax error or exception: ${e}")
                     }
@@ -107,9 +107,9 @@ Jenkins Automation
             steps {
                 script {
                     mail(
-                        to: "${EMAIL_RECIPIENTS}",
-                        subject: "${PRE_BUILD_SUBJECT}",
-                        body: "${PRE_BUILD_BODY}"
+                        to: EMAIL_RECIPIENTS,
+                        subject: PRE_BUILD_SUBJECT,
+                        body: PRE_BUILD_BODY
                     )
                 }
             }
@@ -134,7 +134,7 @@ Jenkins Automation
             }
         }
 
-        // Commented out the SonarQube stage
+        // Uncomment to enable SonarQube scan
         // stage('Scan') {
         //     steps {
         //         withSonarQubeEnv('sq1') {
@@ -143,24 +143,24 @@ Jenkins Automation
         //     }
         // }
 
-        // Commented out the Docker image build stage
+        // Uncomment to enable Docker image build
         // stage('Build Docker Image') {
         //     steps {
         //         sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
         //     }
         // }
 
-        // Commented out the Docker image push stage
+        // Uncomment to enable Docker image push
         // stage('Push Docker Image to DockerHub') {
         //     steps {
         //         sh '''
-        //            sudo docker login -u rymasd29 -p 223JFT4309
-        //            sudo docker push rymasd29/tp-foyer:5.0.0
+        //             sudo docker login -u rymasd29 -p 223JFT4309
+        //             sudo docker push rymasd29/tp-foyer:5.0.0
         //         '''
         //     }
         // }
 
-        // Commented out the Docker Compose run stage
+        // Uncomment to enable Docker Compose run
         // stage('Run Docker Compose') {
         //     steps {
         //         script {
@@ -177,21 +177,20 @@ Jenkins Automation
         always {
             script {
                 mail(
-                    to: "${EMAIL_RECIPIENTS}",
-                    subject: "${POST_BUILD_SUBJECT}",
-                    body: "${POST_BUILD_BODY}"
+                    to: EMAIL_RECIPIENTS,
+                    subject: POST_BUILD_SUBJECT,
+                    body: POST_BUILD_BODY
                 )
             }
         }
         failure {
             script {
                 mail(
-                    to: "${EMAIL_RECIPIENTS}",
-                    subject: "${FAILURE_SUBJECT}",
-                    body: "${FAILURE_BODY}"
+                    to: EMAIL_RECIPIENTS,
+                    subject: FAILURE_SUBJECT,
+                    body: FAILURE_BODY
                 )
             }
         }
     }
 }
-
