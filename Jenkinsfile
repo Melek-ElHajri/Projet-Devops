@@ -24,11 +24,10 @@ pipeline {
                 sh 'mvn deploy'
             }
         }
-        stage('Scan') {
+      stage('Scan') {
             steps {
-                 withCredentials([string(credentialsId: 'rim-sonarqube', variable: 'SONAR_TOKEN')]) {
-                    sh "mvn sonar:sonar -Dsonar.projectKey=JenkinsFile -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN
-                }
+                withSonarQubeEnv('rim-sonarqube') {
+                    sh 'mvn sonar:sonar'
             }
         }
 
