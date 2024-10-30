@@ -38,6 +38,24 @@ Your vigilance in monitoring these updates is essential for our continuous impro
 Thank you for your collaboration,
 Jenkins Automation
 """
+        SUCCESS_SUBJECT = "Build Success - ${JOB_NAME} #${BUILD_NUMBER}"
+        SUCCESS_BODY = """
+Hello Team,
+
+We are pleased to inform you that the automated build for ${JOB_NAME} has completed successfully.
+
+Build Information:
+- Job Name: ${JOB_NAME}
+- Build Status: SUCCESS
+- Job Number: ${BUILD_NUMBER}
+- Job URL: ${BUILD_URL}
+- Completion Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
+
+Thank you for your collaboration, and let's continue to maintain high standards in our projects.
+
+Best regards,
+Jenkins Automation
+"""
         FAILURE_SUBJECT = "Build Failure - ${JOB_NAME} #${BUILD_NUMBER}"
         FAILURE_BODY = """
 Hello Team,
@@ -125,11 +143,25 @@ Jenkins Automation
             }
         }
 
-       // stage('Deploy to Nexus') {
-         //   steps {
-           //     sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
-           // }
-        //}
+        stage('Deploy to Nexus') {
+            steps {
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
+            }
+        }
+
+        stage('Success Notification') {  // Add this new stage
+            steps {
+                script {
+                    if (currentBuild.result == 'SUCCESS') {
+                        mail(
+                            to: "${EMAIL_RECIPIENTS}",
+                            subject: "${SUCCESS_SUBJECT}",
+                            body: "${SUCCESS_BODY}"
+                        )
+                    }
+                }
+            }
+        }
 
         // Commented out the SonarQube stage
         // stage('Scan') {
