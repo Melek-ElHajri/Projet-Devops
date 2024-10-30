@@ -27,39 +27,22 @@ Jenkins Automation
         POST_BUILD_BODY = """
 Hello Team,
 
-We are sending this email as part of our security measures in compliance with industry standards.
+We are committed to maintaining high standards of security throughout our development processes. As part of this commitment, we are sending you this email to keep you informed of the build activities associated with ${JOB_NAME}. 
 
-The automated build for ${JOB_NAME} has completed.
+The automated build for ${JOB_NAME} has completed, commencing at ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}. Its current status is ${currentBuild.result ?: 'SUCCESS'}.
 
-Build Summary:
-- Start Time: ${new Date(currentBuild.startTime).format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
-- Duration: ${currentBuild.durationString}
-- Build Status: ${currentBuild.result ?: 'SUCCESS'}
-- Job URL: ${BUILD_URL}
+If the build was successful, the latest code changes have been compiled and deployed without issues. However, in the event of a failure, please review the console output for specific error messages and details regarding the cause.
 
-SCM Changes:
-${scmChanges()}
+Your vigilance in monitoring these updates is essential for our continuous improvement and security compliance. Should you have any questions or require further assistance, feel free to reach out.
 
-Stage Status:
-${stageStatuses()}
-
-Console Output:
-${currentBuild.rawBuild.getLog(10).join('\n')}
-
-If the build was successful, the latest code changes have been compiled and deployed without issues. If it has failed, please review the console output for specific error messages and details regarding the failure.
-
-Your attention to these details is appreciated, and if you have any questions or need further assistance, feel free to reach out.
-
-Thank you,
+Thank you for your collaboration,
 Jenkins Automation
 """
         FAILURE_SUBJECT = "Build Failure - ${JOB_NAME} #${BUILD_NUMBER}"
         FAILURE_BODY = """
 Hello Team,
 
-We are sending this email as part of our security measures in compliance with industry standards.
-
-The automated build for ${JOB_NAME} encountered a failure.
+In our ongoing effort to uphold security measures in compliance with industry standards, we are notifying you of a failure in the automated build for ${JOB_NAME}.
 
 Build Information:
 - Job Name: ${JOB_NAME}
@@ -69,9 +52,10 @@ Build Information:
 - Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 
 Failure Details:
-- Please review the console output for specific error messages and details related to the failure. Common issues could include compilation errors, failed tests, or deployment issues.
+The build has failed due to the following reasons:
+- Please review the console output for specific error messages and details related to the failure. Common issues could include compilation errors, failed tests, or deployment problems.
 
-Your prompt attention to these issues is crucial, and if you require further assistance, please do not hesitate to reach out.
+We appreciate your prompt attention to these issues, as your engagement is crucial for maintaining the quality and security of our projects. If you require further assistance, please do not hesitate to reach out.
 
 Thank you,
 Jenkins Automation
@@ -80,18 +64,18 @@ Jenkins Automation
         ERROR_BODY = """
 Hello Team,
 
-We are sending this email as part of our security measures in compliance with industry standards.
+This email is part of our commitment to security compliance. 
 
-There was an error in the Jenkinsfile for the job ${JOB_NAME}.
+An error has occurred in the Jenkinsfile for the job ${JOB_NAME}.
 
 Build Information:
 - Job Name: ${JOB_NAME}
 - Job Number: ${BUILD_NUMBER}
 - Job URL: ${BUILD_URL}
 
-Please check the Jenkins logs for details.
+We urge you to check the Jenkins logs for detailed information about this issue.
 
-Thank you,
+Thank you for your attention,
 Jenkins Automation
 """
     }
@@ -206,25 +190,4 @@ Jenkins Automation
             }
         }
     }
-}
-
-// Helper methods to get SCM changes and stage statuses
-def scmChanges() {
-    def changes = currentBuild.changeSets.collect { changeSet ->
-        changeSet.collect { entry ->
-            entry.items.collect { item ->
-                "- ${item.commitId}: ${item.msg} by ${item.author}"
-            }.join('\n')
-        }.join('\n')
-    }.join('\n')
-    return changes ?: 'No SCM changes detected.'
-}
-
-def stageStatuses() {
-    def statuses = currentBuild.rawBuild.getAllActions(hudson.model.Run).collect { runAction ->
-        runAction.getStageResults().collect { stage ->
-            "- ${stage.name}: ${stage.result ?: 'SUCCESS'}"
-        }.join('\n')
-    }.join('\n')
-    return statuses ?: 'No stage statuses available.'
 }
