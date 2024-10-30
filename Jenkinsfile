@@ -9,24 +9,24 @@ pipeline {
     stages {
         stage('GIT') {
             steps {
-                git branch: 'nourhene-chammakhi',
+                git branch: 'Gabsi-Rim',
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
         
-        stage('Compile Stage') {   // Move the compile stage before the scan
+        stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
             }
         }
-         stage('Deploy to Nexus') {  // Add the deployment stage
+         stage('Deploy to Nexus') {  
             steps {
                 sh 'mvn deploy'
             }
         }
         stage('Scan') {
             steps {
-                withSonarQubeEnv('sq1') {
+                withSonarQubeEnv('rim-sonarqube') {
                     // Add sonar.java.binaries property to point to compiled classes
                     sh 'mvn sonar:sonar'
                 }
