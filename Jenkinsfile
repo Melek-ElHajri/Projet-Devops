@@ -182,6 +182,7 @@ Jenkins Automation
                 // Update build user ID for triggered user
                 env.BUILD_USER_ID = currentBuild.getBuildCauses().collect { it.getUserId() }.find { it } ?: 'Unknown'
 
+                echo "Sending build report email..."
                 mail(
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
@@ -191,6 +192,7 @@ Jenkins Automation
         }
         failure {
             script {
+                echo "Sending failure email..."
                 mail(
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "${FAILURE_SUBJECT}",
