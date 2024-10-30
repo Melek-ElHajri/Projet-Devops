@@ -19,16 +19,17 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
-
-        stage('Deploy to Nexus') {  
+// Uncomment these stages as needed
+        /*
+        stage('Deploy to Nexus') {
             steps {
-                sh 'mvn deploy'
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
-
+        
         stage('Scan') {
             steps {
-              withSonarQubeEnv('sq1') {
+                withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
                 }
             }
