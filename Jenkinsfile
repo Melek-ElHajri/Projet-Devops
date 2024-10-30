@@ -103,10 +103,8 @@ Jenkins Automation
             steps {
                 script {
                     try {
-                        // Placeholder for pipeline execution
                         echo 'Pipeline execution begins...'
                     } catch (Exception e) {
-                        // Send error email when there's an exception
                         mail(
                             to: "${EMAIL_RECIPIENTS}",
                             subject: "${ERROR_SUBJECT}",
@@ -143,12 +141,26 @@ Jenkins Automation
             }
         }
 
-      //  stage('Deploy to Nexus') {
-        //    steps {
-          //      sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
-            //}
-       // }
-   // }
+        stage('Deploy to Nexus') {
+            steps {
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
+            }
+        }
+
+        stage('Success Notification') {
+            steps {
+                script {
+                    if (currentBuild.result == 'SUCCESS') {
+                        mail(
+                            to: "${EMAIL_RECIPIENTS}",
+                            subject: "${SUCCESS_SUBJECT}",
+                            body: "${SUCCESS_BODY}"
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     post {
         always {
@@ -160,7 +172,7 @@ Jenkins Automation
                 )
             }
         }
-        success {  // This section will only execute if the build is successful
+        success {
             script {
                 mail(
                     to: "${EMAIL_RECIPIENTS}",
