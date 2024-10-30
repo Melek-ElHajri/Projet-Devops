@@ -31,7 +31,7 @@ The automated build for ${JOB_NAME} has completed.
 
 Build Information:
 - Job Name: ${JOB_NAME}
-- Build Status: ${currentBuild.currentResult}
+- Build Status: ${currentBuild.result ?: 'SUCCESS'}
 - Job Number: ${BUILD_NUMBER}
 - Job URL: ${BUILD_URL}
 - Completion Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
@@ -47,7 +47,7 @@ The automated build for ${JOB_NAME} encountered a failure.
 
 Build Information:
 - Job Name: ${JOB_NAME}
-- Build Status: ${currentBuild.currentResult}
+- Build Status: ${currentBuild.result ?: 'FAILURE'}
 - Job Number: ${BUILD_NUMBER}
 - Job URL: ${BUILD_URL}
 - Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
