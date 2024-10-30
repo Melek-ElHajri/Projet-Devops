@@ -24,12 +24,12 @@ pipeline {
                 sh 'mvn deploy'
             }
         }
-      stage('Scan') {
+       stage('Scan') {
             steps {
                 withSonarQubeEnv('rim-sonarqube') {
                     sh 'mvn sonar:sonar'
+                }
             }
-        }
 
         
     }
