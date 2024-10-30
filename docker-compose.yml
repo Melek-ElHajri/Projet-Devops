@@ -13,7 +13,7 @@ services:
       - db:/var/lib/mysql
 
   app-tpfoyer:
-    image: rymasd29/tp-foyer:5.0.0
+    image: nourhenenc/tp-foyer:5.0.0
     depends_on:
       - mysqldb
     restart: on-failure
