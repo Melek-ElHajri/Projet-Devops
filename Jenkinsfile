@@ -33,7 +33,7 @@ The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTime
 
 If the build was successful, the latest code changes have been compiled and deployed without issues. If it has failed, please review the console output for specific error messages and details regarding the failure.
 
-**Your attention to these details is crucial, and if you have any questions or need further assistance, please do not hesitate to reach out.**
+Your attention to these details is appreciated, and if you have any questions or need further assistance, feel free to reach out.
 
 Thank you,
 Jenkins Automation
