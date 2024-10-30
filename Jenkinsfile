@@ -18,6 +18,7 @@ Build Information:
 - Job Name: ${JOB_NAME}
 - Build Number: #${BUILD_NUMBER}
 - Build URL: ${BUILD_URL}
+- Start Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 
 Thank you,
 Jenkins Automation
@@ -33,6 +34,23 @@ Build Information:
 - Build Status: ${currentBuild.currentResult}
 - Job Number: ${BUILD_NUMBER}
 - Job URL: ${BUILD_URL}
+- Completion Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
+
+Thank you,
+Jenkins Automation
+"""
+        FAILURE_SUBJECT = "Build Failure - ${JOB_NAME} #${BUILD_NUMBER}"
+        FAILURE_BODY = """
+Hello Team,
+
+The automated build for ${JOB_NAME} encountered a failure.
+
+Build Information:
+- Job Name: ${JOB_NAME}
+- Build Status: ${currentBuild.currentResult}
+- Job Number: ${BUILD_NUMBER}
+- Job URL: ${BUILD_URL}
+- Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 
 Thank you,
 Jenkins Automation
@@ -65,45 +83,45 @@ Jenkins Automation
             }
         }
         
-        /* stage('Deploy to Nexus') {
-            steps {
-                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
-            }
-        }
+        // stage('Deploy to Nexus') {
+        //     steps {
+        //         sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
+        //     }
+        // }
 
-        stage('Scan') {
-            steps {
-                withSonarQubeEnv('sq1') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
+        // stage('Scan') {
+        //     steps {
+        //         withSonarQubeEnv('sq1') {
+        //             sh 'mvn sonar:sonar'
+        //         }
+        //     }
+        // }
         
-        stage('Build Docker Image') {
-            steps {
-                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .' 
-            }
-        }
+        // stage('Build Docker Image') {
+        //     steps {
+        //         sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .' 
+        //     }
+        // }
 
-        stage('Push Docker Image to DockerHub') {
-            steps {
-                sh '''
-                   sudo docker login -u rymasd29 -p 223JFT4309
-                   sudo docker push rymasd29/tp-foyer:5.0.0
-                '''
-            }
-        }
+        // stage('Push Docker Image to DockerHub') {
+        //     steps {
+        //         sh '''
+        //            sudo docker login -u rymasd29 -p 223JFT4309
+        //            sudo docker push rymasd29/tp-foyer:5.0.0
+        //         '''
+        //     }
+        // }
 
-        stage('Run Docker Compose') {
-            steps {
-                script {
-                    sh '''
-                        sudo docker-compose down -v
-                        sudo docker-compose up -d
-                    ''' 
-                }
-            }
-        } */
+        // stage('Run Docker Compose') {
+        //     steps {
+        //         script {
+        //             sh '''
+        //                 sudo docker-compose down -v
+        //                 sudo docker-compose up -d
+        //             ''' 
+        //         }
+        //     }
+        // }
     }
 
     post {
@@ -113,6 +131,15 @@ Jenkins Automation
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
                     body: "${POST_BUILD_BODY}"
+                )
+            }
+        }
+        failure {
+            script {
+                mail(
+                    to: "${EMAIL_RECIPIENTS}",
+                    subject: "${FAILURE_SUBJECT}",
+                    body: "${FAILURE_BODY}"
                 )
             }
         }
