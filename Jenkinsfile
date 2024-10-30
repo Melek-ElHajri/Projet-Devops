@@ -143,63 +143,11 @@ Jenkins Automation
             }
         }
 
-       // stage('Deploy to Nexus') {
-        //    steps {
-        //        sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
-        //    }
-      //  }
-
-        stage('Success Notification') {  // Add this new stage
+        stage('Deploy to Nexus') {
             steps {
-                script {
-                    if (currentBuild.result == 'SUCCESS') {
-                        mail(
-                            to: "${EMAIL_RECIPIENTS}",
-                            subject: "${SUCCESS_SUBJECT}",
-                            body: "${SUCCESS_BODY}"
-                        )
-                    }
-                }
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
-
-        // Commented out the SonarQube stage
-        // stage('Scan') {
-        //     steps {
-        //         withSonarQubeEnv('sq1') {
-        //             sh 'mvn sonar:sonar'
-        //         }
-        //     }
-        // }
-
-        // Commented out the Docker image build stage
-        // stage('Build Docker Image') {
-        //     steps {
-        //         sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
-        //     }
-        // }
-
-        // Commented out the Docker image push stage
-        // stage('Push Docker Image to DockerHub') {
-        //     steps {
-        //         sh '''
-        //            sudo docker login -u rymasd29 -p 223JFT4309
-        //            sudo docker push rymasd29/tp-foyer:5.0.0
-        //         '''
-        //     }
-        // }
-
-        // Commented out the Docker Compose run stage
-        // stage('Run Docker Compose') {
-        //     steps {
-        //         script {
-        //             sh '''
-        //                 sudo docker-compose down -v
-        //                 sudo docker-compose up -d
-        //             ''' 
-        //         }
-        //     }
-        // }
     }
 
     post {
@@ -209,6 +157,15 @@ Jenkins Automation
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
                     body: "${POST_BUILD_BODY.replace('SUCCESS', currentBuild.result)}"
+                )
+            }
+        }
+        success {  // This section will only execute if the build is successful
+            script {
+                mail(
+                    to: "${EMAIL_RECIPIENTS}",
+                    subject: "${SUCCESS_SUBJECT}",
+                    body: "${SUCCESS_BODY}"
                 )
             }
         }
