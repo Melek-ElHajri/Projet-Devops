@@ -62,7 +62,7 @@ Jenkins Automation
             steps {
                 script {
                     mail(
-                        to: nouha.sedraoui@esprit.tn,
+                        to: "${EMAIL_RECIPIENTS}",
                         subject: "${PRE_BUILD_SUBJECT}",
                         body: "${PRE_BUILD_BODY}"
                     )
@@ -76,18 +76,18 @@ Jenkins Automation
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-               
+
         stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
             }
         }
-        
-         stage('Deploy to Nexus') {
-             steps {
-                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
-             }
-         }
+
+        stage('Deploy to Nexus') {
+            steps {
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
+            }
+        }
 
         // stage('Scan') {
         //     steps {
@@ -128,7 +128,7 @@ Jenkins Automation
         always {
             script {
                 mail(
-                    to: nouha.sedraoui@esprit.tn,
+                    to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
                     body: "${POST_BUILD_BODY}"
                 )
@@ -137,7 +137,7 @@ Jenkins Automation
         failure {
             script {
                 mail(
-                    to: "nouha.sedraoui@esprit.tn",
+                    to: "${EMAIL_RECIPIENTS}",
                     subject: "${FAILURE_SUBJECT}",
                     body: "${FAILURE_BODY}"
                 )
