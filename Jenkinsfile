@@ -29,14 +29,11 @@ Hello Team,
 
 The automated build for ${JOB_NAME} has completed.
 
-Build Information:
-- Job Name: ${JOB_NAME}
-- Build Status: ${currentBuild.result ?: 'SUCCESS'}
-- Job Number: ${BUILD_NUMBER}
-- Job URL: ${BUILD_URL}
-- Completion Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
+The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}. Its status is ${currentBuild.result ?: 'SUCCESS'}.
 
-Please check the Jenkins logs for details regarding the build process. If you have any questions or require further assistance, feel free to reach out.
+If the build was successful, the latest code changes have been compiled and deployed without issues. If it has failed, please review the console output for specific error messages and details regarding the failure.
+
+Your attention to these details is appreciated, and if you have any questions or need further assistance, feel free to reach out.
 
 Thank you,
 Jenkins Automation
@@ -55,7 +52,10 @@ Build Information:
 - Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 
 Failure Details:
-- Please review the console output for specific error messages and details related to the failure. 
+The build has failed due to the following reasons:
+- Please review the console output for specific error messages and details related to the failure. Common issues could include compilation errors, failed tests, or deployment issues.
+
+Your prompt attention to these issues is crucial, and if you require further assistance, please do not hesitate to reach out.
 
 Thank you,
 Jenkins Automation
@@ -174,7 +174,7 @@ Jenkins Automation
                 mail(
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
-                    body: "${POST_BUILD_BODY}"
+                    body: "${POST_BUILD_BODY.replace('SUCCESS', currentBuild.result)}"
                 )
             }
         }
