@@ -24,38 +24,26 @@ Thank you,
 Jenkins Automation
 """
         POST_BUILD_SUBJECT = "Build Report - ${JOB_NAME} #${BUILD_NUMBER}"
-        POST_BUILD_BODY_SUCCESS = """
+        POST_BUILD_BODY = """
 Hello Team,
 
-The automated build for ${JOB_NAME} has completed successfully.
+This email is sent to you as part of our security measures and to ensure compliance with our norms for communication.
+
+The automated build for ${JOB_NAME} has completed.
 
 The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}.
-Its status is SUCCESS.
+Its status is ${currentBuild.result ?: 'SUCCESS'}.
 
-- Git Branch: ${env.GIT_BRANCH ?: 'Unknown'}
-- Triggered By: ${env.BUILD_USER_ID ?: 'Unknown'}
+- Git Branch: ${env.GIT_BRANCH ?: 'Not Specified'}
+- Triggered By: ${currentBuild.getBuildCauses()[0]?.getShortDescription() ?: 'Unknown'}
 
-Thank you for your attention, and if you have any questions or need further assistance, feel free to reach out.
+${currentBuild.result == 'SUCCESS' ? 
+    'The build completed successfully. Your code changes have been compiled and deployed without issues.' : 
+    'Please review the console output for specific error messages and details regarding the failure.'}
 
-Best regards,
-Jenkins Automation
-"""
-        POST_BUILD_BODY_FAILURE = """
-Hello Team,
+Your attention to these details is appreciated. If you have any questions or need further assistance, feel free to reach out.
 
-The automated build for ${JOB_NAME} has encountered a failure.
-
-The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}.
-Its status is FAILURE.
-
-- Git Branch: ${env.GIT_BRANCH ?: 'Unknown'}
-- Triggered By: ${env.BUILD_USER_ID ?: 'Unknown'}
-
-Please review the console output for specific error messages and details regarding the failure.
-
-Your attention to these details is appreciated, and if you have any questions or need further assistance, feel free to reach out.
-
-Best regards,
+Thank you,
 Jenkins Automation
 """
         FAILURE_SUBJECT = "Build Failure - ${JOB_NAME} #${BUILD_NUMBER}"
@@ -100,8 +88,10 @@ Jenkins Automation
             steps {
                 script {
                     try {
+                        // Placeholder for pipeline execution
                         echo 'Pipeline execution begins...'
                     } catch (Exception e) {
+                        // Send error email when there's an exception
                         mail(
                             to: "${EMAIL_RECIPIENTS}",
                             subject: "${ERROR_SUBJECT}",
@@ -144,18 +134,52 @@ Jenkins Automation
             }
         }
 
-        // Add your other stages as necessary
+        // Commented out the SonarQube stage
+        // stage('Scan') {
+        //     steps {
+        //         withSonarQubeEnv('sq1') {
+        //             sh 'mvn sonar:sonar'
+        //         }
+        //     }
+        // }
+
+        // Commented out the Docker image build stage
+        // stage('Build Docker Image') {
+        //     steps {
+        //         sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
+        //     }
+        // }
+
+        // Commented out the Docker image push stage
+        // stage('Push Docker Image to DockerHub') {
+        //     steps {
+        //         sh '''
+        //            sudo docker login -u rymasd29 -p 223JFT4309
+        //            sudo docker push rymasd29/tp-foyer:5.0.0
+        //         '''
+        //     }
+        // }
+
+        // Commented out the Docker Compose run stage
+        // stage('Run Docker Compose') {
+        //     steps {
+        //         script {
+        //             sh '''
+        //                 sudo docker-compose down -v
+        //                 sudo docker-compose up -d
+        //             ''' 
+        //         }
+        //     }
+        // }
     }
 
     post {
         always {
             script {
-                // Prepare the email body based on the build status
-                def emailBody = currentBuild.result == 'SUCCESS' ? POST_BUILD_BODY_SUCCESS : POST_BUILD_BODY_FAILURE
                 mail(
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
-                    body: emailBody
+                    body: "${POST_BUILD_BODY}"
                 )
             }
         }
