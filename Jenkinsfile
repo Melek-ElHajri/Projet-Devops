@@ -27,6 +27,8 @@ Jenkins Automation
         POST_BUILD_BODY = """
 Hello Team,
 
+We are sending this email as part of our security measures in compliance with industry standards.
+
 The automated build for ${JOB_NAME} has completed.
 
 The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}. Its status is ${currentBuild.result ?: 'SUCCESS'}.
@@ -41,6 +43,8 @@ Jenkins Automation
         FAILURE_SUBJECT = "Build Failure - ${JOB_NAME} #${BUILD_NUMBER}"
         FAILURE_BODY = """
 Hello Team,
+
+We are sending this email as part of our security measures in compliance with industry standards.
 
 The automated build for ${JOB_NAME} encountered a failure.
 
@@ -63,6 +67,8 @@ Jenkins Automation
         ERROR_SUBJECT = "Jenkinsfile Error - ${JOB_NAME} #${BUILD_NUMBER}"
         ERROR_BODY = """
 Hello Team,
+
+We are sending this email as part of our security measures in compliance with industry standards.
 
 There was an error in the Jenkinsfile for the job ${JOB_NAME}.
 
