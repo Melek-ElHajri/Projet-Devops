@@ -83,11 +83,11 @@ Jenkins Automation
             }
         }
         
-        // stage('Deploy to Nexus') {
-        //     steps {
-        //         sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
-        //     }
-        // }
+         stage('Deploy to Nexus') {
+             steps {
+                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
+             }
+         }
 
         // stage('Scan') {
         //     steps {
