@@ -33,14 +33,14 @@ pipeline {
         }
          stage("Generate Docker Image") {
             steps {
-                sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
+                sh 'docker build -t nourhenenc/timesheet-devops:1.0.0 .'
             }
         }
 
         stage("Push Docker Image") {
             steps {
-                sh "echo ${dockerhub_token} | docker login -u m2l2k --password-stdin" 
-                sh "docker push m2l2k/tp-foyer:5.0.0"
+                sh "echo ${dockerhub_token} | docker login -u nourhenenc --password-stdin" 
+                sh "docker push nourhenenc/timesheet-devops:1.0.0"
             }
         }
 
