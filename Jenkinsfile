@@ -93,7 +93,7 @@ Jenkins Automation
                     } catch (Exception e) {
                         // Send error email when there's an exception
                         mail(
-                            to: "${EMAIL_RECIPIENTS}",
+                            to: EMAIL_RECIPIENTS,
                             subject: ERROR_SUBJECT,
                             body: ERROR_BODY
                         )
@@ -107,7 +107,7 @@ Jenkins Automation
             steps {
                 script {
                     mail(
-                        to: "${EMAIL_RECIPIENTS}",
+                        to: EMAIL_RECIPIENTS,
                         subject: PRE_BUILD_SUBJECT,
                         body: PRE_BUILD_BODY
                     )
@@ -177,7 +177,7 @@ Jenkins Automation
         always {
             script {
                 mail(
-                    to: "${EMAIL_RECIPIENTS}",
+                    to: EMAIL_RECIPIENTS,
                     subject: POST_BUILD_SUBJECT,
                     body: POST_BUILD_BODY
                 )
@@ -186,7 +186,7 @@ Jenkins Automation
         failure {
             script {
                 mail(
-                    to: "${EMAIL_RECIPIENTS}",
+                    to: EMAIL_RECIPIENTS,
                     subject: FAILURE_SUBJECT,
                     body: FAILURE_BODY
                 )
