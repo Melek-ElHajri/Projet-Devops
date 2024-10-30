@@ -27,21 +27,13 @@ Jenkins Automation
         POST_BUILD_BODY = """
 Hello Team,
 
-This email is sent to you as part of our security measures and to ensure compliance with our norms for communication.
-
 The automated build for ${JOB_NAME} has completed.
 
-The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}.
-Its status is ${currentBuild.result ?: 'SUCCESS'}.
+The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}. Its status is ${currentBuild.result ?: 'SUCCESS'}.
 
-- Git Branch: ${env.GIT_BRANCH ?: 'Not Specified'}
-- Triggered By: ${currentBuild.getBuildCauses()[0]?.getShortDescription() ?: 'Unknown'}
+If the build was successful, the latest code changes have been compiled and deployed without issues. If it has failed, please review the console output for specific error messages and details regarding the failure.
 
-${currentBuild.result == 'SUCCESS' ? 
-    'The build completed successfully. Your code changes have been compiled and deployed without issues.' : 
-    'Please review the console output for specific error messages and details regarding the failure.'}
-
-Your attention to these details is appreciated. If you have any questions or need further assistance, feel free to reach out.
+Your attention to these details is appreciated, and if you have any questions or need further assistance, feel free to reach out.
 
 Thank you,
 Jenkins Automation
@@ -60,7 +52,10 @@ Build Information:
 - Failure Time: ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))}
 
 Failure Details:
-- Please review the console output for specific error messages and details related to the failure. 
+The build has failed due to the following reasons:
+- Please review the console output for specific error messages and details related to the failure. Common issues could include compilation errors, failed tests, or deployment issues.
+
+Your prompt attention to these issues is crucial, and if you require further assistance, please do not hesitate to reach out.
 
 Thank you,
 Jenkins Automation
@@ -179,7 +174,7 @@ Jenkins Automation
                 mail(
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
-                    body: "${POST_BUILD_BODY}"
+                    body: "${POST_BUILD_BODY.replace('SUCCESS', currentBuild.result)}"
                 )
             }
         }
