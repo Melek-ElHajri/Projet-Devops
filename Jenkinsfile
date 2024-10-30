@@ -27,13 +27,15 @@ Jenkins Automation
         POST_BUILD_BODY = """
 Hello Team,
 
+As part of our commitment to security management, we aim to provide you with a detailed report after each build. 
+
 The automated build for ${JOB_NAME} has completed.
 
 The build started on ${new Date().format("yyyy-MM-dd HH:mm:ss", TimeZone.getTimeZone("UTC"))} for the project ${JOB_NAME}. 
-Its status is ${currentBuild.result ?: 'SUCCESS'}.
+Its status is ${currentBuild.result == 'FAILURE' ? 'FAILURE' : 'SUCCESS'}.
 
-- Git Branch: ${env.GIT_BRANCH}
-- Triggered By: ${env.BUILD_USER_ID ?: 'Unknown'}
+- Git Branch: ${env.GIT_BRANCH ?: 'N/A'}
+- Triggered By: ${env.BUILD_USER_ID ?: 'N/A'}
 
 ${currentBuild.result == 'SUCCESS' ? 
     'The latest code changes have been compiled and deployed successfully.' : 
@@ -177,6 +179,9 @@ Jenkins Automation
     post {
         always {
             script {
+                // Update build user ID for triggered user
+                env.BUILD_USER_ID = currentBuild.getBuildCauses().collect { it.getUserId() }.find { it } ?: 'Unknown'
+
                 mail(
                     to: "${EMAIL_RECIPIENTS}",
                     subject: "${POST_BUILD_SUBJECT}",
