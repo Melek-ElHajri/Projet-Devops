@@ -16,12 +16,20 @@ pipeline {
 
         stage('Compile Stage') {
             steps {
+                script {
+                    // Check out the latest code from the branch again before compiling
+                    checkout scm
+                }
                 sh 'mvn clean compile'
             }
         }
 
         stage('Scan') {
             steps {
+                script {
+                    // Check out the latest code from the branch again before compiling
+                    checkout scm
+                }
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
                 }
