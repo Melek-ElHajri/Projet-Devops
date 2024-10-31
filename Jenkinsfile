@@ -137,6 +137,10 @@ Jenkins Automation
 
         stage('Compile Stage') {
             steps {
+                script {
+                    // Check out the latest code from the branch again before compiling
+                    checkout scm
+                }
                 sh 'mvn clean compile'
             }
         }
@@ -145,12 +149,20 @@ Jenkins Automation
         /*
         stage('Deploy to Nexus') {
             steps {
+                    script {
+                    // Check out the latest code from the branch again before compiling
+                    checkout scm
+                }
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
         
         stage('Scan') {
             steps {
+                    script {
+                    // Check out the latest code from the branch again before compiling
+                    checkout scm
+                }
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
                 }
