@@ -52,7 +52,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {  
-                sh "docker build -t gabsirim/alpine:latest ."
+                sh "docker build -t gabsirim/alpine:1.0.0 ."
             }
         }
 
@@ -62,7 +62,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                         sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin"
                     }
-                    sh 'docker push gabsirim/alpine:latest'
+                    sh 'docker push gabsirim/alpine:1.0.0'
                 }
             }
         }
