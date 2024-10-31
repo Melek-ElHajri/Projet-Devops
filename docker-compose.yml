@@ -16,7 +16,7 @@ services:
   app-achat:
     depends_on:
       - mysqldb
-    image: gabsirim/alpine:latest  # Update to your Docker image
+    image: gabsirim/alpine:1.0.0  # Update to your Docker image
     restart: on-failure
     ports:
       - 8089:8089  # Use the port specified in your application.properties
