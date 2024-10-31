@@ -13,6 +13,13 @@ pipeline {
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
+
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/Gabsi-Rim']], 
+                          userRemoteConfigs: [[url: 'https://github.com/Melek-ElHajri/Projet-Devops.git']]])
+            }
+        }
     
         stage('Compile Stage') {   
             steps {
@@ -35,5 +42,38 @@ pipeline {
             }
         }
         */
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+                sh 'ls target'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {  
+                sh "docker build -t gabsirim/alpine:1.0.0 ."
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin"
+                    }
+                    sh 'docker push gabsirim/alpine:1.0.0'
+                }
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    sh 'ls -la'
+                    sh 'docker compose -f ./docker-compose.yml up -d'
+                }
+            }
+        }
     }
 }
