@@ -5,23 +5,27 @@ pipeline {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
     }
- stage('GIT') {
+
+    stages {
+        stage('GIT') {
             steps {
                 git branch: 'NouhaSedraoui',
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
 
-stage('Compile Stage') {
+        stage('Compile Stage') {
             steps {
                 sh 'mvn clean compile'
             }
         }
-stage('Scan') {
+
+        stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
                 }
             }
         }
+    }
 }
