@@ -96,6 +96,7 @@ We urge you to check the Jenkins logs for detailed information about this issue.
 Thank you for your attention,
 Jenkins Automation
 """
+        NOTIFY_TOKEN = 'xa_wiujkx3bfrasfrqnzopgeuag659gh' // Add your Notify.Events token here
     }
 
     stages {
@@ -124,6 +125,8 @@ Jenkins Automation
                         subject: "${PRE_BUILD_SUBJECT}",
                         body: "${PRE_BUILD_BODY}"
                     )
+                    notifyEvents message: "<b>Pre-Build Notification</b> - Job: ${JOB_NAME}, Build Number: ${BUILD_NUMBER}", 
+                                 token: "${NOTIFY_TOKEN}"
                 }
             }
         }
@@ -137,10 +140,6 @@ Jenkins Automation
 
         stage('Compile Stage') {
             steps {
-                script {
-                    // Check out the latest code from the branch again before compiling
-                    checkout scm
-                }
                 sh 'mvn clean compile'
             }
         }
@@ -149,20 +148,12 @@ Jenkins Automation
         /*
         stage('Deploy to Nexus') {
             steps {
-                    script {
-                    // Check out the latest code from the branch again before compiling
-                    checkout scm
-                }
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
         
         stage('Scan') {
             steps {
-                    script {
-                    // Check out the latest code from the branch again before compiling
-                    checkout scm
-                }
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
                 }
@@ -205,6 +196,8 @@ Jenkins Automation
                             subject: "${SUCCESS_SUBJECT}",
                             body: "${SUCCESS_BODY}"
                         )
+                        notifyEvents message: "<b>Build Success</b> - Job: ${JOB_NAME}, Build Number: ${BUILD_NUMBER}", 
+                                     token: "${NOTIFY_TOKEN}"
                     }
                 }
             }
@@ -219,6 +212,8 @@ Jenkins Automation
                     subject: "${POST_BUILD_SUBJECT}",
                     body: "${POST_BUILD_BODY.replace('SUCCESS', currentBuild.result)}"
                 )
+                notifyEvents message: "<b>Post-Build Notification</b> - Job: ${JOB_NAME}, Build Status: ${currentBuild.result ?: 'SUCCESS'}", 
+                             token: "${NOTIFY_TOKEN}"
             }
         }
         success {
@@ -237,6 +232,8 @@ Jenkins Automation
                     subject: "${FAILURE_SUBJECT}",
                     body: "${FAILURE_BODY}"
                 )
+                notifyEvents message: "<b>Build Failed</b> - Job: ${JOB_NAME}, Build Number: ${BUILD_NUMBER}", 
+                             token: "${NOTIFY_TOKEN}"
             }
         }
     }
