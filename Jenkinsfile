@@ -46,7 +46,6 @@ pipeline {
            steps {
                  script {
                      sh '''
-                         
                          sudo docker-compose up -d
                      ''' 
                  }
