@@ -20,18 +20,14 @@ pipeline {
             }
         }
 
-        stage('List Workspace') {
+       
+
+       stage('Build Docker Image') {
             steps {
-                sh 'ls -l'
-                sh 'ls -l target'
+                sh ' sudo docker build -t rymasd29/tp-foyer:5.0.0 .' // Replace with your Docker Hub username
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
-            }
-        }
 
         stage('Push Docker Image to DockerHub') {
             steps {
