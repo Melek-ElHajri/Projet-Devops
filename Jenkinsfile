@@ -35,8 +35,8 @@ pipeline {
         
         stage('Scan') {
             steps {
-                withSonarQubeEnv('sq1') {
-                    sh 'mvn sonar:sonar'
+                withCredentials([string(credentialsId: 'sq1', variable: 'SONAR_TOKEN')]) {
+                    sh "mvn sonar:sonar -Dsonar.projectKey=JenkinsFile -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN"
                 }
             }
         }
