@@ -27,33 +27,31 @@ pipeline {
             }
         }
 
-      stage('Build Docker Image') {
-             steps {
-                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .' 
+        stage('Build Docker Image') {
+            steps {
+                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
             }
-         }
+        }
 
-         stage('Push Docker Image to DockerHub') {
-             steps {
-                 sh '''
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                sh '''
                     sudo docker login -u rymasd29 -p 223JFT4309
                     sudo docker push rymasd29/tp-foyer:5.0.0
-                 '''
-             }
-         }
+                '''
+            }
+        }
 
-       stage('Run Docker Compose') {
-           steps {
-                 script {
-                     sh '''
-                         sudo docker-compose down -v
-                         sudo docker-compose up -d
-                     ''' 
-                 }
-             }
-         }
-    }
-
+        stage('Run Docker Compose') {
+            steps {
+                script {
+                    sh '''
+                        sudo docker-compose down -v
+                        sudo docker-compose up -d
+                    '''
+                }
+            }
+        }
 
         stage('Run Docker Compose for ELK Stack') {
             steps {
@@ -65,14 +63,14 @@ pipeline {
                 }
             }
         }
-    
+    }
 
     post {
         always {
             script {
                 // Clean up both stacks after the pipeline run
                 sh 'sudo docker-compose down -v'
-                sh 'sudo docker-compose -f ocker-compose-elk.yml down -v'
+                sh 'sudo docker-compose -f docker-compose-elk.yml down -v'
             }
         }
     }
