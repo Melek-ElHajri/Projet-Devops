@@ -14,11 +14,11 @@ pipeline {
             }
         }
 
-        stage('Compile') {
+      /*  stage('Compile') {
             steps {
                 sh 'mvn clean compile'
             }
-        }
+        }*/
 
        
 
@@ -29,16 +29,16 @@ pipeline {
         }
 
 
-        /* stage('Push Docker Image to DockerHub') {
+         stage('Push Docker Image to DockerHub') {
              steps {
                  sh '''
                     sudo docker login -u rymasd29 -p 223JFT4309
                     sudo docker push rymasd29/tp-foyer:5.0.0
                  '''
              }
-         }*/
+         }
 
-      /* stage('Run Docker Compose') {
+       stage('Run Docker Compose') {
            steps {
                  script {
                      sh '''
@@ -70,6 +70,6 @@ pipeline {
                 sh 'sudo docker-compose down -v'
                 sh 'sudo docker-compose -f docker-compose-elk.yml down -v'
             }
-        }*/
+        }
     }
 }
