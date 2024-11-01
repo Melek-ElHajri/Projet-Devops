@@ -26,13 +26,13 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
-        /**
+        
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
-        **/
+        
         
         stage('Scan') {
             steps {
@@ -41,7 +41,7 @@ pipeline {
                 }
             }
         }
-         /**
+         
 
         stage('Build') {
             steps {
@@ -49,13 +49,13 @@ pipeline {
                 sh 'ls target'
             }
         }
-**/ /**
+
         stage('Build Docker Image') {
             steps {  
                 sh "docker build -t gabsirim/alpine:1.0.0 ."
             }
         }
-**/ /**
+
         stage('Push Docker Image') {
             steps {
                 script {
@@ -66,7 +66,7 @@ pipeline {
                 }
             }
         }
-**/ /**
+
         stage('Deploy with Docker Compose') {
             steps {
                 script {
