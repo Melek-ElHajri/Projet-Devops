@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JAVA_HOME'  // Adjust if necessary
+        jdk 'JAVA_HOME'  // Adjust if neces
         maven 'M2_HOME'  // Adjust if necessary
     }
 
