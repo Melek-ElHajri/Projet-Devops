@@ -63,13 +63,5 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            script {
-                // Clean up both stacks after the pipeline run
-                sh 'sudo docker-compose down -v'
-                sh 'sudo docker-compose -f docker-compose-elk.yml down -v'
-            }
-        }
-    }
+   
 }
