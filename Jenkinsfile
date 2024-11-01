@@ -37,7 +37,7 @@ pipeline {
              }
          }
 
-       stage('Run Docker Compose') {
+      /* stage('Run Docker Compose') {
            steps {
                  script {
                      sh '''
@@ -69,6 +69,6 @@ pipeline {
                 sh 'sudo docker-compose down -v'
                 sh 'sudo docker-compose -f docker-compose-elk.yml down -v'
             }
-        }
+        }*/
     }
 }
