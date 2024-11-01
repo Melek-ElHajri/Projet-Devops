@@ -2,16 +2,55 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JAVA_HOME'
-        maven 'M2_HOME'
+        jdk 'JAVA_HOME'  // Adjust if necessary
+        maven 'M2_HOME'  // Adjust if necessary
     }
 
     stages {
-        stage('Package') {
+        stage('GIT') {
             steps {
-                sh 'mvn package'
+                git branch: 'NouhaSedraoui',
+                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
 
-}
+        stage('Compile') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('List Workspace') {
+            steps {
+                sh 'ls -l'
+                sh 'ls -l target'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
+            }
+        }
+
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                sh '''
+                    sudo docker login -u rymasd29 -p 223JFT4309
+                    sudo docker push rymasd29/tp-foyer:5.0.0
+                '''
+            }
+        }
+
+        stage('Run Docker Compose') {
+            steps {
+                script {
+                    sh '''
+                        sudo docker-compose down -v
+                        sudo docker-compose up -d
+                    '''
+                }
+            }
+        }
+    }
 }
