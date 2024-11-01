@@ -20,7 +20,7 @@ pipeline {
             }
         }
 
-     /*   stage('List Workspace') {
+        stage('List Workspace') {
             steps {
                 sh 'ls -l'
                 sh 'ls -l target'
@@ -52,7 +52,7 @@ pipeline {
                 }
             }
         }
-*/
+
         stage('Run Docker Compose for ELK Stack') {
             steps {
                 script {
