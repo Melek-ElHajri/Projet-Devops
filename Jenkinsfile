@@ -23,19 +23,20 @@ pipeline {
        
 
        stage('Build Docker Image') {
-             steps {
-                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .' 
+            steps {
+                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
             }
-         }
+        }
 
-         stage('Push Docker Image to DockerHub') {
+
+        /* stage('Push Docker Image to DockerHub') {
              steps {
                  sh '''
                     sudo docker login -u rymasd29 -p 223JFT4309
                     sudo docker push rymasd29/tp-foyer:5.0.0
                  '''
              }
-         }
+         }*/
 
       /* stage('Run Docker Compose') {
            steps {
