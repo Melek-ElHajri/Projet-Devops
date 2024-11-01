@@ -33,7 +33,7 @@ pipeline {
             }
         }
         
-        /* 
+        
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -41,7 +41,7 @@ pipeline {
                 }
             }
         }
-        */
+        
 
         stage('Build') {
             steps {
