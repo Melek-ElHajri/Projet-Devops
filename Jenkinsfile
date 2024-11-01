@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         jdk 'JAVA_HOME'  // Adjust if 
-        maven 'M2_HOME'  // Adjust if necessary
+        maven 'M2_HOME'  // Adjust if neces
     }
 
     stages {
