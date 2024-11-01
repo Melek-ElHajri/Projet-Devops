@@ -31,7 +31,7 @@ pipeline {
                 sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .' 
             }
          }
-    }
+    
     stage('Push Docker Image to DockerHub') {
              steps {
                  sh '''
