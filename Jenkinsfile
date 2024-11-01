@@ -13,4 +13,26 @@ pipeline {
             }
          }
     }
+    stage('Push Docker Image to DockerHub') {
+             steps {
+                 sh '''
+                    sudo docker login -u rymasd29 -p 223JFT4309
+                    sudo docker push rymasd29/tp-foyer:5.0.0
+                 '''
+             }
+         }
+
+       stage('Run Docker Compose') {
+           steps {
+                 script {
+                     sh '''
+                         sudo docker-compose down -v
+                         sudo docker-compose up -d
+                     ''' 
+                 }
+             }
+         }
+    }
+
+
 }
