@@ -33,7 +33,6 @@ pipeline {
             }
         }
         
-        
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -41,7 +40,6 @@ pipeline {
                 }
             }
         }
-         
 
         stage('Build') {
             steps {
@@ -74,6 +72,6 @@ pipeline {
                     sh 'docker compose -f ./docker-compose.yml up -d'
                 }
             } 
-        }**/ 
+        }
     }
 }
