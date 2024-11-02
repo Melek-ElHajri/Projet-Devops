@@ -14,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Compile') {
+       /* stage('Compile') {
             steps {
                 sh 'mvn clean package'
             }}
@@ -58,6 +58,45 @@ pipeline {
                         sudo docker-compose -f docker-compose-elk.yml down -v
                         sudo docker-compose -f docker-compose-elk.yml up -d
                     '''
+                }
+            }
+        }*/
+         stage('Check and Start Prometheus') {
+            steps {
+                script {
+                    // Check if Prometheus is running
+                    def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
+                    if (prometheusRunning) {
+                        echo 'Prometheus is already running.'
+                    } else {
+                        echo 'Starting Prometheus container...'
+                        sh 'docker start prometheus'
+                    }
+                }
+            }
+        }
+        stage('Check and Start Grafana') {
+            steps {
+                script {
+                    // Check if Grafana is running
+                    def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
+                    if (grafanaRunning) {
+                        echo 'Grafana is already running.'
+                    } else {
+                        echo 'Starting Grafana container...'
+                        sh 'docker start grafana'
+                    }
+                }
+            }
+        }
+        
+        stage('Validate Setup') {
+            steps {
+                script {
+                    // Optionally validate that Prometheus and Grafana are accessible
+                    echo 'Validating Prometheus and Grafana setup...'
+                    sh 'curl -f http://localhost:9090/ || echo "Prometheus is not accessible"'
+                    sh 'curl -f http://localhost:3000/ || echo "Grafana is not accessible"'
                 }
             }
         }
