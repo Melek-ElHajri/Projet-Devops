@@ -16,17 +16,23 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    networks:
+      elk-network:
+        ipv4_address: 192.168.33.10  # Set specific IP address
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.17.10
     container_name: logstash
     ports:
-      - 5000:5000  # Change this to 5000
+      - 5000:5000  # Keep this to 5000
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     environment:
       - xpack.monitoring.enabled=true
       - xpack.monitoring.elasticsearch.hosts=http://elasticsearch:9200
+    networks:
+      elk-network:
+        ipv4_address: 192.168.33.11  # Set specific IP address for Logstash
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.10
@@ -35,10 +41,16 @@ services:
       - 5601:5601
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      elk-network:
+        ipv4_address: 192.168.33.12  # Set specific IP address for Kibana
 
 networks:
-  default:
-    name: elk-network
+  elk-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.33.0/24  # Define subnet for the network
 
 volumes:
   esdata:
