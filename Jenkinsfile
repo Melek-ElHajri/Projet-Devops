@@ -34,7 +34,7 @@ pipeline {
                     sudo docker push rymasd29/tp-foyer:5.0.0
                 '''
             }
-        }*/
+        }
 
         stage('Run Docker Compose') {
             steps {
