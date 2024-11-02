@@ -47,16 +47,7 @@ pipeline {
             }
         }
 */
-        stage('Run Docker Compose for ELK Stack') {
-            steps {
-                script {
-                    sh '''
-                        sudo docker-compose -f docker-compose-elk.yml down 
-                        sudo docker-compose -f docker-compose-elk.yml up -d
-                    '''
-                }
-            }
-        }
+        
         
 
       /*  stage('Check and Start Prometheus') {
