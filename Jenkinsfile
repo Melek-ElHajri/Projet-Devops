@@ -5,7 +5,7 @@ pipeline {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
     }
-
+/**
     stages {
         stage('GIT') {
             steps {
@@ -13,7 +13,7 @@ pipeline {
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-
+**/
         stage('Checkout') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/Gabsi-Rim']], 
