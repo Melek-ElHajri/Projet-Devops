@@ -8,7 +8,7 @@ services:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
     ports:
-      - "9200:9200"  # Bind to host IP
+      - 9200:9200
     volumes:
       - esdata:/usr/share/elasticsearch/data
     healthcheck:
@@ -21,7 +21,7 @@ services:
     image: docker.elastic.co/logstash/logstash:7.17.10
     container_name: logstash
     ports:
-      - "5000:5000"  # Bind to host IP
+      - 5000:5000  # Change this to 5000
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     environment:
@@ -32,9 +32,13 @@ services:
     image: docker.elastic.co/kibana/kibana:7.17.10
     container_name: kibana
     ports:
-      - "5601:5601"  # Bind to host IP
+      - 5601:5601
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+networks:
+  default:
+    name: elk-network
 
 volumes:
   esdata:
