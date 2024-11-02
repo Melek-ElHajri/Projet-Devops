@@ -34,13 +34,13 @@ pipeline {
                     sudo docker push rymasd29/tp-foyer:5.0.0
                 '''
             }
-        }
+        }*/
 
         stage('Run Docker Compose') {
             steps {
                 script {
                     sh '''
-                        sudo docker-compose down -v
+                        sudo docker-compose down 
                         sudo docker-compose up -d
                     '''
                 }
@@ -51,15 +51,15 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        sudo docker-compose -f docker-compose-elk.yml down -v
+                        sudo docker-compose -f docker-compose-elk.yml down 
                         sudo docker-compose -f docker-compose-elk.yml up -d
                     '''
                 }
             }
         }
-        */
+        
 
-        stage('Check and Start Prometheus') {
+      /*  stage('Check and Start Prometheus') {
             steps {
                 script {
                     def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
@@ -96,7 +96,7 @@ pipeline {
                 }
             }
         }
-
+*/
         stage('Verify Logstash and Elasticsearch') {
             steps {
                 script {
