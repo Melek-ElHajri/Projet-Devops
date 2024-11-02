@@ -6,26 +6,35 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
     ports:
-      - 9200:9200
+      - "9200:9200"  # Bind to host IP
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.17.10
     container_name: logstash
     ports:
-      - 5044:5044
+      - "5000:5000"  # Bind to host IP
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    environment:
+      - xpack.monitoring.enabled=true
+      - xpack.monitoring.elasticsearch.hosts=http://elasticsearch:9200
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.10
     container_name: kibana
     ports:
-      - 5601:5601
+      - "5601:5601"  # Bind to host IP
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
 
-networks:
-  default:
-    name: elk-network
+volumes:
+  esdata:
