@@ -17,7 +17,7 @@ pipeline {
         stage('Compile') {
             steps {
                 sh 'mvn clean package'
-            }
+            }}
         
 
        
@@ -61,7 +61,10 @@ pipeline {
                 }
             }
         }
-    }
+        } 
+}
+        
+    
 
    
-}
+
