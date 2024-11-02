@@ -11,11 +11,17 @@ services:
       - 3306:3306
     volumes:
       - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   app-tpfoyer:
     image: rymasd29/tp-foyer:5.0.0
     depends_on:
-      - mysqldb
+      mysqldb:
+        condition: service_healthy
     restart: on-failure
     ports:
       - 8089:8089
