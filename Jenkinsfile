@@ -46,7 +46,7 @@ pipeline {
                 }
             }
         }
-
+*/
         stage('Run Docker Compose for ELK Stack') {
             steps {
                 script {
