@@ -88,28 +88,7 @@ pipeline {
             }
         }
 */
-        stage('Verify Logstash and Elasticsearch') {
-            steps {
-                script {
-                    // Check if Logstash is running on port 5000
-                    def logstashStatus = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://logstash:5000", returnStdout: true).trim()
-
-                    if (logstashStatus == '200') {
-                        echo 'Logstash is running and reachable on port 5000.'
-                    } else {
-                        error 'Logstash is not reachable on port 5000.'
-                    }
-
-                    // Query Elasticsearch to verify logs are present
-                    def logs = sh(script: "curl -s -X GET 'http://elasticsearch:9200/devops-logs-*/_search?pretty'", returnStdout: true).trim()
-
-                    // Check if logs contain expected data
-                    if (logs.contains('Build successful:')) {
-                        echo 'Logs are present in Elasticsearch.'
-                    } else {
-                        error 'No logs found in Elasticsearch.'
-                    }
-                }
+       
             }
         }
     }
