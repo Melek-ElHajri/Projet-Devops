@@ -33,7 +33,7 @@ pipeline {
         }
          stage("Generate Docker Image") {
             steps {
-                sh 'docker build -t nourhenenc/alpine:1.0.0  .'
+                sh 'docker build -t nourhenenc/alpine:1.0.0 .'
             }
         }
 
