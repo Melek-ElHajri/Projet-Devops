@@ -33,14 +33,14 @@ pipeline {
         }
          stage("Generate Docker Image") {
             steps {
-                sh 'docker build -t nourhenenc/tp-foyer:5.0.0 .'
+                sh 'docker build -t nourhenenc/alpine:1.0.0  .'
             }
         }
 
         stage("Push Docker Image") {
             steps {
                 sh "echo ${dockerhub_token} | docker login -u nourhenenc --password-stdin" 
-                sh "docker push nourhenenc/tp-foyer:5.0.0"
+                sh "docker push nourhenenc/alpine:1.0.0"
             }
         }
 
