@@ -14,14 +14,38 @@ pipeline {
         }
 
         // Uncomment and adjust the following stages as needed
-        /*
-        stage('Compile') {
+        
+         stage('Compile') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean'
+            }
+        }
+         stage('Compile') {
+            steps {
+                sh 'mvn Compile'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Run Tests and Generate JaCoCo Report') {
+            steps {
+                sh 'mvn test jacoco:report'
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        stage('Sonar') {
+            steps {
+                withSonarQubeEnv('sq1') {
+            sh 'mvn sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
+                 }
+             }
+        }
+
+      /*  stage('Build Docker Image') {
             steps {
                 sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
             }
