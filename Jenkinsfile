@@ -13,16 +13,15 @@ pipeline {
             }
         }
 
-        // Uncomment and adjust the following stages as needed
-        
-         stage('Compile') {
+        stage('Clean') {
             steps {
                 sh 'mvn clean'
             }
         }
-         stage('Compile') {
+
+        stage('Compile') {
             steps {
-                sh 'mvn Compile'
+                sh 'mvn compile'
             }
         }
 
@@ -32,20 +31,22 @@ pipeline {
             }
         }
 
-        stage('Compile') {
+        stage('Package') {
             steps {
                 sh 'mvn package'
             }
         }
+
         stage('Sonar') {
             steps {
                 withSonarQubeEnv('sq1') {
-            sh 'mvn sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
-                 }
-             }
+                    sh 'mvn sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
+                }
+            }
         }
 
-      /*  stage('Build Docker Image') {
+        /* Uncomment the following stages if needed for Docker operations
+        stage('Build Docker Image') {
             steps {
                 sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
             }
@@ -70,11 +71,8 @@ pipeline {
                 }
             }
         }
-*/
-        
-        
 
-      /*  stage('Check and Start Prometheus') {
+        stage('Check and Start Prometheus') {
             steps {
                 script {
                     def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
@@ -111,9 +109,6 @@ pipeline {
                 }
             }
         }
-*/
-       
-            }
-        }
-    
-
+        */
+    }
+}
