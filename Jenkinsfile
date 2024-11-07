@@ -26,10 +26,12 @@ pipeline {
         }
 
         stage('Run Tests') {
-            steps {
-                sh 'mvn test'
-                    }
-                    }
+    steps {
+        sh 'mvn test'
+        sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
+    }
+}
+
 
 
         stage('Package') {
