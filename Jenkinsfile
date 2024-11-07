@@ -1,54 +1,79 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'JAVA_HOME'
+        maven 'M2_HOME'
+    }
+
     stages {
-        stage('Checkout Git') {
+        stage('GIT') {
             steps {
-                // Checkout the code from the new repository
-                git credentialsId: 'cred-github', 
-                    branch: 'nourhene-chammakhi', // Change branch name
-                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git' // New repository
+                git branch: 'nourhene-chammakhi',
+                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
 
-        stage('Compiling') {
+    
+        stage('Compile Stage') {   
             steps {
-                // Compile the project using Maven
                 sh 'mvn clean compile'
             }
         }
-
-        stage('SonarQube') {
-            steps {
-                // Run SonarQube analysis using Maven
-                sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
-            }
-        }
-
+        
         stage('Deploy to Nexus') {
             steps {
-                // Deploy to Nexus repository
-                sh 'mvn deploy'
-            }
-        }
-         stage("Generate Docker Image") {
-            steps {
-                sh 'docker build -t nourhenenc/alpine:1.0.0 .'
-            }
-        }
-
-        stage("Push Docker Image") {
-            steps {
-                sh "echo ${dockerhub_token} | docker login -u nourhenenc --password-stdin" 
-                sh "docker push nourhenenc/alpine:1.0.0"
-            }
-        }
-
-        stage('Docker Compose') {
-            steps {
-                sh 'docker compose up -d'
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
             }
         }
         
+        stage('Scan') {
+            steps {
+                withSonarQubeEnv('sq1') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true 
+                }
+            }
+        }
+    
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+                sh 'ls target'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {  
+                sh "docker build -t nourhenenc/alpine:1.0.0 ."
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin"
+                    }
+                    sh 'docker push nourhenenc/alpine:1.0.0'
+                }
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    sh 'ls -la'
+                    sh 'docker compose -f ./docker-compose.yml up -d'
+                }
+            } 
+        }
     }
 }
