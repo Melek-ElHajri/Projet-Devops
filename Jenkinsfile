@@ -25,11 +25,12 @@ pipeline {
             }
         }
 
-        stage('Run Tests and Generate JaCoCo Report') {
+        stage('Run Tests') {
             steps {
-                sh 'mvn test jacoco:report'
-            }
-        }
+                sh 'mvn test'
+                    }
+                    }
+
 
         stage('Package') {
             steps {
