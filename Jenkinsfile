@@ -26,6 +26,12 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
+
+         stage('Mockito Tests') {
+            steps {
+                sh 'mvn test' 
+            }
+        }
         
         stage('Deploy to Nexus') {
             steps {
