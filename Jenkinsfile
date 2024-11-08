@@ -20,12 +20,13 @@ pipeline {
             }
         }
         
-         stage('Deploy to Nexus') {
+        stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
             }
         }
-          stage('SonarQube') {
+
+        stage('SonarQube') {
             steps {
                 // Run SonarQube analysis using Maven
                 sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
@@ -34,14 +35,13 @@ pipeline {
        
         stage('Build') {
             steps {
-                sh 'mvn clean'
-          
+                sh 'mvn clean package' // This will create the JAR in the target directory
             }
         }
 
         stage('Build Docker Image') {
             steps {  
-                sh "docker build -t nourhenenc/alpine:1.0.0 ."
+                sh 'docker build -t nourhenenc/alpine:1.0.0 .'
             }
         }
 
@@ -59,7 +59,7 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    sh 'ls -la'
+                    sh 'ls -la' // Confirm files are in the right directory
                     sh 'docker compose -f ./docker-compose.yml up -d'
                 }
             } 
