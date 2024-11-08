@@ -25,12 +25,10 @@ pipeline {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
             }
         }
-        
-        stage('Sonar') {
+          stage('SonarQube') {
             steps {
-                withSonarQubeEnv('sq1') {
-                    sh 'mvn sonar:sonar'
-                }
+                // Run SonarQube analysis using Maven
+                sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
             }
         }
        
