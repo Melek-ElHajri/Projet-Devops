@@ -83,7 +83,7 @@ pipeline {
             steps {
                 script {
                     sh 'ls -la'
-                    sh 'docker compose -f ./docker-compose.yml up -d'
+                    sh 'docker-compose -f ./docker-compose.yml up -d'
                 }
             } 
         }
