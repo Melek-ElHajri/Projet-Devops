@@ -43,8 +43,8 @@ pipeline {
        
         stage('Build') {
             steps {
-                sh 'mvn clean package'
-                sh 'ls target'
+                sh 'mvn clean'
+          
             }
         }
 
