@@ -79,13 +79,18 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('Run Docker Compose') {
             steps {
                 script {
-                    sh 'ls -la'
-                    sh 'docker compose -f ./docker-compose.yml up -d'
+                    sh '''
+                        pwd
+                        ls -la
+                        docker-compose down -v
+                        docker-compose up -d
+                        docker-compose ps
+                    '''
                 }
-            } 
+            }
         }
     }
 }
