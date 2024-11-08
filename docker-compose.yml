@@ -20,13 +20,19 @@ services:
     ports:
       - 8089:8089  # Use the port specified in your application.properties
     environment:
-      SPRING_APPLICATION_JSON: '{
-        "spring.datasource.url" : "jdbc:mysql://mysqldb:3306/tpfoyer_db?createDatabaseIfNotExist=true",
-        "spring.datasource.username" : "root",
-        "spring.datasource.password" : "",
-        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL5InnoDBDialect",
-        "spring.jpa.hibernate.ddl-auto" : "update"
-      }'
+      SPRING_APPLICATION_JSON: >-
+        {
+          "spring.datasource.url": "jdbc:mysql://mysqldb:3306/tpfoyer_db?createDatabaseIfNotExist=true",
+          "spring.datasource.username": "root",
+          "spring.datasource.password": "",
+          "spring.jpa.show-sql": true,
+          "spring.jpa.hibernate.ddl-auto": "update",
+          "spring.jpa.properties.hibernate.dialect": "org.hibernate.dialect.MySQLDialect",
+          "server.port": 8089,
+          "server.servlet.context-path": "/tpfoyer",
+          "management.endpoints.web.exposure.include": "prometheus",
+          "management.endpoint.prometheus.enabled": true
+        }
     stdin_open: true
     tty: true
 
