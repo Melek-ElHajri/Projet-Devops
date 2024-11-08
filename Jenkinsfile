@@ -14,13 +14,6 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
-            steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/nourhene-chammakhi']], 
-                          userRemoteConfigs: [[url: 'https://github.com/Melek-ElHajri/Projet-Devops.git']]])
-            }
-        }
-    
         stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
