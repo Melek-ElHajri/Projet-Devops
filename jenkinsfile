@@ -12,45 +12,21 @@ pipeline {
     }
 
     stages {
-        stage('Pre-commit Security Hooks') {
-            steps {
-                script {
-                    // Check if pre-commit is installed, if not, install it in a virtual environment
-                    sh '''
-                    if ! command -v pre-commit &> /dev/null
-                    then
-                        echo "pre-commit is not installed, installing in a virtual environment..."
-                        python3 -m venv venv
-                        . venv/bin/activate
-                        pip install pre-commit
-                    fi
-
-                    # Unset any pre-existing core.hooksPath configuration
-                    git config --unset-all core.hooksPath
-
-                    # Install pre-commit hooks
-                    pre-commit install
-
-                    # Run pre-commit hooks on all files
-                    pre-commit run --all-files
-
-                    # Deactivate the virtual environment
-                    deactivate
-                    '''
-                }
-            }
-        }
-
         stage('GIT') {
             steps {
                 git branch: 'ElHedi-Melek-Elhajri',
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-
+        
         stage('Build') {
             steps {
                 sh 'mvn clean install compile'
+            }
+        }
+        stage('JUnit/Mockito Tests') {
+            steps {
+                sh 'mvn test' 
             }
         }
 
@@ -73,7 +49,7 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Deploy to Nexus') {
             steps {
                 // Check if the container is running, start it if not
@@ -90,8 +66,38 @@ pipeline {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
         }
+
+        // Uncomment these stages if you want to generate and push a Docker image
+        
+        stage("Generate Docker Image") {
+            steps {
+                sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
+            }
+        }
+
+        stage("Push Docker Image") {
+            steps {
+                sh "echo ${dockerhub_token} | docker login -u m2l2k --password-stdin" 
+                sh "docker push m2l2k/tp-foyer:5.0.0"
+            }
+        }
+
+        stage('Docker Compose') {
+            steps {
+                sh 'docker compose up -d'
+            }
+        }
+        
+        stage('Start Monitoring Containers') {
+            steps {
+                sh 'docker start 4223e0421a91'
+                sh 'docker start cf099f77ec8b'
+            }
+        }
     }
 
+    // Uncomment the post block if you want notifications
+    /*
     post {
         success {
             script {
@@ -107,4 +113,5 @@ pipeline {
             }
         }
     }
+    */
 }
