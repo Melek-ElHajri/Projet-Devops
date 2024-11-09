@@ -29,15 +29,20 @@ pipeline {
                 '''
             }
         }*/
-        stage('DOCKER BUILD FRONTEND') {
-            steps {
-                dir('front') {
-                    //sh 'npm install'
-                    sh 'ng build --configuration production'
-                    sh 'sudo docker build -t rymasd29/front_angular:latest .' // Build frontend image
-                }
-            }
+       stage('DOCKER BUILD FRONTEND') {
+    steps {
+        dir('front') {
+            // Install dependencies if necessary
+            sh 'npm install'
+            // Install Angular CLI globally
+            sh 'npm install -g @angular/cli'
+            // Build the Angular application
+            sh 'ng build --configuration production'
+            // Build the Docker image
+            sh 'sudo docker build -t rymasd29/front_angular:latest .' // Build frontend image
         }
+    }
+}
 
         stage('DOCKER DEPLOY FRONTEND') {
             steps {
