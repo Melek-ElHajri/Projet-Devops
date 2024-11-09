@@ -45,10 +45,25 @@ pipeline {
             }
         }
 
-        stage('Dependency Check') {
+       stage('Dependency Check') {
             steps {
                 dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
                                odcInstallation: 'Dependency-Check'
+            }
+        }
+
+        stage('Publish Dependency-Check Report') {
+            steps {
+                script {
+                    // Publish the Dependency-Check HTML report
+                    publishHTML([
+                        reportDir: 'target/dependency-check-report',  // Directory containing the report
+                        reportFiles: 'index.html',                     // The main report file
+                        reportName: 'Dependency Check Report',         // Name displayed in Jenkins
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true
+                    ])
+                }
             }
         }
 
