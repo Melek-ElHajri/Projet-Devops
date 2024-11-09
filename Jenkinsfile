@@ -18,6 +18,12 @@ pipeline {
                 sh 'mvn clean'
             }
         }
+         stage('Install') {
+            steps {
+                // Install dependencies and compile project
+                sh 'mvn install'
+            }
+        }
 
         stage('Compile') {
             steps {
