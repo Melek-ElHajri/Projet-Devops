@@ -39,7 +39,7 @@ pipeline {
             steps {
         // Check if the container is running, and start it if it is not
                 sh '''
-                    if ! sudo docker ps | grep a5b6a466786c > /dev/null; then
+                    if ! docker ps | grep a5b6a466786c > /dev/null; then
                         echo "Container is not running. Starting container..."
                         sudo docker start a5b6a466786c
                     else
