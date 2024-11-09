@@ -37,9 +37,22 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
+                // Start Docker container
+                sh 'docker start sonarqube'
+
+        // Wait for the container to be running
+                sh '''
+                    while ! docker ps | grep -q "sonarqube"; do
+                        echo "Waiting for container to start..."
+                        sleep 5
+                    done
+                '''
+
+        // Run the Maven deploy command
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
         }
+
 
         stage("Generate Docker Image") {
             steps {
