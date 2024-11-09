@@ -48,7 +48,7 @@ pipeline {
         stage('Dependency Check') {
             steps {
                 // Run Dependency-Check analysis
-                dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out /var/lib/jenkins/workspace/sonar/reports/ --noupdate', 
                                odcInstallation: 'Dependency-Check'
             }
         }
@@ -139,9 +139,9 @@ pipeline {
         always {
             // Publish the Dependency-Check results using the absolute file path
             dependencyCheckPublisher(
-                pattern: '**/reports/dependency-check-report.xml',  // Adjusted to a relative path
-                unstableTotalLow: '5',  // Corrected parameter name
-                unstableNewHigh: '3'    // Corrected parameter name
+                pattern: '/var/lib/jenkins/workspace/sonar/reports/dependency-check-report.xml',  // Absolute path to the report
+                unstableTotalLow: '5',  // Threshold for low vulnerabilities
+                unstableNewHigh: '3'    // Threshold for new high vulnerabilities
             )
         }
     }
