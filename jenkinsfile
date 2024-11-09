@@ -133,7 +133,7 @@ pipeline {
             steps {
                 script {
                     echo "Starting Nmap Security Scan..."
-                    sh 'sudo nmap -sS -p 8089 -v 192.168.10.2'
+                    sh 'nmap -sS -p 8089 -v 192.168.10.2'
                 }
             }
         }
