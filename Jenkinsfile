@@ -7,7 +7,8 @@ pipeline {
     }
 
     environment {
-        REPORT_PATH = '**/dependency-check-report.html'  // Use relative GLOB pattern for HTML report
+        // Store the Dependency Check report in the target directory
+        REPORT_PATH = 'target/dependency-check-report.html'  // Path for HTML report
     }
 
     stages {
@@ -49,24 +50,14 @@ pipeline {
             }
         }
 
-        // OWASP Dependency Check Stage
-        stage('OWASP Dependency Check') {
+        stage('Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--scan target/', odcInstallation: 'owasp'
-            }
-        }
+                // Run Dependency-Check analysis and save the HTML report in the target directory
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out target --noupdate', 
+                               odcInstallation: 'Dependency-Check'
 
-        // Publish OWASP Dependency Check Report Stage
-        stage('Publish OWASP Dependency Check Report') {
-            steps {
-                publishHTML(target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'target',   // Directory where the report is generated
-                    reportFiles: 'dependency-check-report.html',  // Report file name
-                    reportName: 'OWASP Dependency Check Report'
-                ])
+                // Debugging: List the files in the target directory to ensure the report is generated
+                sh 'ls -R target'
             }
         }
 
@@ -83,22 +74,86 @@ pipeline {
                 }
             }
         }
+
+        // Uncomment the following stages if needed for Docker operations
+        /*
+        stage('Build Docker Image') {
+            steps {
+                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
+            }
+        }
+
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                sh '''
+                    sudo docker login -u rymasd29 -p 223JFT4309
+                    sudo docker push rymasd29/tp-foyer:5.0.0
+                '''
+            }
+        }
+
+        stage('Run Docker Compose') {
+            steps {
+                script {
+                    sh '''
+                        sudo docker-compose down 
+                        sudo docker-compose up -d
+                    '''
+                }
+            }
+        }
+
+        stage('Check and Start Prometheus') {
+            steps {
+                script {
+                    def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
+                    if (prometheusRunning) {
+                        echo 'Prometheus is already running.'
+                    } else {
+                        echo 'Starting Prometheus container...'
+                        sh 'docker start prometheus'
+                    }
+                }
+            }
+        }
+
+        stage('Check and Start Grafana') {
+            steps {
+                script {
+                    def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
+                    if (grafanaRunning) {
+                        echo 'Grafana is already running.'
+                    } else {
+                        echo 'Starting Grafana container...'
+                        sh 'docker start grafana'
+                    }
+                }
+            }
+        }
+
+        stage('Validate Setup') {
+            steps {
+                script {
+                    echo 'Validating Prometheus and Grafana setup...'
+                    sh 'curl -f http://localhost:9090/ || echo "Prometheus is not accessible"'
+                    sh 'curl -f http://localhost:3000/ || echo "Grafana is not accessible"'
+                }
+            }
+        }
+        */
     }
 
     post {
         always {
-            // Debugging: List files in the reports directory before publishing
+            // Debugging: List files again before trying to publish to ensure the report exists
             sh 'ls -R target'
 
-            // Publish the Dependency-Check HTML report (not XML) in the post section
-            publishHTML(target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'target',
-                reportFiles: 'dependency-check-report.html',  // Report file name
-                reportName: 'OWASP Dependency Check HTML Report'
-            ])
+            // Publish the Dependency-Check results using the updated report path
+            dependencyCheckPublisher(
+                pattern: "${REPORT_PATH}",  // Use the relative path to the HTML report
+                unstableTotalLow: '5',       // Threshold for low vulnerabilities
+                unstableNewHigh: '3'         // Threshold for new high vulnerabilities
+            )
         }
     }
 }
