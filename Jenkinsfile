@@ -1,94 +1,43 @@
 pipeline {
-    agent any
-
-    environment {
-        dockerhub_token = credentials('dockerhub_token') 
-        notify_token = credentials('NOTIFY_TOKEN')
-    }
-
-    tools {
-        jdk 'JAVA_HOME'
-        maven 'M2_HOME'
-    }
-
-    stages {
-        stage('GIT') {
-            steps {
-                git branch: 'ElHedi-Melek-Elhajri', 
-                url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
-            }
-        } 
-    stage('Build') {
-        steps {
-            sh '''
-                mvn clean
-                mvn install
-                mvn compile
-            '''
-            }
-        }
-        stage('Scan') {
-            steps {
-                withSonarQubeEnv('sq') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('Deploy to Nexus') {
-            steps {
-        // Check if the container is running, and start it if it is not
-                sh '''
-                    if ! sudo docker ps | grep a5b6a466786c > /dev/null; then
-                        echo "Container is not running. Starting container..."
-                        sudo docker start a5b6a466786c
-                    else
-                        echo "Container is already running."
-                    fi
-                '''
-        
-        // Run the Maven deploy command
-                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
-            }
-        }
-
-        stage("Generate Docker Image") {
-            steps {
-                //sh 'sudo chmod 666 /var/run/docker.sock'
-                sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
-            }
-        }
-
-        stage("Push Docker Image") {
-            steps {
-                sh "echo ${dockerhub_token} | docker login -u m2l2k --password-stdin" 
-                sh "docker push m2l2k/tp-foyer:5.0.0"
-            }
-        }
-
-        stage('Docker Compose') {
-            steps {
-                sh 'docker compose up -d'
-            }
-        }
-    }
-
-    // Uncomment the post block if you want notifications
-    /*
-    post {
-        success {
-            script {
-                notifyEvents message: "<b>Build Success</b> - Job: ${env.JOB_NAME}, Build Number: ${env.BUILD_NUMBER}", 
-                             token: env.notify_token
-            }
-        }
-        
-        failure {
-            script {
-                notifyEvents message: "<b>Build Failed</b> - Job: ${env.JOB_NAME}, Build Number: ${env.BUILD_NUMBER}", 
-                             token: env.notify_token
-            }
-        }
-    }
-    */
-}
+ agent any
+--ou--
+ agent {
+ node {
+ label 'build'
+ }
+ }
+ tools {
+ maven 'M2_HOME'
+ }
+ options {
+ --Timeout counter starts after agent is allocated--
+ timeout(time: 1, unit: 'SECONDS')
+ }
+ environment {
+ APP_ENV = "DEV"
+ }
+ stages {
+ stage('Code Checkout') {
+ steps {
+ git branch: 'Dhaoui-Badreddine',
+ url: 'https://github.com/Melek-ElHajri/Projet-Devops.git',
+ }
+ }
+ stage('Code Build') {
+ steps {
+ sh 'mvn install -Dmaven.test.skip=true'
+ }
+ }
+ }
+ post {
+ always {
+ echo "======always======"
+ }
+ success {
+ echo "=====pipeline executed successfully ====="
+ }
+ failure {
+ echo "======pipeline execution failed======"
+ }
+ }
+ }
