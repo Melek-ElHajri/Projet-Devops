@@ -35,16 +35,9 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-        /*
-
-        stage('Compile Stage') {
-            steps {
-                sh 'mvn clean compile'
-            }
-        }
- /*
         stage('Scan') {
             steps {
+                sh 'sudo docker start sonarqube'
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
@@ -53,9 +46,10 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
+                sh 'sudo docker start a5b6a466786c'
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
-        }*/
+        }
 
         stage("Generate Docker Image") {
             steps {
