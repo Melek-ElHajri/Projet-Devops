@@ -12,29 +12,31 @@ pipeline {
     }
 
     stages {
-        stage('Install Pre-commit') {
+        stage('Pre-commit Security Hooks') {
             steps {
                 script {
-                    // Install pre-commit if it's not already installed
-                    sh 'pip install pre-commit'
-                }
-            }
-        }
+                    // Check if pre-commit is installed, if not, install it in a virtual environment
+                    sh '''
+                    if ! command -v pre-commit &> /dev/null
+                    then
+                        echo "pre-commit is not installed, installing in a virtual environment..."
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install pre-commit
+                    fi
 
-        stage('Setup Pre-commit Hooks') {
-            steps {
-                script {
-                    // Install pre-commit hooks
-                    sh 'pre-commit install'
-                }
-            }
-        }
+                    # Unset any pre-existing core.hooksPath configuration
+                    git config --unset-all core.hooksPath
 
-        stage('Run Pre-commit Hooks') {
-            steps {
-                script {
-                    // Run pre-commit hooks on all files
-                    sh 'pre-commit run --all-files'
+                    # Install pre-commit hooks
+                    pre-commit install
+
+                    # Run pre-commit hooks on all files
+                    pre-commit run --all-files
+
+                    # Deactivate the virtual environment
+                    deactivate
+                    '''
                 }
             }
         }
