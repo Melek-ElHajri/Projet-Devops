@@ -34,7 +34,7 @@ pipeline {
                 dir('front') {
                     sh 'npm install'
                     sh 'ng build --configuration production'
-                    sh 'docker build -t  chebliaymen/aymenchebli-5arctic4-g3-kaddem-front:latest .'
+                    sh 'docker build -t  rymasd29/front_angular:latest .'
                     }
                 }
             }
