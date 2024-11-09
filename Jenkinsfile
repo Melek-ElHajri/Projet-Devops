@@ -81,6 +81,55 @@ pipeline {
                         sh 'docker start grafana'
                     }
                 }
+
+      stage('Email Notification') {
+            steps {
+                mail bcc: '',
+                     body: '''
+Final Report: The pipeline has completed successfully. No action required.
+''',
+                     cc: '',
+                     from: '',
+                     replyTo: '',
+                     subject: 'Pipeline DevOps Project exécutée avec succès',
+                     to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
             }
         }
+    }
+
+    post {
+        success {
+            script {
+                emailext (
+                    subject: "Build Success: ${currentBuild.fullDisplayName}",
+                    body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
+                )
+            }
+        }
+        failure {
+            script {
+                emailext (
+                    subject: "Build Failure: ${currentBuild.fullDisplayName}",
+                    body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
+                )
+            }
+        }
+        always {
+            script {
+                emailext (
+                    subject: "Build Notification: ${currentBuild.fullDisplayName}",
+                    body: "Consultez les détails du build à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
+                )
+            }
+        }
+    }
+}
+            
+        
     
