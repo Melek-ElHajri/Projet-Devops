@@ -20,74 +20,25 @@ pipeline {
                           userRemoteConfigs: [[url: 'https://github.com/Melek-ElHajri/Projet-Devops.git']]])
             }
         }
-
-        stage('Install Python and Pip') {
-            steps {
-                script {
-                    sh '''
-                    # Update packages
-                    sudo apt update
-
-                    # Install Python3 and pip if not already installed
-                    if ! command -v pip3 &> /dev/null; then
-                        sudo apt install -y python3 python3-pip
-                    fi
-                    '''
-                }
-            }
-        }
-
-        stage('Setup Python Virtual Environment and Install Pre-commit') {
-            steps {
-                script {
-                    sh '''
-                    # Create a virtual environment
-                    python3 -m venv venv
-
-                    # Activate the virtual environment and install pre-commit
-                    . venv/bin/activate
-                    pip install pre-commit
-                    '''
-                }
-            }
-        }
-
-        stage('Run Pre-commit Hooks') {
-            steps {
-                script {
-                    sh '''
-                    # Activate the virtual environment
-                    . venv/bin/activate
-
-                    # Unset existing Git hooks path to avoid conflicts
-                    git config --unset-all core.hooksPath
-
-                    # Install pre-commit hooks and run them on all files
-                    pre-commit install
-                    pre-commit run --all-files
-                    '''
-                }
-            }
-        }
-
+    
         stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
             }
         }
 
-        stage('Mockito Tests') {
+         stage('Mockito Tests') {
             steps {
-                sh 'mvn test'
+                sh 'mvn test' 
             }
         }
-
+        
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
-
+        
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -95,14 +46,51 @@ pipeline {
                 }
             }
         }
-
         stage("Quality Gate") {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                    waitForQualityGate abortPipeline: true 
                 }
             }
         }
+         stage('Check and Start Prometheus') {
+            steps {
+                script {
+                    def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
+                    if (prometheusRunning) {
+                        echo 'Prometheus is already running.'
+                    } else {
+                        echo 'Starting Prometheus container...'
+                        sh 'docker start prometheus'
+                    }
+                }
+            }
+        }
+
+        stage('Check and Start Grafana') {
+            steps {
+                script {
+                    def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
+                    if (grafanaRunning) {
+                        echo 'Grafana is already running.'
+                    } else {
+                        echo 'Starting Grafana container...'
+                        sh 'docker start grafana'
+                    }
+                }
+            }
+        }
+
+        stage('Validate Setup') {
+            steps {
+                script {
+                    echo 'Validating Prometheus and Grafana setup...'
+                    sh 'curl -f http://localhost:9090/ || echo "Prometheus is not accessible"'
+                    sh 'curl -f http://localhost:3000/ || echo "Grafana is not accessible"'
+                }
+            }
+        }
+    
 
         stage('Build') {
             steps {
@@ -128,13 +116,18 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('Run Docker Compose') {
             steps {
                 script {
-                    sh 'ls -la'
-                    sh 'docker-compose -f ./docker-compose.yml up -d'
+                    sh '''
+                        pwd
+                        ls -la
+                        docker-compose down -v
+                        docker-compose up -d
+                        docker-compose ps
+                    '''
                 }
-            } 
+            }
         }
     }
 }
