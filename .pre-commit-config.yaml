@@ -1,0 +1,18 @@
+repos:
+- repo: https://github.com/hmrc/security-git-hooks
+  rev: release/1.11.0  
+  hooks:
+    - id: secrets_filecontent
+      name: Detect secrets in file content
+      description: Checks for potential secrets in the content of staged files.
+      files: \.(txt|aws\.file|password\.file|\.pem|\.key|\.env|\.log)$ 
+      exclude: ^(README\.md|config\.json)$  
+
+    - id: secrets_filename
+      name: Detect sensitive filenames
+      description: Detect files with names indicating sensitive data (e.g. *.key, *.pem, etc.).
+      files: \.(pem|key|env|password|log)$  
+
+    - id: hooks_version_check
+      name: Check pre-commit hook versions
+      description: Ensures pre-commit hooks are up to date.
