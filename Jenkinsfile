@@ -29,18 +29,17 @@ pipeline {
                 '''
             }
         }*/
-       stage('DOCKER BUILD FRONTEND') {
+       stage('Install Node.js and Angular CLI') {
     steps {
-        dir('front') {
-            // Install dependencies if necessary
-            sh 'npm install'
-            // Install Angular CLI globally
-            sh 'npm install -g @angular/cli'
-            // Build the Angular application
-            sh 'ng build --configuration production'
-            // Build the Docker image
-            sh 'sudo docker build -t rymasd29/front_angular:latest .' // Build frontend image
-        }
+        // Install Node.js version 18
+        sh 'curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -'
+        sh 'sudo apt-get install -y nodejs'
+
+        // Install npm (in case it's not installed correctly with Node.js)
+        sh 'sudo apt-get install -y npm'
+
+        // Install Angular CLI globally
+        sh 'sudo npm install -g @angular/cli'
     }
 }
 
