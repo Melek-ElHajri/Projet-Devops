@@ -24,6 +24,11 @@ pipeline {
                 sh 'mvn clean install compile'
             }
         }
+        stage('JUnit/Mockito Tests') {
+            steps {
+                sh 'mvn test' 
+            }
+        }
 
         stage('Scan') {
             steps {
