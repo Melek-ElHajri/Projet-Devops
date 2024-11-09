@@ -26,15 +26,15 @@ pipeline {
                 mvn compile
             '''
             }
-        }/*
-        stage('Scan') {
+        }
+        /*stage('Scan') {
             steps {
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
             }
-        }*/
-
+        }
+*/
         stage('Deploy to Nexus') {
             steps {
                 sh 'sleep 30'
