@@ -148,15 +148,4 @@ pipeline {
         */
     }
 
-    /* 
-    post {
-        always {
-            dependencyCheckPublisher(
-                pattern: '**/reports/dependency-check-report.xml',
-                unstableTotalLow: '5',
-                unstableNewHigh: '3'
-            )
-        }
-    }
-    */
-}
+   }
