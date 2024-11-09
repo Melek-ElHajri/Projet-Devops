@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        dockerhub_token = credentials('dockerhub_token') 
+        dockerhub_token = credentials('dockerhub_token')
         notify_token = credentials('NOTIFY_TOKEN')
     }
 
@@ -21,23 +21,17 @@ pipeline {
         
         stage('Build') {
             steps {
-                sh '''
-                    mvn clean
-                    mvn install
-                    mvn compile
-                '''
+                sh 'mvn clean install compile'
             }
         }
 
-        // Uncomment this stage if you want to include SonarQube scan
-        /*
         stage('Scan') {
             steps {
                 // Check if the SonarQube container is running, start it if not
                 sh '''
-                    if ! docker ps | grep sonarqube > /dev/null; then
+                    if ! docker ps | grep 656251e296fb > /dev/null; then
                         echo "SonarQube container is not running. Starting SonarQube container..."
-                        docker start sonarqube
+                        docker start 656251e296fb
                         sleep 20  # Wait for the container to be fully up
                     else
                         echo "SonarQube container is already running."
@@ -50,7 +44,6 @@ pipeline {
                 }
             }
         }
-        */
         
         stage('Deploy to Nexus') {
             steps {
