@@ -1,0 +1,134 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JAVA_HOME'
+        maven 'M2_HOME'
+    }
+
+    stages {
+        stage('GIT') {
+            steps {
+                git branch: 'nourhene-chammakhi',
+                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+            }
+        }
+
+        stage('Compile Stage') {   
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Deploy to Nexus') {
+            steps {
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
+            }
+        }
+
+        stage('SonarQube') {
+            steps {
+                // Run SonarQube analysis using Maven
+                sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package' // This will create the JAR in the target directory
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {  
+                sh 'docker build -t nourhenenc/alpine:1.0.0 .'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin"
+                    }
+                    sh 'docker push nourhenenc/alpine:1.0.0'
+                }
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    sh 'ls -la' // Confirm files are in the right directory
+                    sh 'docker compose -f ./docker-compose.yml up -d'
+                }
+            } 
+        }
+
+        stage('Prometheus') {
+            steps {
+                sh 'docker start prometheus'
+            }
+        }
+
+        stage('Grafana') {
+            steps {
+                sh 'docker start grafana'
+            }
+        }
+
+      /*  stage('JUnit/Mockito Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        } */
+
+        stage('Email Notification') {
+            steps {
+                mail bcc: '',
+                     body: '''
+Final Report: The pipeline has completed successfully. No action required.
+''',
+                     cc: '',
+                     from: '',
+                     replyTo: '',
+                     subject: 'Pipeline DevOps Project exécutée avec succès',
+                     to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                emailext (
+                    subject: "Build Success: ${currentBuild.fullDisplayName}",
+                    body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
+                )
+            }
+        }
+        failure {
+            script {
+                emailext (
+                    subject: "Build Failure: ${currentBuild.fullDisplayName}",
+                    body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
+                )
+            }
+        }
+        always {
+            script {
+                emailext (
+                    subject: "Build Notification: ${currentBuild.fullDisplayName}",
+                    body: "Consultez les détails du build à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
+                )
+            }
+        }
+    }
+}
+
