@@ -57,7 +57,7 @@ pipeline {
             steps {
                 script {
                     publishHTML([
-                        reportDir: '/home/vagrant/Projet-Devops/target/dependency-check-report',
+                        reportDir: 'target/dependency-check-report',
                         reportFiles: 'dependency-check-report.html',
                         reportName: 'Dependency Check Report',
                         alwaysLinkToLastBuild: true,
