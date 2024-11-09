@@ -26,13 +26,18 @@ pipeline {
         }
 
         stage('Run Tests') {
-    steps {
-        sh 'mvn test'
-        sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
-    }
-}
+            steps {
+                sh 'mvn test'
+                sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
+            }
+        }
 
-
+        stage('Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/', 
+                odcInstallation: 'Dependency-Check'
+            }
+        }
 
         stage('Package') {
             steps {
@@ -48,7 +53,8 @@ pipeline {
             }
         }
 
-        /* Uncomment the following stages if needed for Docker operations
+        // Uncomment the following stages if needed for Docker operations
+        /* 
         stage('Build Docker Image') {
             steps {
                 sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
