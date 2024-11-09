@@ -120,15 +120,24 @@ pipeline {
             }
         }
         */
-        
+
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 4223e0421a91'
                 sh 'docker start cf099f77ec8b'
             }
         }
-    }
 
+        // Add Nmap scan stage here
+        stage('Security Scan : Nmap') {
+            steps {
+                script {
+                    echo "Starting Nmap Security Scan..."
+                    sh 'sudo nmap -sS -p 8089 -v 192.168.10.2'
+                }
+            }
+        }
+    }
     // Uncomment the post block if you want notifications
     /*
     post {
