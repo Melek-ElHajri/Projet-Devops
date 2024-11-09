@@ -20,25 +20,25 @@ pipeline {
                           userRemoteConfigs: [[url: 'https://github.com/Melek-ElHajri/Projet-Devops.git']]])
             }
         }
-    
+
         stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
             }
         }
 
-         stage('Mockito Tests') {
+        stage('Mockito Tests') {
             steps {
                 sh 'mvn test' 
             }
         }
-        
+
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
-        
+
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -46,6 +46,7 @@ pipeline {
                 }
             }
         }
+
         stage("Quality Gate") {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
@@ -53,7 +54,8 @@ pipeline {
                 }
             }
         }
-         stage('Check and Start Prometheus') {
+
+        stage('Check and Start Prometheus') {
             steps {
                 script {
                     def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
@@ -90,7 +92,6 @@ pipeline {
                 }
             }
         }
-    
 
         stage('Build') {
             steps {
@@ -129,17 +130,16 @@ pipeline {
                 }
             }
         }
+
         stage('Email Notification') {
             steps {
                 mail bcc: '',
-                     body: '''
-Final Report: The pipeline has completed successfully. No action required.
-''',
+                     body: 'Final Report: The pipeline has completed successfully. No action required.',
                      cc: '',
                      from: '',
                      replyTo: '',
-                     subject: 'Succès de la pipeline DevOps Project',
-                     to: 'hammaminawel22@gmail.com, nawel.hammami@esprit.tn'
+                     subject: 'Pipeline DevOps Project exécutée avec succès',
+                     to: 'rim.gabsi.zg@gmail.com, rim.gabsi@esprit.tn'
             }
         }
     }
@@ -175,7 +175,5 @@ Final Report: The pipeline has completed successfully. No action required.
                 )
             }
         }
-    }
-}
     }
 }
