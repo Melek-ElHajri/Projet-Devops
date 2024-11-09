@@ -44,11 +44,17 @@ pipeline {
             }
         }
 
+       stage('Copy Dependency Check Report') {
+            steps {
+                sh 'cp /home/vagrant/Projet-Devops/target/dependency-check-report/dependency-check-report.html ${WORKSPACE}/target/dependency-check-report/'
+            }
+        }
+
         stage('Publish Dependency-Check Report') {
             steps {
                 script {
                     publishHTML([
-                        reportDir: '/home/vagrant/Projet-Devops/target/dependency-check-report',
+                        reportDir: 'target/dependency-check-report',
                         reportFiles: 'dependency-check-report.html',
                         reportName: 'Dependency Check Report',
                         alwaysLinkToLastBuild: true,
@@ -57,6 +63,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Package') {
             steps {
