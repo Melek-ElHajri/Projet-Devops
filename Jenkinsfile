@@ -50,12 +50,25 @@ pipeline {
             }
         }
 
-        stage('Dependency Check') {
+       /* stage('Dependency Check') {
             steps {
                 dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
                                odcInstallation: 'Dependency-Check'
             }
-        }
+        }*/
+    
+        stage ('OWASP Dependency-Check Vulnerabilities') {
+            steps {
+                dependencyCheck additionalArguments: ''' 
+                    -o "./" 
+                    -s "./"
+                    -f "ALL" 
+                    --prettyPrint''', odcInstallation: 'Dependency-Check'
+
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+            }
+        }     
+    
 
 
         stage('Publish Dependency-Check Report') {
@@ -152,15 +165,6 @@ pipeline {
         }
         */
     }
-   post {
-    always {
-        // Publish the Dependency-Check results using the relative file path
-        dependencyCheckPublisher(
-            pattern: '**/target/dependency-check-report/dependency-check-report.xml'  // Correct relative path
-           // unstableTotalLow: '5',  // Corrected parameter name
-           // unstableNewHigh: '3'    // Corrected parameter name
-        )
-    }
-}
+  
 
 }
