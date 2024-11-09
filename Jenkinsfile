@@ -47,6 +47,7 @@ pipeline {
 
         stage('Dependency Check') {
             steps {
+                // Run Dependency-Check analysis
                 dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
                                odcInstallation: 'Dependency-Check'
             }
@@ -65,7 +66,7 @@ pipeline {
                 }
             }
         }
-
+        
         // Uncomment the following stages if needed for Docker operations
         /*
         stage('Build Docker Image') {
