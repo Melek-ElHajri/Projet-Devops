@@ -6,11 +6,6 @@ pipeline {
         maven 'M2_HOME'  // Adjust if necessary
     }
 
-    environment {
-        // Store the Dependency Check report in the target directory
-        REPORT_PATH = 'target/dependency-check-report.html'  // Path for HTML report
-    }
-
     stages {
         stage('GIT') {
             steps {
@@ -37,27 +32,10 @@ pipeline {
             }
         }
 
-        stage('JaCoCo Report') {
-            steps {
-                script {
-                    // Publish the JaCoCo code coverage report to Jenkins
-                    jacoco(
-                        execPattern: '**/target/jacoco.exec', // Path to JaCoCo exec file
-                        classPattern: '**/target/classes',    // Path to compiled classes
-                        sourcePattern: '**/src/main/java'     // Path to source code
-                    )
-                }
-            }
-        }
-
         stage('Dependency Check') {
             steps {
-                // Run Dependency-Check analysis and save the HTML report in the target directory
-                dependencyCheck additionalArguments: '--failOnCVSS 7 --out target --noupdate', 
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
                                odcInstallation: 'Dependency-Check'
-
-                // Debugging: List the files in the target directory to ensure the report is generated
-                sh 'ls -R target'
             }
         }
 
@@ -145,14 +123,11 @@ pipeline {
 
     post {
         always {
-            // Debugging: List files again before trying to publish to ensure the report exists
-            sh 'ls -R target'
-
-            // Publish the Dependency-Check results using the updated report path
+           // Publish the Dependency-Check results using the absolute file path
             dependencyCheckPublisher(
-                pattern: 'target/dependency-check-report.html',  // Corrected report path
-                unstableTotalLow: '5',       // Threshold for low vulnerabilities
-                unstableNewHigh: '3'         // Threshold for new high vulnerabilities
+                pattern: '**/reports/dependency-check-report.xml',  // Adjusted to a relative path
+                unstableTotalLow: '5',  // Corrected parameter name
+                unstableNewHigh: '3'    // Corrected parameter name
             )
         }
     }
