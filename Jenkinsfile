@@ -46,7 +46,7 @@ pipeline {
 
         stage('Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--failOnCVSS 7 --out Projet-Devops/target/dependency-check-report --noupdate', 
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
                                odcInstallation: 'Dependency-Check'
             }
         }
@@ -149,7 +149,7 @@ pipeline {
     always {
         // Publish the Dependency-Check results using the relative file path
         dependencyCheckPublisher(
-            pattern: '**Projet-Devops/target/dependency-check-report/dependency-check-report.xml',  // Correct relative path
+            pattern: '**/target/dependency-check-report/dependency-check-report.xml',  // Correct relative path
             unstableTotalLow: '5',  // Corrected parameter name
             unstableNewHigh: '3'    // Corrected parameter name
         )
