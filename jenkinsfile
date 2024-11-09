@@ -11,15 +11,14 @@ pipeline {
         maven 'M2_HOME'
     }
 
-
-
+    stages {
         stage('GIT') {
             steps {
                 git branch: 'ElHedi-Melek-Elhajri',
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-    stages {
+
         stage('Pre-commit Security Hooks') {
             steps {
                 script {
@@ -103,7 +102,6 @@ pipeline {
             }
         }
 
-        // ZAP Baseline Scan
         stage('ZAP Baseline Scan') {
             steps {
                 script {
