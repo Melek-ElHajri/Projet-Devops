@@ -13,7 +13,7 @@ pipeline {
             }
         }
 
-        stage('Clean') {
+        /*stage('Clean') {
             steps {
                 sh 'mvn clean'
             }
