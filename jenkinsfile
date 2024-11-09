@@ -15,7 +15,6 @@ pipeline {
         stage('Pre-commit Security Hooks') {
             steps {
                 script {
-                    // Exécuter le script et vérifier si une erreur se produit, mais ne pas arrêter l'exécution
                     def result = sh(script: '''
                         if ! command -v pre-commit &> /dev/null; then
                             echo "pre-commit is not installed, installing in a virtual environment..."
@@ -25,21 +24,12 @@ pipeline {
                         else
                             echo "pre-commit is already installed."
                         fi
-
-                        # Unset any pre-existing core.hooksPath configuration
                         git config --unset-all core.hooksPath
-
-                        # Install pre-commit hooks
                         pre-commit install
-
-                        # Run pre-commit hooks on all files
                         pre-commit run --all-files
-
-                        # Deactivate the virtual environment
                         deactivate
                     ''', returnStatus: true)
-                    
-                    // Si une erreur survient, afficher un message d'erreur mais continuer l'exécution
+
                     if (result != 0) {
                         echo "Pre-commit hooks did not pass, but continuing pipeline."
                     } else {
@@ -64,18 +54,16 @@ pipeline {
 
         stage('Scan') {
             steps {
-                // Check if the SonarQube container is running, start it if not
                 sh '''
                     if ! docker ps | grep -q 656251e296fb; then
                         echo "SonarQube container is not running. Starting SonarQube container..."
                         docker start 656251e296fb
-                        sleep 20  # Wait for the container to be fully up
+                        sleep 20
                     else
                         echo "SonarQube container is already running."
                     fi
                 '''
                 
-                // Run the SonarQube scan
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
@@ -84,12 +72,11 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
-                // Check if the Nexus container is running, start it if not
                 sh '''
                     if ! docker ps | grep -q a5b6a466786c; then
                         echo "Nexus container is not running. Starting container..."
                         docker start a5b6a466786c
-                        sleep 30  # Wait for the container to be fully up
+                        sleep 30
                     else
                         echo "Nexus container is already running."
                     fi
@@ -99,28 +86,6 @@ pipeline {
             }
         }
 
-        // Uncomment these stages if you want to generate and push a Docker image
-        /*
-        stage("Generate Docker Image") {
-            steps {
-                sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
-            }
-        }
-
-        stage("Push Docker Image") {
-            steps {
-                sh "echo ${dockerhub_token} | docker login -u m2l2k --password-stdin" 
-                sh "docker push m2l2k/tp-foyer:5.0.0"
-            }
-        }
-
-        stage('Docker Compose') {
-            steps {
-                sh 'docker compose up -d'
-            }
-        }
-        */
-
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 4223e0421a91'
@@ -128,8 +93,7 @@ pipeline {
             }
         }
 
-        // Add Nmap scan stage here
-        stage('Security Scan : Nmap') {
+        stage('Security Scan: Nmap') {
             steps {
                 script {
                     echo "Starting Nmap Security Scan..."
@@ -137,8 +101,34 @@ pipeline {
                 }
             }
         }
+
+        // ZAP Baseline Scan
+        stage('ZAP Baseline Scan') {
+            steps {
+                script {
+                    sh '''
+                        docker run --rm -v $(pwd):/zap/wrk:rw zaproxy/zap2docker-stable \
+                        zap-baseline.py -t http://192.168.10.2:8089 -r zap_report.html
+                    '''
+                }
+            }
+        }
+
+        stage('Publish ZAP Report') {
+            steps {
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: '.',
+                    reportFiles: 'zap_report.html',
+                    reportName: 'ZAP Baseline Report'
+                ])
+            }
+        }
     }
-    // Uncomment the post block if you want notifications
+
+    // Uncomment for notifications if needed
     /*
     post {
         success {
