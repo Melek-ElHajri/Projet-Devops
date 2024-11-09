@@ -11,7 +11,7 @@ pipeline {
         maven 'M2_HOME'
     }
 
-   /* stages {
+    stages {
         stage('GIT') {
             steps {
                 git branch: 'ElHedi-Melek-Elhajri', 
@@ -34,7 +34,7 @@ pipeline {
                 }
             }
         }
-*/
+
         stage('Deploy to Nexus') {
             steps {
                 sh 'docker start a5b6a466786c'
