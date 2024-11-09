@@ -165,15 +165,15 @@ pipeline {
         }
         */
     }
-   /* post {
+   post {
     always {
         // Publish the Dependency-Check results using the relative file path
         dependencyCheckPublisher(
-            pattern: '**/target/dependency-check-report/dependency-check-report.xml',  // Correct relative path
+            pattern: '**/target/dependency-check-report/dependency-check-report.xml'  // Correct relative path
            // unstableTotalLow: '5',  // Corrected parameter name
            // unstableNewHigh: '3'    // Corrected parameter name
         )
     }
-}*/
+}
 
 }
