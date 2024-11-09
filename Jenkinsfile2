@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'JAVA_HOME'
+        maven 'M2_HOME'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: '*/nourhene-chammakhi']], 
+                          userRemoteConfigs: [[url: 'https://github.com/Melek-ElHajri/Projet-Devops.git']]])
+            }
+        }
+
+        stage('Pre-commit Security Hooks') {
+            steps {
+                script {
+                    // Verify if pre-commit is installed; if not, install it
+                    sh '''
+                    if ! command -v pre-commit &> /dev/null
+                    then
+                        echo "pre-commit is not installed, installing in a virtual environment..."
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install pre-commit
+                    fi
+                    # Disable existing Git hooks to avoid conflicts
+                    git config --unset-all core.hooksPath
+                    # Install pre-commit hooks
+                    pre-commit install
+                    # Run pre-commit hooks on all files
+                    pre-commit run --all-files
+                    '''
+                }
+            }
+        }
+
+        stage('Compile Stage') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+    }
+}
