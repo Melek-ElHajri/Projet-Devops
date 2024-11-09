@@ -46,7 +46,7 @@ pipeline {
 
        stage('Copy Dependency Check Report') {
             steps {
-                sh 'cp /home/vagrant/Projet-Devops/target/dependency-check-report/dependency-check-report.html ${WORKSPACE}/target/dependency-check-report/'
+                sh ' sudo cp /home/vagrant/Projet-Devops/target/dependency-check-report/dependency-check-report.html ${WORKSPACE}/target/dependency-check-report/'
             }
         }
 
