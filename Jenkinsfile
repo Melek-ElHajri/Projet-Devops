@@ -121,5 +121,15 @@ pipeline {
             }
         }
         */
+        post {
+    always {
+        // Publish the Dependency-Check results using the absolute file path
+        dependencyCheckPublisher(
+            pattern: '/var/lib/jenkins/workspace/sonar/reports/dependency-check-report.xml', 
+            unstableTotal: '5', 
+            unstableHigh: '3'
+        )
+    }
+}
     }
 }
