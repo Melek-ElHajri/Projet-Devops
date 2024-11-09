@@ -23,21 +23,27 @@ pipeline {
         stage('Pre-commit Security Hooks') {
             steps {
                 script {
-                    // Vérifier si pre-commit est installé, sinon l'installer
+                    // Check if pre-commit is installed, if not, install it in a virtual environment
                     sh '''
                     if ! command -v pre-commit &> /dev/null
                     then
-                        echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
+                        echo "pre-commit is not installed, installing in a virtual environment..."
                         python3 -m venv venv
                         . venv/bin/activate
                         pip install pre-commit
                     fi
-                    # Désactiver les hooks Git existants pour éviter les conflits
+
+                    # Disable existing Git hooks to avoid conflicts
                     git config --unset-all core.hooksPath
-                    # Installer les hooks de pre-commit
+
+                    # Install pre-commit hooks
                     pre-commit install
-                    # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
+
+                    # Run pre-commit hooks on all files
                     pre-commit run --all-files
+
+                    # Deactivate the virtual environment
+                    deactivate
                     '''
                 }
             }
@@ -48,6 +54,7 @@ pipeline {
                 sh 'mvn clean install compile'
             }
         }
+
         stage('JUnit/Mockito Tests') {
             steps {
                 sh 'mvn test' 
@@ -110,7 +117,7 @@ pipeline {
                 sh 'docker compose up -d'
             }
         }
-        
+
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 4223e0421a91'
@@ -120,7 +127,6 @@ pipeline {
     }
 
     // Uncomment the post block if you want notifications
-    /*
     post {
         success {
             script {
@@ -136,5 +142,4 @@ pipeline {
             }
         }
     }
-    */
 }
