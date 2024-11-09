@@ -44,21 +44,19 @@ pipeline {
             }
         }
 
-        /* 
         stage('Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
                                odcInstallation: 'Dependency-Check'
             }
         }
-        */
 
         stage('Publish Dependency-Check Report') {
             steps {
                 script {
                     publishHTML([
                         reportDir: 'target/dependency-check-report',
-                        reportFiles: 'dependency-check-report.html',
+                        reportFiles: 'dependency-check-report.html',  // Ensure this matches the file generated
                         reportName: 'Dependency Check Report',
                         alwaysLinkToLastBuild: true,
                         keepAll: true
