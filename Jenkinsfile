@@ -30,7 +30,7 @@ pipeline {
         }
 
         // Uncomment this stage if you want to include SonarQube scan
-        
+        /*
         stage('Scan') {
             steps {
                 // Check if the SonarQube container is running, start it if not
@@ -38,7 +38,7 @@ pipeline {
                     if ! docker ps | grep sonarqube > /dev/null; then
                         echo "SonarQube container is not running. Starting SonarQube container..."
                         docker start sonarqube
-                        sleep 30  # Wait for the container to be fully up
+                        sleep 20  # Wait for the container to be fully up
                     else
                         echo "SonarQube container is already running."
                     fi
@@ -50,7 +50,7 @@ pipeline {
                 }
             }
         }
-        
+        */
         
         stage('Deploy to Nexus') {
             steps {
