@@ -50,6 +50,9 @@ pipeline {
                 // Run Dependency-Check analysis
                 dependencyCheck additionalArguments: '--failOnCVSS 7 --out /var/lib/jenkins/workspace/sonar/reports/ --noupdate', 
                                odcInstallation: 'Dependency-Check'
+
+                // Debugging: List the files in the reports directory to ensure the report is generated
+                sh 'ls -R /var/lib/jenkins/workspace/sonar/reports'
             }
         }
 
@@ -66,7 +69,7 @@ pipeline {
                 }
             }
         }
-        
+
         // Uncomment the following stages if needed for Docker operations
         /*
         stage('Build Docker Image') {
@@ -137,11 +140,14 @@ pipeline {
 
     post {
         always {
-            // Publish the Dependency-Check results using the correct GLOB pattern
-        dependencyCheckPublisher(
-            pattern: '**/reports/dependency-check-report.xml',  // Corrected to a GLOB pattern
-            unstableTotalLow: '5',  // Corrected parameter name
-            unstableNewHigh: '3'    // Corrected parameter name
+            // Debugging: List files again before trying to publish to ensure the report exists
+            sh 'ls -R /var/lib/jenkins/workspace/sonar/reports'
+            
+            // Publish the Dependency-Check results using the absolute file path
+            dependencyCheckPublisher(
+                pattern: '/var/lib/jenkins/workspace/sonar/reports/dependency-check-report.xml',  // Absolute path to the report
+                unstableTotalLow: '5',  // Threshold for low vulnerabilities
+                unstableNewHigh: '3'    // Threshold for new high vulnerabilities
             )
         }
     }
