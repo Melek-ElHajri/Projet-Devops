@@ -15,7 +15,7 @@ pipeline {
         stage('GIT') {
             steps {
                 git branch: 'ElHedi-Melek-Elhajri', 
-                url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
         
@@ -29,25 +29,39 @@ pipeline {
             }
         }
         
-        /*stage('Scan') {
+        // Uncomment this stage if you want to include SonarQube scan
+        /*
+        stage('Scan') {
             steps {
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
             }
-        }*/
+        }
+        */
         
         stage('Deploy to Nexus') {
             steps {
-                sh 'sleep 30'
-                sh 'docker start a5b6a466786c'
+                // Check if the container is running, start it if not
+                sh '''
+                    if ! docker ps | grep a5b6a466786c > /dev/null; then
+                        echo "Container is not running. Starting container..."
+                        docker start a5b6a466786c
+                        sleep 30  # Wait for the container to be fully up
+                    else
+                        echo "Container is already running."
+                    fi
+                '''
+                
+                // Run the Maven deploy command
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
         }
-        
-        /*stage("Generate Docker Image") {
+
+        // Uncomment these stages if you want to generate and push a Docker image
+        /*
+        stage("Generate Docker Image") {
             steps {
-                //sh 'sudo chmod 666 /var/run/docker.sock'
                 sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
             }
         }
@@ -63,7 +77,8 @@ pipeline {
             steps {
                 sh 'docker compose up -d'
             }
-        }*/
+        }
+        */
     }
 
     // Uncomment the post block if you want notifications
