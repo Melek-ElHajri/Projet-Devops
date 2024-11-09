@@ -22,28 +22,65 @@ pipeline {
         }
 
 
-     stage('Pre-commit Security Hooks') {
-    steps {
-        script {
-            // Vérifier si pre-commit est installé, sinon l'installer
-            sh '''
-            if ! command -v pre-commit &> /dev/null
-            then
-                echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
-                python3 -m venv venv
-                . venv/bin/activate
-                pip install pre-commit
-            fi
-            # Désactiver les hooks Git existants pour éviter les conflits
-            git config --unset-all core.hooksPath
-            # Installer les hooks de pre-commit
-            pre-commit install
-            # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
-            pre-commit run --all-files
-            '''
+  pipeline {
+    agent any
+
+    stages {
+        stage('Install Python and Pip') {
+            steps {
+                script {
+                    sh '''
+                    # Mettre à jour les paquets
+                    sudo apt update
+
+                    # Installer Python3 et pip si nécessaire
+                    if ! command -v pip3 &> /dev/null; then
+                        sudo apt install -y python3 python3-pip
+                    fi
+                    '''
+                }
+            }
+        }
+
+        stage('Setup Python Virtual Environment and Install Pre-commit') {
+            steps {
+                script {
+                    sh '''
+                    # Créer un environnement virtuel
+                    python3 -m venv venv
+
+                    # Activer l'environnement virtuel
+                    . venv/bin/activate
+
+                    # Installer pre-commit dans l'environnement virtuel
+                    pip install pre-commit
+                    '''
+                }
+            }
+        }
+
+        stage('Run Pre-commit Hooks') {
+            steps {
+                script {
+                    sh '''
+                    # Activer l'environnement virtuel
+                    . venv/bin/activate
+
+                    # Désactiver les hooks Git existants pour éviter les conflits
+                    git config --unset-all core.hooksPath
+
+                    # Installer les hooks de pre-commit
+                    pre-commit install
+
+                    # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
+                    pre-commit run --all-files
+                    '''
+                }
+            }
         }
     }
 }
+
     
         stage('Compile Stage') {   
             steps {
