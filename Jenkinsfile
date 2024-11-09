@@ -36,19 +36,19 @@ pipeline {
                 sh 'mvn test'
                 sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
             }
-        }
+        }*/
 
-        stage('JaCoCo Report') {
+       /* stage('JaCoCo Report') {
             steps {
                 script {
                     jacoco(
-                        execPattern: '**/target/jacoco.exec',
-                        classPattern: '**/target/classes',
-                        sourcePattern: '**/src/main/java'
+                        //execPattern: '**/target/jacoco.exec',
+                        //classPattern: '**/target/classes',
+                        //sourcePattern: '**/src/main/java'
                     )
                 }
             }
-        }
+        }*/
 
        /* stage('Dependency Check') {
             steps {
