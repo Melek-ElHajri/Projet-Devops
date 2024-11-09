@@ -57,6 +57,20 @@ pipeline {
             }
         }
 
+        
+        stage('Publish OWASP Dependency Check Report') {
+            steps {
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'Projet-Devops/target/dependency-check-report',
+                    reportFiles: 'dependency-check-report.html',
+                    reportName: 'OWASP Dependency Check Report'
+                ])
+            }
+        }
+
         stage('Publish Dependency-Check Report') {
             steps {
                 script {
@@ -151,7 +165,7 @@ pipeline {
         }
         */
     }
-    post {
+   /* post {
     always {
         // Publish the Dependency-Check results using the relative file path
         dependencyCheckPublisher(
@@ -160,6 +174,6 @@ pipeline {
            // unstableNewHigh: '3'    // Corrected parameter name
         )
     }
-}
+}*/
 
 }
