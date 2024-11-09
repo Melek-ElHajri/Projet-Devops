@@ -25,7 +25,6 @@ pipeline {
         }
     stage('Install') {
             steps {
-                // Install dependencies and compile project
                 sh 'mvn install'
             }
         }
@@ -37,7 +36,6 @@ pipeline {
         }
         stage('Scan') {
             steps {
-                sh 'docker start sonarqube'
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
@@ -46,7 +44,6 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
-                sh 'sudo docker start a5b6a466786c'
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
         }
