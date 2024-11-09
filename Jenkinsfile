@@ -59,7 +59,6 @@ pipeline {
 
         stage("Generate Docker Image") {
             steps {
-                sh 'chmod 666 /var/run/docker.sock'
                 sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
             }
         }
