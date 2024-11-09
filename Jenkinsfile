@@ -6,6 +6,10 @@ pipeline {
         maven 'M2_HOME'  // Adjust if necessary
     }
 
+    environment {
+        REPORT_PATH = '/var/lib/jenkins/workspace/sonar/reports/dependency-check-report.xml'
+    }
+
     stages {
         stage('GIT') {
             steps {
@@ -143,11 +147,11 @@ pipeline {
             // Debugging: List files again before trying to publish to ensure the report exists
             sh 'ls -R /var/lib/jenkins/workspace/sonar/reports'
             
-            // Publish the Dependency-Check results using the absolute file path
+            // Publish the Dependency-Check results using the environment variable
             dependencyCheckPublisher(
-                pattern: '/var/lib/jenkins/workspace/sonar/reports/dependency-check-report.xml',  // Absolute path to the report
-                unstableTotalLow: '5',  // Threshold for low vulnerabilities
-                unstableNewHigh: '3'    // Threshold for new high vulnerabilities
+                pattern: "${REPORT_PATH}",  // Use the REPORT_PATH environment variable
+                unstableTotalLow: '5',       // Threshold for low vulnerabilities
+                unstableNewHigh: '3'         // Threshold for new high vulnerabilities
             )
         }
     }
