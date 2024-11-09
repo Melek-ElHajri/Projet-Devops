@@ -29,6 +29,7 @@ pipeline {
         }
         stage('Scan') {
             steps {
+                sh 'sudo docker start sonarqube'
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
