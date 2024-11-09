@@ -68,7 +68,7 @@ pipeline {
         }
 
         // Uncomment these stages if you want to generate and push a Docker image
-        /*
+        
         stage("Generate Docker Image") {
             steps {
                 sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
@@ -87,7 +87,13 @@ pipeline {
                 sh 'docker compose up -d'
             }
         }
-        */
+        
+        stage('Start Monitoring Containers') {
+            steps {
+                sh 'docker start 4223e0421a91'
+                sh 'docker start cf099f77ec8b'
+            }
+        }
     }
 
     // Uncomment the post block if you want notifications
