@@ -21,19 +21,14 @@ pipeline {
             }
         }
 
-
-  pipeline {
-    agent any
-
-    stages {
         stage('Install Python and Pip') {
             steps {
                 script {
                     sh '''
-                    # Mettre à jour les paquets
+                    # Update packages
                     sudo apt update
 
-                    # Installer Python3 et pip si nécessaire
+                    # Install Python3 and pip if not already installed
                     if ! command -v pip3 &> /dev/null; then
                         sudo apt install -y python3 python3-pip
                     fi
@@ -46,13 +41,11 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    # Créer un environnement virtuel
+                    # Create a virtual environment
                     python3 -m venv venv
 
-                    # Activer l'environnement virtuel
+                    # Activate the virtual environment and install pre-commit
                     . venv/bin/activate
-
-                    # Installer pre-commit dans l'environnement virtuel
                     pip install pre-commit
                     '''
                 }
@@ -63,43 +56,38 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    # Activer l'environnement virtuel
+                    # Activate the virtual environment
                     . venv/bin/activate
 
-                    # Désactiver les hooks Git existants pour éviter les conflits
+                    # Unset existing Git hooks path to avoid conflicts
                     git config --unset-all core.hooksPath
 
-                    # Installer les hooks de pre-commit
+                    # Install pre-commit hooks and run them on all files
                     pre-commit install
-
-                    # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
                     pre-commit run --all-files
                     '''
                 }
             }
         }
-    }
-}
 
-    
         stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
             }
         }
 
-         stage('Mockito Tests') {
+        stage('Mockito Tests') {
             steps {
-                sh 'mvn test' 
+                sh 'mvn test'
             }
         }
-        
+
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
-        
+
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -107,14 +95,14 @@ pipeline {
                 }
             }
         }
+
         stage("Quality Gate") {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true 
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
-    
 
         stage('Build') {
             steps {
@@ -144,7 +132,7 @@ pipeline {
             steps {
                 script {
                     sh 'ls -la'
-                    sh 'docker compose -f ./docker-compose.yml up -d'
+                    sh 'docker-compose -f ./docker-compose.yml up -d'
                 }
             } 
         }
