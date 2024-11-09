@@ -65,16 +65,31 @@ pipeline {
             }
         }
 
-        // Optional: Stage to expose Prometheus metrics if needed
-        stage('Expose Prometheus Metrics') {
-            steps {
-                script {
-                    // Prometheus already scrapes Jenkins metrics at http://192.168.56.10:8080/prometheus
-                    // You can expose other additional metrics here if required
-                    // For example, you can add a custom Prometheus endpoint, but this depends on your Jenkins setup
-                    sh 'curl http://192.168.56.10:8080/prometheus' // Verify if Prometheus endpoint is accessible
+        stage('Check and Start Prometheus') {
+                steps {
+                    script {
+                        def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
+                        if (prometheusRunning) {
+                            echo 'Prometheus is already running.'
+                        } else {
+                            echo 'Starting Prometheus container...'
+                            sh 'docker start prometheus'
+                      }
+                  }
+              }
+          }
+             stage('Check and Start Grafana') {
+                    steps {
+                        script {
+                            def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
+                            if (grafanaRunning) {
+                                echo 'Grafana is already running.'
+                            } else {
+                                echo 'Starting Grafana container...'
+                                sh 'docker start grafana'
+                            }
+                        }
+                    }
                 }
-            }
-        }
     }
 }
