@@ -20,7 +20,7 @@ pipeline {
             }
         }
         
-        /*
+        
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
@@ -33,7 +33,7 @@ pipeline {
                 sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
             }
         }
-        */
+        
 
         stage('Build') {
             steps {
@@ -41,7 +41,7 @@ pipeline {
             }
         }
 
-        /*
+        
         stage('Build Docker Image') {
             steps {  
                 sh 'docker build -t nourhenenc/alpine:1.0.0 .'
@@ -67,7 +67,7 @@ pipeline {
                 }
             } 
         }
-        */
+        
 
         stage('Prometheus') {
             steps {
