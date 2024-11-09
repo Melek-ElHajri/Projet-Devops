@@ -34,12 +34,10 @@ pipeline {
 
         stage('Dependency Check') {
             steps {
-        dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate',
-        odcInstallation: 'Dependency-Check'
-                  }
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
+                               odcInstallation: 'Dependency-Check'
+            }
         }
-
-
 
         stage('Package') {
             steps {
@@ -56,7 +54,7 @@ pipeline {
         }
 
         // Uncomment the following stages if needed for Docker operations
-        /* 
+        /*
         stage('Build Docker Image') {
             steps {
                 sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
@@ -121,15 +119,16 @@ pipeline {
             }
         }
         */
-        post {
-    always {
-        // Publish the Dependency-Check results using the absolute file path
-        dependencyCheckPublisher(
-            pattern: '/var/lib/jenkins/workspace/sonar/reports/dependency-check-report.xml', 
-            unstableTotal: '5', 
-            unstableHigh: '3'
-        )
     }
-}
+
+    post {
+        always {
+            // Publish the Dependency-Check results using the absolute file path
+            dependencyCheckPublisher(
+                pattern: '**/reports/dependency-check-report.xml',  // Adjusted to a relative path
+                unstableTotal: '5', 
+                unstableHigh: '3'
+            )
+        }
     }
 }
