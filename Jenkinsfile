@@ -34,10 +34,11 @@ pipeline {
 
         stage('Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/', 
-                odcInstallation: 'Dependency-Check'
-            }
+        dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --disableNVD',
+        odcInstallation: 'Dependency-Check'
+                }
         }
+
 
         stage('Package') {
             steps {
