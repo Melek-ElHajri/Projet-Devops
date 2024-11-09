@@ -98,7 +98,7 @@ pipeline {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
         }
-    }
+
         // Uncomment these stages if you want to generate and push a Docker image
         /*
         stage("Generate Docker Image") {
@@ -120,6 +120,7 @@ pipeline {
             }
         }
         */
+        
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 4223e0421a91'
