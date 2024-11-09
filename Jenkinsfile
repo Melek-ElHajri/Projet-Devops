@@ -123,11 +123,11 @@ pipeline {
 
     post {
         always {
-            // Publish the Dependency-Check results using the absolute file path
+           // Publish the Dependency-Check results using the absolute file path
             dependencyCheckPublisher(
                 pattern: '**/reports/dependency-check-report.xml',  // Adjusted to a relative path
-                unstableTotal: '5', 
-                unstableHigh: '3'
+                unstableTotalLow: '5',  // Corrected parameter name
+                unstableNewHigh: '3'    // Corrected parameter name
             )
         }
     }
