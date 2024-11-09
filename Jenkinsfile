@@ -38,7 +38,7 @@ pipeline {
                     if ! docker ps | grep sonarqube > /dev/null; then
                         echo "SonarQube container is not running. Starting SonarQube container..."
                         docker start sonarqube
-                        sleep 20  # Wait for the container to be fully up
+                        sleep 30  # Wait for the container to be fully up
                     else
                         echo "SonarQube container is already running."
                     fi
