@@ -59,7 +59,7 @@ pipeline {
             }
         }
 
-        stage('Check and Start Prometheus') {
+        stage('Prometheus') {
             steps {
                 script {
                     def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
@@ -73,7 +73,7 @@ pipeline {
             }
         }
 
-        stage('Check and Start Grafana') {
+        stage(' Grafana') {
             steps {
                 script {
                     def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
