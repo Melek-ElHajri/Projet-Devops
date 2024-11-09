@@ -11,6 +11,14 @@ pipeline {
         maven 'M2_HOME'
     }
 
+
+
+        stage('GIT') {
+            steps {
+                git branch: 'ElHedi-Melek-Elhajri',
+                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+            }
+        }
     stages {
         stage('Pre-commit Security Hooks') {
             steps {
@@ -36,13 +44,6 @@ pipeline {
                         echo "Pre-commit hooks passed successfully."
                     }
                 }
-            }
-        }
-
-        stage('GIT') {
-            steps {
-                git branch: 'ElHedi-Melek-Elhajri',
-                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
 
