@@ -17,24 +17,26 @@ pipeline {
                 git branch: 'ElHedi-Melek-Elhajri', 
                 url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
-        } 
-    stage('Build') {
-        steps {
-            sh '''
-                mvn clean
-                mvn install
-                mvn compile
-            '''
+        }
+        
+        stage('Build') {
+            steps {
+                sh '''
+                    mvn clean
+                    mvn install
+                    mvn compile
+                '''
             }
         }
+        
         /*stage('Scan') {
             steps {
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
             }
-        }
-*/
+        }*/
+        
         stage('Deploy to Nexus') {
             steps {
                 sh 'sleep 30'
@@ -42,8 +44,8 @@ pipeline {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
         }
-/*
-        stage("Generate Docker Image") {
+        
+        /*stage("Generate Docker Image") {
             steps {
                 //sh 'sudo chmod 666 /var/run/docker.sock'
                 sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
@@ -61,9 +63,9 @@ pipeline {
             steps {
                 sh 'docker compose up -d'
             }
-        }
+        }*/
     }
-*/
+
     // Uncomment the post block if you want notifications
     /*
     post {
