@@ -32,14 +32,14 @@ pipeline {
        stage('Install Node.js and Angular CLI') {
     steps {
         // Install Node.js version 18
-        sh 'sudo -S curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -'
-        sh 'sudo -S apt-get install -y nodejs'
+        sh 'curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -'
+        sh 'apt-get install -y nodejs'
 
         // Install npm (in case it's not installed correctly with Node.js)
-        sh 'sudo -S apt-get install -y npm'
+        sh 'apt-get install -y npm'
 
         // Install Angular CLI globally
-        sh 'sudo -S npm install -g @angular/cli'
+        sh 'npm install -g @angular/cli'
     }
 }
 
