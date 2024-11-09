@@ -117,8 +117,8 @@ pipeline {
         stage('DOCKER BUILD FRONTEND') {
             steps {
                 dir('front') {
-                    sh 'npm install'
-                    sh 'ng build --configuration production'
+                    //sh 'npm install'
+                   // sh 'ng build --configuration production'
                     sh 'sudo docker build -t rymasd29/front_angular:latest .' // Build frontend image
                 }
             }
