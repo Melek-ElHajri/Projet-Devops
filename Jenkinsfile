@@ -150,7 +150,7 @@ pipeline {
 
             // Publish the Dependency-Check results using the updated report path
             dependencyCheckPublisher(
-                pattern: "${REPORT_PATH}",  // Use the relative path to the HTML report
+                pattern: 'target/dependency-check-report.html',  // Corrected report path
                 unstableTotalLow: '5',       // Threshold for low vulnerabilities
                 unstableNewHigh: '3'         // Threshold for new high vulnerabilities
             )
