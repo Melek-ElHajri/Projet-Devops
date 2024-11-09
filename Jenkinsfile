@@ -71,30 +71,16 @@ pipeline {
 
         stage('Prometheus') {
             steps {
-                script {
-                    def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
-                    if (prometheusRunning) {
-                        echo 'Prometheus is already running.'
-                    } else {
-                        echo 'Starting Prometheus container...'
-                        sh 'docker start prometheus'
-                    }
+                  sh 'docker start prometheus'
                 }
             }
-        }
+        
 
         stage('Grafana') {
             steps {
-                script {
-                    def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
-                    if (grafanaRunning) {
-                        echo 'Grafana is already running.'
-                    } else {
-                        echo 'Starting Grafana container...'
                         sh 'docker start grafana'
                     }
                 }
             }
         }
-    }
-}
+    
