@@ -18,20 +18,13 @@ pipeline {
                 url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         } 
-    stage('Clean') {
-            steps {
-                sh 'mvn clean'
-            }
-        }
-    stage('Install') {
-            steps {
-                sh 'mvn install'
-            }
-        }
-
-    stage('Compile') {
-            steps {
-                sh 'mvn compile'
+    stage('Build') {
+        steps {
+            sh '''
+                mvn clean
+                mvn install
+                mvn compile
+            '''
             }
         }
         stage('Scan') {
