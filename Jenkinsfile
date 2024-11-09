@@ -32,6 +32,19 @@ pipeline {
             }
         }
 
+        stage('JaCoCo Report') {
+            steps {
+                script {
+                    // Publish the JaCoCo code coverage report to Jenkins
+                    jacoco(
+                        execPattern: '**/target/jacoco.exec', // Path to JaCoCo exec file
+                        classPattern: '**/target/classes',    // Path to compiled classes
+                        sourcePattern: '**/src/main/java'     // Path to source code
+                    )
+                }
+            }
+        }
+
         stage('Dependency Check') {
             steps {
                 dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
@@ -123,7 +136,7 @@ pipeline {
 
     post {
         always {
-           // Publish the Dependency-Check results using the absolute file path
+            // Publish the Dependency-Check results using the absolute file path
             dependencyCheckPublisher(
                 pattern: '**/reports/dependency-check-report.xml',  // Adjusted to a relative path
                 unstableTotalLow: '5',  // Corrected parameter name
