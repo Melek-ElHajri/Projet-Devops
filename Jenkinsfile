@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('GIT') {
             steps {
-                git branch: 'ElHedi-Melek-Elhajri', 
+                git branch: 'ElHedi-Melek-Elhajri',
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
@@ -28,17 +28,29 @@ pipeline {
                 '''
             }
         }
-        
+
         // Uncomment this stage if you want to include SonarQube scan
-        /*
+        
         stage('Scan') {
             steps {
+                // Check if the SonarQube container is running, start it if not
+                sh '''
+                    if ! docker ps | grep sonarqube > /dev/null; then
+                        echo "SonarQube container is not running. Starting SonarQube container..."
+                        docker start sonarqube
+                        sleep 20  # Wait for the container to be fully up
+                    else
+                        echo "SonarQube container is already running."
+                    fi
+                '''
+                
+                // Run the SonarQube scan
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
             }
         }
-        */
+        
         
         stage('Deploy to Nexus') {
             steps {
@@ -52,6 +64,7 @@ pipeline {
                         echo "Container is already running."
                     fi
                 '''
+                
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
         }
