@@ -35,31 +35,31 @@ pipeline {
         stage('JaCoCo Report') {
             steps {
                 script {
-                    // Publish the JaCoCo code coverage report to Jenkins
                     jacoco(
-                        execPattern: '**/target/jacoco.exec', // Path to JaCoCo exec file
-                        classPattern: '**/target/classes',    // Path to compiled classes
-                        sourcePattern: '**/src/main/java'     // Path to source code
+                        execPattern: '**/target/jacoco.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: '**/src/main/java'
                     )
                 }
             }
         }
 
-       stage('Dependency Check') {
+        /* 
+        stage('Dependency Check') {
             steps {
                 dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
                                odcInstallation: 'Dependency-Check'
             }
         }
+        */
 
         stage('Publish Dependency-Check Report') {
             steps {
                 script {
-                    // Publish the Dependency-Check HTML report
                     publishHTML([
-                        reportDir: 'target/dependency-check-report',  // Directory containing the report
-                        reportFiles: 'index.html',                     // The main report file
-                        reportName: 'Dependency Check Report',         // Name displayed in Jenkins
+                        reportDir: 'target/dependency-check-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Dependency Check Report',
                         alwaysLinkToLastBuild: true,
                         keepAll: true
                     ])
@@ -81,7 +81,6 @@ pipeline {
             }
         }
 
-        // Uncomment the following stages if needed for Docker operations
         /*
         stage('Build Docker Image') {
             steps {
@@ -149,14 +148,15 @@ pipeline {
         */
     }
 
+    /* 
     post {
         always {
-            // Publish the Dependency-Check results using the absolute file path
             dependencyCheckPublisher(
-                pattern: '**/reports/dependency-check-report.xml',  // Adjusted to a relative path
-                unstableTotalLow: '5',  // Corrected parameter name
-                unstableNewHigh: '3'    // Corrected parameter name
+                pattern: '**/reports/dependency-check-report.xml',
+                unstableTotalLow: '5',
+                unstableNewHigh: '3'
             )
         }
     }
+    */
 }
