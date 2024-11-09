@@ -99,8 +99,8 @@ pipeline {
             }
         }
 
-        /*
-        stage('Build Docker Image') {
+        
+       /* stage('Build Docker Image') {
             steps {
                 sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
             }
@@ -113,8 +113,26 @@ pipeline {
                     sudo docker push rymasd29/tp-foyer:5.0.0
                 '''
             }
+        }*/
+        stage('DOCKER BUILD FRONTEND') {
+            steps {
+                dir('front') {
+                    sh 'npm install'
+                    sh 'ng build --configuration production'
+                    sh 'sudo docker build -t rymasd29/front_angular:latest .' // Build frontend image
+                }
+            }
         }
 
+        stage('DOCKER DEPLOY FRONTEND') {
+            steps {
+                sh '''
+                    sudo docker login -u rymasd29 -p 223JFT4309
+                    sudo docker push rymasd29/front_angular:latest
+                '''
+            }
+        }
+/*
         stage('Run Docker Compose') {
             steps {
                 script {
