@@ -29,15 +29,6 @@ pipeline {
         }
         stage('Scan') {
             steps {
-                withSonarQubeEnv('sq') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('Deploy to Nexus') {
-            steps {
-                // Start Docker container
                 sh 'docker start sonarqube'
 
         // Wait for the container to be running
@@ -47,8 +38,14 @@ pipeline {
                         sleep 5
                     done
                 '''
+                withSonarQubeEnv('sq') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
 
-        // Run the Maven deploy command
+        stage('Deploy to Nexus') {
+            steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
         }
