@@ -18,7 +18,31 @@ pipeline {
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-        
+
+        // Pre-commit Security Hooks Stage
+        stage('Pre-commit Security Hooks') {
+            steps {
+                script {
+                    // Vérifier si pre-commit est installé, sinon l'installer
+                    sh '''
+                    if ! command -v pre-commit &> /dev/null
+                    then
+                        echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install pre-commit
+                    fi
+                    # Désactiver les hooks Git existants pour éviter les conflits
+                    git config --unset-all core.hooksPath
+                    # Installer les hooks de pre-commit
+                    pre-commit install
+                    # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
+                    pre-commit run --all-files
+                    '''
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'mvn clean install compile'
@@ -49,7 +73,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy to Nexus') {
             steps {
                 // Check if the container is running, start it if not
@@ -68,7 +92,6 @@ pipeline {
         }
 
         // Uncomment these stages if you want to generate and push a Docker image
-        
         stage("Generate Docker Image") {
             steps {
                 sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
