@@ -18,6 +18,12 @@ pipeline {
                 sh 'mvn clean'
             }
         }
+        /* stage('Install') {
+            steps {
+                // Install dependencies and compile project
+                sh 'mvn install'
+            }
+        }*/
 
         stage('Compile') {
             steps {
@@ -35,20 +41,47 @@ pipeline {
         stage('JaCoCo Report') {
             steps {
                 script {
-                    // Publish the JaCoCo code coverage report to Jenkins
                     jacoco(
-                        execPattern: '**/target/jacoco.exec', // Path to JaCoCo exec file
-                        classPattern: '**/target/classes',    // Path to compiled classes
-                        sourcePattern: '**/src/main/java'     // Path to source code
+                        execPattern: '**/target/jacoco.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: '**/src/main/java'
                     )
                 }
             }
         }
 
-        stage('Dependency Check') {
+       /* stage('Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
                                odcInstallation: 'Dependency-Check'
+            }
+        }*/
+    
+        stage ('OWASP Dependency-Check Vulnerabilities') {
+            steps {
+                dependencyCheck additionalArguments: ''' 
+                    -o "./" 
+                    -s "./"
+                    -f "ALL" 
+                    --prettyPrint''', odcInstallation: 'Dependency-Check'
+
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+            }
+        }     
+    
+
+
+        stage('Publish Dependency-Check Report') {
+            steps {
+                script {
+                    publishHTML([ 
+                        reportDir: 'Projet-Devops/target/dependency-check-report',
+                        reportFiles: 'dependency-check-report.html',  // Ensure this matches the file generated
+                        reportName: 'Dependency Check Report',
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true
+                    ])
+                }
             }
         }
 
@@ -66,7 +99,6 @@ pipeline {
             }
         }
 
-        // Uncomment the following stages if needed for Docker operations
         /*
         stage('Build Docker Image') {
             steps {
@@ -133,15 +165,6 @@ pipeline {
         }
         */
     }
+  
 
-    post {
-        always {
-            // Publish the Dependency-Check results using the absolute file path
-            dependencyCheckPublisher(
-                pattern: '**/reports/dependency-check-report.xml',  // Adjusted to a relative path
-                unstableTotalLow: '5',  // Corrected parameter name
-                unstableNewHigh: '3'    // Corrected parameter name
-            )
-        }
-    }
 }

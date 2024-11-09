@@ -113,7 +113,7 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>6.5.1</version> <!-- Use the latest version -->
+                <version>11.1.0</version> <!-- Use the latest version -->
                 <configuration>
                     <!-- Set fail threshold for vulnerabilities -->
                     <failBuildOnCVSS>7</failBuildOnCVSS>
