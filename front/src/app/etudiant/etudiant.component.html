@@ -1,0 +1,36 @@
+<!-- Multi-Step Form -->
+<form #etudiantForm="ngForm" (ngSubmit)="addEtudiant()" id="msform">
+  <!-- Progress bar -->
+  <ul id="progressbar">
+    <li class="active">Nom et Prénom</li>
+    <li>CIN</li>
+    <li>École</li>
+  </ul>
+
+  <!-- Step 1: Nom et Prénom -->
+  <fieldset *ngIf="currentStep === 1">
+    <h2 class="fs-title">Nom et Prénom</h2>
+    <h3 class="fs-subtitle">Étape 1</h3>
+    <input type="text" placeholder="Nom" [(ngModel)]="etudiant.nomEt" name="nomEt" required />
+    <input type="text" placeholder="Prénom" [(ngModel)]="etudiant.prenomEt" name="prenomEt" required />
+    <button type="button" class="next action-button" (click)="nextStep()">Suivant</button>
+  </fieldset>
+
+  <!-- Step 2: CIN -->
+  <fieldset *ngIf="currentStep === 2">
+    <h2 class="fs-title">CIN</h2>
+    <h3 class="fs-subtitle">Étape 2</h3>
+    <input type="number" placeholder="CIN" [(ngModel)]="etudiant.cin" name="cin" required />
+    <button type="button" class="previous action-button" (click)="previousStep()">Précédent</button>
+    <button type="button" class="next action-button" (click)="nextStep()">Suivant</button>
+  </fieldset>
+
+  <!-- Step 3: École -->
+  <fieldset *ngIf="currentStep === 3">
+    <h2 class="fs-title">École</h2>
+    <h3 class="fs-subtitle">Étape 3</h3>
+    <input type="text" placeholder="École" [(ngModel)]="etudiant.ecole" name="ecole" required />
+    <button type="button" class="previous action-button" (click)="previousStep()">Précédent</button>
+    <button type="submit" class="action-button">Soumettre</button>
+  </fieldset>
+</form>

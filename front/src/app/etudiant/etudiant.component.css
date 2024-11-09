@@ -1,0 +1,18 @@
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: montserrat, arial, verdana; background: linear-gradient(rgba(196, 102, 0, 0.6), rgba(155, 89, 182, 0.6)); display: flex; justify-content: center; align-items: center; }
+
+#msform { width: 400px; margin: 50px auto; text-align: center; position: relative; }
+#msform fieldset { background: white; border: 0 none; border-radius: 3px; box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4); padding: 20px 30px; width: 80%; margin: 0 10%; position: relative; }
+#msform fieldset:not(:first-of-type) { display: none; }
+
+#progressbar { display: flex; justify-content: space-between; margin-bottom: 30px; counter-reset: step; }
+#progressbar li { list-style-type: none; color: white; background: #ccc; padding: 5px; border-radius: 3px; text-align: center; width: 100%; font-size: 10px; text-transform: uppercase; }
+#progressbar li.active { background: #27AE60; }
+
+input { padding: 15px; border: 1px solid #ccc; border-radius: 3px; margin-bottom: 10px; width: 100%; }
+.action-button { background: #27AE60; color: white; border: none; padding: 10px 20px; border-radius: 3px; cursor: pointer; }
+.action-button:hover { box-shadow: 0 0 0 2px white, 0 0 0 3px #27AE60; }
+
+.fs-title { font-size: 15px; text-transform: uppercase; color: #2C3E50; margin-bottom: 10px; }
+.fs-subtitle { font-weight: normal; font-size: 13px; color: #666; margin-bottom: 20px; }

@@ -7,6 +7,7 @@ import tn.esprit.tpfoyer.service.IEtudiantService;
 
 import java.util.List;
 
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost"})
 
 @RestController
 @AllArgsConstructor
