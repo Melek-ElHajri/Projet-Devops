@@ -17,7 +17,25 @@ pipeline {
                 git branch: 'ElHedi-Melek-Elhajri', 
                 url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
-        } /*
+        } 
+    stage('Clean') {
+            steps {
+                sh 'mvn clean'
+            }
+        }
+    stage('Install') {
+            steps {
+                // Install dependencies and compile project
+                sh 'mvn install'
+            }
+        }
+
+    stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        /*
 
         stage('Compile Stage') {
             steps {
