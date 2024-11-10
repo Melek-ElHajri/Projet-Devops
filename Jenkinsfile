@@ -42,9 +42,10 @@ pipeline {
                     fi
                 '''
                 
-                // Run the SonarQube scan
-                withSonarQubeEnv('snrq') {
-                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
+    // Run the SonarQube scan securely using credentials
+                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('snrq') {
+                        sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
             }
         }
