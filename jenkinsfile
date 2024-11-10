@@ -126,7 +126,7 @@ pipeline {
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
-                    reportDir: '/var/lib/jenkins/workspace/sonar/zap_results',
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',
                     reportFiles: 'baseline_scan_report.html, active_scan_report.html',
                     reportName: 'ZAP Reports'
                 ])
