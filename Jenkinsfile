@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+    environment {
+        SONAR_TOKEN = 'squ_a92c5a8ed72df820dbf9f1988e0a3704fac3dbd4'
+    }
+    
     tools {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
@@ -40,7 +44,7 @@ pipeline {
                 
                 // Run the SonarQube scan
                 withSonarQubeEnv('sq') {
-                    sh 'mvn sonar:sonar'
+                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
             }
         }
