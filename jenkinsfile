@@ -121,19 +121,28 @@ pipeline {
 
         stage('Publish ZAP Report') {
             steps {
-                publishHTML(target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: '.',
-                    reportFiles: 'zap_report.html',
-                    reportName: 'ZAP Baseline Report'
-                ])
+                script {
+                    // Check if the report exists
+                    def reportFile = 'zap_report.html'
+                    if (fileExists(reportFile)) {
+                        publishHTML(target: [
+                            allowMissing: true,  // Allow the report to be missing without failing the build
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: '.',
+                            reportFiles: reportFile,
+                            reportName: 'ZAP Baseline Report'
+                        ])
+                        echo "ZAP report published successfully."
+                    } else {
+                        echo "ZAP report not found, skipping publication."
+                    }
+                }
             }
         }
     }
 
-    /* 
+    /*
     post {
         success {
             script {
