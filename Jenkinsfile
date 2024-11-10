@@ -68,7 +68,7 @@ pipeline {
         }*/
 
         // Uncomment these stages if you want to generate and push a Docker image
-        
+     /*   
         stage("Generate Docker Image") {
             steps {
                 //sudo chmod 666 /var/run/docker.sock
@@ -88,7 +88,7 @@ pipeline {
                 sh 'docker compose up -d'
             }
         }
-        
+        */
         /*stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 4223e0421a91'
