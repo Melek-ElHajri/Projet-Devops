@@ -52,6 +52,18 @@ pipeline {
             }
         }
 
+        stage('Nmap Scan Attack') {
+            steps {
+                script {
+                    // Run Gauntlt Nmap attack from the correct directory, display output to console and save it to a file
+                    sh 'sudo gauntlt /var/lib/jenkins/workspace/nmap/gauntlt-attacks/nmap.attack | tee nmap_output.txt'
+                    
+                    // Archive the output file
+                    archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
+                }
+            }
+        }
+
         /*
         stage('Scan') {
             steps {
@@ -97,18 +109,6 @@ pipeline {
             steps {
                 sh 'docker start 4223e0421a91'
                 sh 'docker start cf099f77ec8b'
-            }
-        }
-
-        stage('Nmap Scan Attack') {
-            steps {
-                script {
-                    // Run Gauntlt Nmap attack from the correct directory, display output to console and save it to a file
-                    sh 'sudo gauntlt /var/lib/jenkins/workspace/nmap/gauntlt-attacks/nmap.attack | tee nmap_output.txt'
-                    
-                    // Archive the output file
-                    archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
-                }
             }
         }
 
