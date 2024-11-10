@@ -1,15 +1,15 @@
 pipeline {
     agent any
-
-    /*environment {
-        // Uncomment and set the necessary environment variables if needed
-        // SONAR_TOKEN = 'squ_65eb01a1246ad720ee511a4d5d0bce064014'
+    /*  
+    environment {
+        SONAR_TOKEN = 'squ_65eb01a1246ad720ee511a4d5d0bce064014'
+        // SONAR_TOKEN = credentials('SONAR_TEXT')
         // dockerhub_token = credentials('dockerhub_token')
     }*/
     
     tools {
-        jdk 'JAVA_HOME'
-        maven 'M2_HOME'
+        jdk 'JAVA_HOME'  // Ensure that 'JAVA_HOME' is configured in Jenkins tools
+        maven 'M2_HOME'  // Ensure that 'M2_HOME' is configured in Jenkins tools
     }
 
     stages {
@@ -22,13 +22,15 @@ pipeline {
         
         stage('Build') {
             steps {
+                echo "Running Maven clean install and compile"
                 sh 'mvn clean install compile'
             }
         }
-
+        
         stage('JUnit/Mockito Tests') {
             steps {
-                sh 'mvn test'
+                echo "Running JUnit/Mockito tests"
+                sh 'mvn test' 
             }
         }
 
@@ -53,7 +55,7 @@ pipeline {
             }
         }
 
-        // Security Scan with FindSecurityBugs (Only one instance needed)
+        // FindSecurityBugs Scan Stage
         stage('Security Scan with FindSecurityBugs') {
             steps {
                 echo "Running security scan using FindSecurityBugs..."
@@ -65,29 +67,6 @@ pipeline {
                     archiveArtifacts artifacts: 'target/spotbugsXml.xml', allowEmptyArchive: true
                     echo "FindSecurityBugs report has been archived."
                 }
-            }
-        }
-    }
-
-    post {
-        success {
-            script {
-                emailext (
-                    subject: "Build Success: ${currentBuild.fullDisplayName}",
-                    body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'rim.gabsi.zg@gmail.com, rim.gabsi@esprit.tn'
-                )
-            }
-        }
-        failure {
-            script {
-                emailext (
-                    subject: "Build Failure: ${currentBuild.fullDisplayName}",
-                    body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
-                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
-                    to: 'rim.gabsi.zg@gmail.com, rim.gabsi@esprit.tn'
-                )
             }
         }
     }
