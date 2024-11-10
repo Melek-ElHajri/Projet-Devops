@@ -45,7 +45,7 @@ pipeline {
                 
                 // Run the SonarQube scan
                 withSonarQubeEnv('snrq') {
-                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TEXT'
+                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
             }
         }
