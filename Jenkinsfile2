@@ -26,7 +26,7 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
-/**
+
  stage('Security Scan : Nmap') {
     steps {
         script {
@@ -34,7 +34,7 @@ pipeline {
             sh 'nmap -sT -p 1-65535 -v localhost'
         }
     }
-} **/
+} 
 
  stage('Pre-commit Security Hooks') {
             steps {
