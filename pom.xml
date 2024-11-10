@@ -62,11 +62,10 @@
     </dependencies>
 
     <distributionManagement>
-        <repository>
-            <id>deploymentRepo</id>
-            <name>Nexus Repository</name>
-            <url>http://192.168.10.2:8081/repository/maven-releases/</url>
-        </repository>
+    <repository>
+        <id>deploymentRepo</id>
+        <url>http://192.168.10.2:8081/repository/maven-releases/</url>
+    </repository>
     </distributionManagement>
 
     <build>
