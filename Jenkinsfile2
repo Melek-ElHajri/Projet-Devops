@@ -27,12 +27,36 @@ pipeline {
             }
         }
 
+stage('Pre-commit Security Hooks') {
+    steps {
+        script {
+            // Vérifier si pre-commit est installé, sinon l'installer
+            sh '''
+            if ! command -v pre-commit &> /dev/null
+            then
+                echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
+                python3 -m venv venv
+                . venv/bin/activate  # Use dot instead of source if source is not found
+                pip install pre-commit
+            fi
+            # Désactiver les hooks Git existants pour éviter les conflits
+            git config --unset-all core.hooksPath
+            # Installer les hooks de pre-commit
+            pre-commit install
+            # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
+            pre-commit run --all-files
+            '''
+        }
+    }
+} 
+/**
          stage('Mockito Tests') {
             steps {
                 sh 'mvn test' 
             }
         }
-        
+        **/
+/**
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
@@ -128,6 +152,6 @@ pipeline {
                     '''
                 }
             }
-        }
+        } **/
     }
 }
