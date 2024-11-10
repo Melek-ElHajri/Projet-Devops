@@ -107,7 +107,7 @@ pipeline {
                 script {
                     def result = sh(script: '''
                         docker run --rm -v $(pwd):/zap/wrk:rw zaproxy/zap-stable \
-                        zap-baseline.py -t http://192.168.10.2:8080 -r zap_report.html
+                        zap-baseline.py -t https://www.facebook.com -r zap_report.html
                     ''', returnStatus: true)
                     
                     if (result != 0) {
