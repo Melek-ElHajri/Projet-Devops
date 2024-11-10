@@ -110,25 +110,14 @@ pipeline {
             }
         }
 
-        stage('Publish ZAP Reports') {
-            steps {
-                // List files in the zap_results directory for debugging
-                sh 'ls -l /var/lib/jenkins/workspace/nmap/zap_results/'
-
-                // Publish HTML reports
-                publishHTML(target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: false,
-                    keepAll: true,
-                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Absolute path
-                    reportFiles: 'active_scan_report.html, baseline_scan_report.html',
-                    reportName: 'ZAP Reports'
-                ])
-
-                // Archive the specific artifact files
-                archiveArtifacts artifacts: 'zap_results/active_scan_report.html,zap_results/baseline_scan_report.html', allowEmptyArchive: true
-            }
-        }
+publishHTML(target: [
+    allowMissing: false,
+    alwaysLinkToLastBuild: false,
+    keepAll: true,
+    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
+    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
+    reportName: 'ZAP Reports'
+])
 
         // Uncomment and adjust if you plan to use SQL Injection tests
         /*
