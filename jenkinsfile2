@@ -82,65 +82,75 @@ pipeline {
                 sh 'mvn test' 
             }
         }
-
-       /* stage('Scan') {
+stage('ZAP Baseline Scan') {
             steps {
-                // Check if the SonarQube container is running, start it if not
-                sh '''
-                    if ! docker ps | grep 5dc45f66b119 > /dev/null; then
-                        echo "SonarQube container is not running. Starting SonarQube container..."
-                        docker start 5dc45f66b119
-                        sleep 20  # Wait for the container to be fully up
-                    else
-                        echo "SonarQube container is already running."
-                    fi
-                '''
-                
-                // Run the SonarQube scan
-                withSonarQubeEnv('sq') {
-                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
+                script {
+                    // Run ZAP Baseline scan and set full permissions for the report
+                    def result = sh(script: '''
+                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
+                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                    ''', returnStatus: true)
+
+                    // Check the result of the ZAP scan
+                    if (result != 0) {
+                        echo "ZAP Baseline Scan completed with warnings or errors."
+                    } else {
+                        echo "ZAP Baseline Scan completed successfully."
+                    }
                 }
             }
-        }*/
-        
-        /*stage('Deploy to Nexus') {
-            steps {
-                // Check if the container is running, start it if not
-                sh '''
-                    if ! docker ps | grep 4f5ed7dc04f8 > /dev/null; then
-                        echo "Container is not running. Starting container..."
-                        docker start 4f5ed7dc04f8
-                        sleep 30  # Wait for the container to be fully up
-                    else
-                        echo "Container is already running."
-                    fi
-                '''
-                
-                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
-            }
-        }*/
+        }
 
-        // Uncomment these stages if you want to generate and push a Docker image
-        
-        /*stage("Generate Docker Image") {
+        stage('ZAP Active Scan') {
             steps {
-                //sudo chmod 666 /var/run/docker.sock
-                sh 'docker build -t badredinedhaoui/tp-foyer:5.0.0 .'
+                script {
+                    // Run ZAP Active scan and set full permissions for the report
+                    def result = sh(script: '''
+                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
+                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                    ''', returnStatus: true)
+
+                    // Check the result of the ZAP scan
+                    if (result != 0) {
+                        echo "ZAP Active Scan completed with warnings or errors."
+                    } else {
+                        echo "ZAP Active Scan completed successfully."
+                    }
+                }
             }
         }
 
-        stage("Push Docker Image") {
+        stage('Publish ZAP Reports') {
             steps {
-                sh "echo ${dockerhub_token} | docker login -u badredinedhaoui --password-stdin" 
-                sh "docker push badredinedhaoui/tp-foyer:5.0.0"
+                // Publish both the baseline and active scan reports
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
+                    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
+                    reportName: 'ZAP Reports'
+                ])
             }
         }
 
-        stage('Docker Compose') {
+        stage('SQL Injection Test (SQLmap)') {
             steps {
-                sh 'docker compose up -d'
+                script {
+                    // Run SQLmap for deeper SQL injection testing, display output to console and save it to a file
+                    sh '''
+                        python3 /var/lib/jenkins/workspace/nmap/gauntlt-attacks/sqlmap/sqlmap.py \
+                        -u "http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant" \
+                        --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" \
+                        --batch --level=5 --risk=3 --tamper=space2comment | tee sqlmap_output.txt
+                    '''
+                    
+                    // Archive the output file
+                    archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
+                }
             }
-        }*/
+        }
+
         
         /*stage('Start Monitoring Containers') {
             steps {
