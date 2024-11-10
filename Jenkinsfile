@@ -31,23 +31,26 @@ pipeline {
             }
         }
 
+        // Nmap Scan stage targeting google.com
         stage('Nmap Scan') {
             steps {
                 script {
-                    def targetIp = '192.168.10.2'  // Replace with the IP or hostname you want to scan
-                    echo "Running Nmap scan on ${targetIp}"
+                    def targetHost = 'google.com'  // Scanning google.com
                     
-                    // Basic port scan and save output to a report
-                    sh "nmap -p 1-65535 ${targetIp} -oN nmap_scan_report.txt"
+                    echo "Running Nmap scan on ${targetHost}"
                     
-                    // Detailed scan with service and OS detection
-                    sh "nmap -sV -O ${targetIp} -oN nmap_detailed_report.txt"
+                    // Basic Nmap port scan across all ports
+                    sh "nmap -p 1-65535 ${targetHost} -oN nmap_scan_report.txt"
+                    
+                    // Detailed Nmap scan (service version and OS detection)
+                    sh "nmap -sV -O ${targetHost} -oN nmap_detailed_report.txt"
                 }
             }
             post {
                 always {
+                    // Archive the Nmap scan results as Jenkins artifacts
                     archiveArtifacts artifacts: 'nmap_*.txt', allowEmptyArchive: true
-                    echo "Nmap scan reports have been archived as artifacts."
+                    echo "Nmap scan reports have been archived."
                 }
             }
         }
