@@ -93,14 +93,14 @@ pipeline {
 
         stage('Prometheus') {
             steps {
-                  sh 'docker compose -f ~/sonar-nexus/docker-compose.yaml start prometheus'
+                  sh 'docker start prometheus'
                 }
             }
         
 
         stage('Grafana') {
             steps {
-                        sh 'docker compose -f ~/sonar-nexus/docker-compose.yaml start grafana'
+                        sh 'docker start grafana'
                     }
                  }
 
@@ -110,12 +110,12 @@ pipeline {
             steps {
                 mail bcc: '',
                 body: '''
-                Final Report: The pipeline has completed successfully. No action required.
+                Final Report: The pipeline has completed successfully.
                 ''',
                     cc: '',
                     from: '',
                     replyTo: '',
-                    subject: 'Pipeline DevOps Project exécutée avec succès',
+                    subject: 'Pipeline Devsecops Project exécutée avec succès',
                     to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
             }
         }
