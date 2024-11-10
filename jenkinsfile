@@ -121,7 +121,6 @@ pipeline {
 
         stage('Publish ZAP Reports') {
             steps {
-                // Publish both the baseline and active scan reports
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
@@ -130,9 +129,12 @@ pipeline {
                     reportFiles: 'baseline_scan_report.html, active_scan_report.html',
                     reportName: 'ZAP Reports'
                 ])
+
+                archiveArtifacts artifacts: '/var/lib/jenkins/workspace/nmap/zap_results/*.html', allowEmptyArchive: true
             }
         }
     }
+}
 
     /* 
     post {
