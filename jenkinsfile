@@ -169,7 +169,7 @@ pipeline {
         }
     }
 
-    */
+    
 
     post {
         success {
@@ -185,5 +185,5 @@ pipeline {
                              token: env.notify_token
             }
         }
-    }
+    } */
 }
