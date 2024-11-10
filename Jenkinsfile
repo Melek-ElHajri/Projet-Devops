@@ -15,7 +15,7 @@ pipeline {
         stage('GIT') {
             steps {
                 git branch: 'Rjeibi-Hazem',
-                    url: 'https://github.com/Rjeibi-Hazem/Projet-Devops.git'
+                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
 /*        
