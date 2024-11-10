@@ -51,38 +51,45 @@ pipeline {
                 sh 'mvn clean install compile'
             }
         }
-/*
+
+        /*
         stage('Scan') {
             steps {
-                sh '''
-                    if ! docker ps | grep -q 656251e296fb; then
-                        echo "SonarQube container is not running. Starting SonarQube container..."
-                        docker start 656251e296fb
-                        sleep 20
-                    else
-                        echo "SonarQube container is already running."
-                    fi
-                '''
-                
-                withSonarQubeEnv('sq') {
-                    sh 'mvn sonar:sonar'
+                script {
+                    def containerID = '656251e296fb'
+                    sh '''
+                        if ! docker ps | grep -q ${containerID}; then
+                            echo "SonarQube container is not running. Starting SonarQube container..."
+                            docker start ${containerID}
+                            sleep 20
+                        else
+                            echo "SonarQube container is already running."
+                        fi
+                    '''
+                    
+                    withSonarQubeEnv('sq') {
+                        sh 'mvn sonar:sonar'
+                    }
                 }
             }
         }
 
         stage('Deploy to Nexus') {
             steps {
-                sh '''
-                    if ! docker ps | grep -q a5b6a466786c; then
-                        echo "Nexus container is not running. Starting container..."
-                        docker start a5b6a466786c
-                        sleep 30
-                    else
-                        echo "Nexus container is already running."
-                    fi
-                '''
-                
-                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
+                script {
+                    def nexusContainerID = 'a5b6a466786c'
+                    sh '''
+                        if ! docker ps | grep -q ${nexusContainerID}; then
+                            echo "Nexus container is not running. Starting container..."
+                            docker start ${nexusContainerID}
+                            sleep 30
+                        else
+                            echo "Nexus container is already running."
+                        fi
+                    '''
+                    
+                    sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
+                }
             }
         }
 
@@ -122,11 +129,10 @@ pipeline {
         stage('Publish ZAP Report') {
             steps {
                 script {
-                    // Check if the report exists
                     def reportFile = 'zap_report.html'
                     if (fileExists(reportFile)) {
                         publishHTML(target: [
-                            allowMissing: true,  // Allow the report to be missing without failing the build
+                            allowMissing: true,
                             alwaysLinkToLastBuild: true,
                             keepAll: true,
                             reportDir: '.',
@@ -140,8 +146,9 @@ pipeline {
                 }
             }
         }
+        */
     }
-*/
+
     /*
     post {
         success {
