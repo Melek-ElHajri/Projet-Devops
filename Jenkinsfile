@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         SONAR_TOKEN = credentials('SONAR_TOKEN')
-        dockerhub_token = credentials('dockerhub_token')
+       // dockerhub_token = credentials('dockerhub_token')
     }
     
     tools {
