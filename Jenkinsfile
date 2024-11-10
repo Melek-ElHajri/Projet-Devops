@@ -18,7 +18,7 @@ pipeline {
                 script {
                     // Run ZAP Baseline scan and set full permissions for the report
                     sh '''
-                    sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk --user $(id -u jenkins):$(id -g jenkins) -t zaproxy/zap-stable zap-baseline.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
+                    sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
                     sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
                     '''
                 }
@@ -30,7 +30,7 @@ pipeline {
                 script {
                     // Run ZAP Active scan and set full permissions for the report
                     sh '''
-                    sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk --user $(id -u jenkins):$(id -g jenkins) -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
+                    sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
                     sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
                     '''
                 }
