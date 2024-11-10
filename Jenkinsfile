@@ -1,11 +1,11 @@
 pipeline {
     agent any
 
-    environment {
+    /*environment {
         // Uncomment and set the necessary environment variables if needed
         // SONAR_TOKEN = 'squ_65eb01a1246ad720ee511a4d5d0bce064014'
         // dockerhub_token = credentials('dockerhub_token')
-    }
+    }*/
     
     tools {
         jdk 'JAVA_HOME'
