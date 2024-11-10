@@ -125,12 +125,13 @@ pipeline {
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
-                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',
-                    reportFiles: 'baseline_scan_report.html, active_scan_report.html',
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Absolute path
+                    reportFiles: 'active_scan_report.html, baseline_scan_report.html',
                     reportName: 'ZAP Reports'
                 ])
 
-                archiveArtifacts artifacts: '/var/lib/jenkins/workspace/nmap/zap_results/*.html', allowEmptyArchive: true
+                // Archive the artifacts with the absolute path
+                archiveArtifacts artifacts: '/var/lib/jenkins/workspace/nmap/zap_results/*.html', allowEmptyArchive: true  // Absolute path
             }
         }
     }
