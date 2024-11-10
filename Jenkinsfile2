@@ -93,14 +93,14 @@ pipeline {
 
         stage('Prometheus') {
             steps {
-                  sh 'docker compose start prometheus'
+                  sh 'docker compose -f ~/sonar-nexus/docker-compose.yaml start prometheus'
                 }
             }
         
 
         stage('Grafana') {
             steps {
-                        sh 'docker compose start grafana'
+                        sh 'docker compose -f ~/sonar-nexus/docker-compose.yaml start grafana'
                     }
                  }
 
