@@ -68,17 +68,17 @@ pipeline {
 
         // Uncomment these stages if you want to generate and push a Docker image
         
-        /*stage("Generate Docker Image") {
+        stage("Generate Docker Image") {
             steps {
                 //sudo chmod 666 /var/run/docker.sock
-                sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
+                sh 'docker build -t badredinedhaoui/tp-foyer:5.0.0 .'
             }
         }
 
         stage("Push Docker Image") {
             steps {
-                sh "echo ${dockerhub_token} | docker login -u m2l2k --password-stdin" 
-                sh "docker push m2l2k/tp-foyer:5.0.0"
+                sh "echo ${dckr_pat_ZvAq9o6m4mmeMhtcphOp10XBi-g} | docker login -u badredinedhaoui --password-stdin" 
+                sh "docker push badredinedhaoui/tp-foyer:5.0.0"
             }
         }
 
@@ -88,7 +88,7 @@ pipeline {
             }
         }
         
-        stage('Start Monitoring Containers') {
+        /*stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 4223e0421a91'
                 sh 'docker start cf099f77ec8b'
