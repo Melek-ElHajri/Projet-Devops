@@ -43,75 +43,68 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
-        // stage('Deploy to Nexus') {
-        //     steps {
-        //         sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
-        //     }
-        // }
+        stage('Deploy to Nexus') {
+            steps {
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
+            }
+        }
 
-        // stage('SonarQube') {
-        //     steps {
-        //         // Run SonarQube analysis using Maven
-        //         sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
-        //     }
-        // }
+        stage('SonarQube') {
+            steps {
+                Run SonarQube analysis using Maven
+                sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
+            }
+        }
         
 
-        // stage('Build') {
-        //     steps {
-        //         sh 'mvn clean package' // This will create the JAR in the target directory
-        //     }
-        // }
+        stage('Build') {
+            steps {
+                sh 'mvn clean package' This will create the JAR in the target directory
+            }
+        }
 
         
-        // stage('Build Docker Image') {
-        //     steps {  
-        //         sh 'docker build -t nourhenenc/alpine:1.0.0 .'
-        //     }
-        // }
+        stage('Build Docker Image') {
+            steps {  
+                sh 'docker build -t nourhenenc/alpine:1.0.0 .'
+            }
+        }
 
-        // stage('Push Docker Image') {
-        //     steps {
-        //         script {
-        //             withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-        //                 sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin"
-        //             }
-        //             sh 'docker push nourhenenc/alpine:1.0.0'
-        //         }
-        //     }
-        // }
-
-        // stage('Deploy with Docker Compose') {
-        //     steps {
-        //         script {
-        //             sh 'ls -la' // Confirm files are in the right directory
-        //             sh 'docker compose -f ./docker-compose.yml up -d'
-        //         }
-        //     } 
-        // }
-        
-
-        // stage('Prometheus') {
-        //     steps {
-        //           sh 'docker start prometheus'
-        //         }
-        //     }
-        
-
-        // stage('Grafana') {
-        //     steps {
-        //                 sh 'docker start grafana'
-        //             }
-        //         }
-
-       stage('Security Scan : Nmap') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    echo "Starting Nmap Security Scan..."
-                    sh 'sudo nmap -sS -p 1-65535 -v localhost'
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin"
+                    }
+                    sh 'docker push nourhenenc/alpine:1.0.0'
                 }
             }
         }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    sh 'ls -la' //Confirm files are in the right directory
+                    sh 'docker compose -f ./docker-compose.yml up -d'
+                }
+            } 
+        }
+        
+
+        stage('Prometheus') {
+            steps {
+                  sh 'docker compose start prometheus'
+                }
+            }
+        
+
+        stage('Grafana') {
+            steps {
+                        sh 'docker compose start grafana'
+                    }
+                 }
+
+      
       
       stage('Email Notification') {
             steps {
@@ -164,5 +157,4 @@ pipeline {
     }
 
 }
-
 
