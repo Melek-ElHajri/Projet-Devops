@@ -24,14 +24,14 @@ pipeline {
                 sh 'mvn test' 
             }
         }
-/*
+
         stage('Scan') {
             steps {
                 // Check if the SonarQube container is running, start it if not
                 sh '''
-                    if ! docker ps | grep 656251e296fb > /dev/null; then
+                    if ! docker ps | grep 5dc45f66b119 > /dev/null; then
                         echo "SonarQube container is not running. Starting SonarQube container..."
-                        docker start 656251e296fb
+                        docker start 5dc45f66b119
                         sleep 20  # Wait for the container to be fully up
                     else
                         echo "SonarQube container is already running."
@@ -43,9 +43,9 @@ pipeline {
                     sh 'mvn sonar:sonar'
                 }
             }
-        }*/
+        }
         
-        stage('Deploy to Nexus') {
+        /*stage('Deploy to Nexus') {
             steps {
                 // Check if the container is running, start it if not
                 sh '''
@@ -60,7 +60,7 @@ pipeline {
                 
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
-        }
+        }*/
 
         // Uncomment these stages if you want to generate and push a Docker image
         
