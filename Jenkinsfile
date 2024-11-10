@@ -1,15 +1,15 @@
 pipeline {
     agent any
-    /*  
+
     environment {
-        SONAR_TOKEN = 'squ_65eb01a1246ad720ee511a4d5d0bce064014'
-        // SONAR_TOKEN = credentials('SONAR_TEXT')
+        // Uncomment and use if necessary
+        // SONAR_TOKEN = 'your-sonar-token'
         // dockerhub_token = credentials('dockerhub_token')
-    }*/
-    
+    }
+
     tools {
-        jdk 'JAVA_HOME'  // Ensure that 'JAVA_HOME' is configured in Jenkins tools
-        maven 'M2_HOME'  // Ensure that 'M2_HOME' is configured in Jenkins tools
+        jdk 'JAVA_HOME'  // Ensure JAVA_HOME is set in Jenkins
+        maven 'M2_HOME'  // Ensure M2_HOME is set in Jenkins
     }
 
     stages {
@@ -34,7 +34,22 @@ pipeline {
             }
         }
 
-        // Quick Nmap Scan stage targeting google.com
+        // JaCoCo Code Coverage Stage
+        stage('Code Coverage with JaCoCo') {
+            steps {
+                echo "Running JaCoCo code coverage"
+                sh 'mvn jacoco:report'  // This will generate the JaCoCo report
+            }
+            post {
+                always {
+                    // Archive the JaCoCo report as Jenkins artifact
+                    archiveArtifacts artifacts: 'target/site/jacoco/jacoco.xml', allowEmptyArchive: true
+                    echo "JaCoCo report has been archived."
+                }
+            }
+        }
+
+        // Nmap Security Scan
         stage('Quick Nmap Scan') {
             steps {
                 script {
@@ -55,11 +70,11 @@ pipeline {
             }
         }
 
-        // FindSecurityBugs Scan Stage
+        // FindSecurityBugs Scan
         stage('Security Scan with FindSecurityBugs') {
             steps {
                 echo "Running security scan using FindSecurityBugs..."
-                sh 'mvn clean compile spotbugs:check'  // Runs the FindSecurityBugs plugin
+                sh 'mvn spotbugs:check'  // Runs the SpotBugs plugin
             }
             post {
                 always {
