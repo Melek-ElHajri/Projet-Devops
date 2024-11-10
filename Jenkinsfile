@@ -1,9 +1,9 @@
 pipeline {
     agent any
     
-   /* environment {
-        SONAR_TOKEN = 'squ_a92c5a8ed72df820dbf9f1988e0a3704fac3dbd4'
-    }*/
+    environment {
+        SONAR_TOKEN = 'squ_65eb01a1246ad720ee511a4d5d0bce064014'
+    }
     
     tools {
         jdk 'JAVA_HOME'
