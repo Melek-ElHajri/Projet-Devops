@@ -117,8 +117,8 @@ pipeline {
                     reportName: 'ZAP Reports'
                 ])
 
-                // Archive the artifacts
-                archiveArtifacts artifacts: '/var/lib/jenkins/workspace/nmap/zap_results/active_scan_report.html,/var/lib/jenkins/workspace/nmap/zap_results/baseline_scan_report.html', allowEmptyArchive: true  // Relative path after confirming the files exist
+                // Archive the specific artifact files
+                archiveArtifacts artifacts: 'zap_results/active_scan_report.html,zap_results/baseline_scan_report.html', allowEmptyArchive: true
             }
         }
 
@@ -141,7 +141,6 @@ pipeline {
             }
         }
         */
-
     }
 
     // Post block commented out as requested
