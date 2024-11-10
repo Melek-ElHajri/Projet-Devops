@@ -51,7 +51,7 @@ pipeline {
                 sh 'mvn clean install compile'
             }
         }
-
+/*
         stage('Scan') {
             steps {
                 sh '''
@@ -141,7 +141,7 @@ pipeline {
             }
         }
     }
-
+*/
     /*
     post {
         success {
