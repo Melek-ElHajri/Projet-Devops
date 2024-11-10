@@ -13,13 +13,11 @@ pipeline {
             }
         }
 
-       
-        
         stage('Nmap Scan Attack') {
             steps {
                 script {
-                    // Run Gauntlt Nmap attack and redirect output to a file
-                    sh 'gauntlt nmap.attack > nmap_output.txt'
+                    // Run Gauntlt Nmap attack from the correct directory and redirect output to a file
+                    sh 'gauntlt /var/lib/jenkins/workspace/sonar/gauntlt-attacks/nmap.attack > nmap_output.txt'
                     
                     // Archive the output file
                     archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
@@ -30,8 +28,8 @@ pipeline {
         stage('SQL Injection Attack (Gauntlt)') {
             steps {
                 script {
-                    // Run Gauntlt SQL Injection attack and redirect output to a file
-                    sh 'gauntlt sql_in.attack > sql_injection_output.txt'
+                    // Run Gauntlt SQL Injection attack from the correct directory and redirect output to a file
+                    sh 'gauntlt /var/lib/jenkins/workspace/sonar/gauntlt-attacks/sql_in.attack > sql_injection_output.txt'
                     
                     // Archive the output file
                     archiveArtifacts artifacts: 'sql_injection_output.txt', allowEmptyArchive: true
@@ -43,7 +41,7 @@ pipeline {
             steps {
                 script {
                     // Run SQLmap for deeper SQL injection testing and redirect output to a file
-                    sh 'python3 sqlmap.py -u "http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant" --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" --batch --level=5 --risk=3 --tamper=space2comment > sqlmap_output.txt'
+                    sh 'python3 /var/lib/jenkins/workspace/sonar/gauntlt-attacks/sqlmap.py -u "http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant" --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" --batch --level=5 --risk=3 --tamper=space2comment > sqlmap_output.txt'
                     
                     // Archive the output file
                     archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
@@ -51,6 +49,4 @@ pipeline {
             }
         }
     }
-  
-
 }
