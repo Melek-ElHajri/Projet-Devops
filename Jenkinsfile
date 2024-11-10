@@ -31,6 +31,26 @@ pipeline {
             }
         }
 
+        stage('Nmap Scan') {
+            steps {
+                script {
+                    def targetIp = '192.168.10.2'  // Replace with the IP or hostname you want to scan
+                    echo "Running Nmap scan on ${targetIp}"
+                    
+                    // Basic port scan and save output to a report
+                    sh "nmap -p 1-65535 ${targetIp} -oN nmap_scan_report.txt"
+                    
+                    // Detailed scan with service and OS detection
+                    sh "nmap -sV -O ${targetIp} -oN nmap_detailed_report.txt"
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'nmap_*.txt', allowEmptyArchive: true
+                    echo "Nmap scan reports have been archived as artifacts."
+                }
+            }
+        }
      /*   stage('Scan') {
             steps {
                 // Check if the SonarQube container is running, start it if not
