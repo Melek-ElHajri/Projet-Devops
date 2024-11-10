@@ -49,7 +49,7 @@ pipeline {
                 }
             }
         }
-        
+        }
         /*stage('Deploy to Nexus') {
             steps {
                 // Check if the container is running, start it if not
