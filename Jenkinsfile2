@@ -27,6 +27,15 @@ pipeline {
             }
         }
 
+ stage('Security Scan : Nmap') {
+    steps {
+        script {
+            echo "Starting Nmap Security Scan..."
+            sh 'nmap -sT -p 1-65535 -v localhost'
+        }
+    }
+}
+/**
 stage('Pre-commit Security Hooks') {
     steps {
         script {
@@ -48,7 +57,7 @@ stage('Pre-commit Security Hooks') {
             '''
         }
     }
-}
+}**/
 
 /**
          stage('Mockito Tests') {
