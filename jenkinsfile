@@ -52,14 +52,35 @@ pipeline {
             }
         }
 
-        stage('Nmap Scan Attack') {
+        stage('Run Nmap Scan') {
             steps {
                 script {
-                    // Run Gauntlt Nmap attack from the correct directory, display output to console and save it to a file
+                    // Run the Nmap scan and save the output to a text file
                     sh 'sudo gauntlt /var/lib/jenkins/workspace/nmap/gauntlt-attacks/nmap.attack | tee nmap_output.txt'
                     
-                    // Archive the output file
-                    archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
+                    // Generate the HTML report
+                    sh '''
+                        echo "<html><head><title>Nmap Scan Results</title></head><body><h1>Nmap Scan Report</h1>" > nmap_report.html
+                        echo "<pre>" >> nmap_report.html
+                        cat nmap_output.txt >> nmap_report.html
+                        echo "</pre></body></html>" >> nmap_report.html
+                    '''
+                }
+            }
+        }
+
+        stage('Publish HTML Report') {
+            steps {
+                script {
+                    // Publish the generated HTML report
+                    publishHTML(target: [
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: '.',
+                        reportFiles: 'nmap_report.html',
+                        reportName: 'Nmap Scan Report'
+                    ])
                 }
             }
         }
@@ -150,9 +171,9 @@ pipeline {
             }
         }
         */
+
     }
 
-    /*
     post {
         success {
             script {
@@ -168,5 +189,4 @@ pipeline {
             }
         }
     }
-    */
 }
