@@ -3,6 +3,7 @@ pipeline {
     
     environment {
         SONAR_TOKEN = 'squ_a92c5a8ed72df820dbf9f1988e0a3704fac3dbd4'
+        dockerhub_token = 'dckr_pat_ZvAq9o6m4mmeMhtcphOp10XBi-g'
     }
     
     tools {
@@ -77,7 +78,7 @@ pipeline {
 
         stage("Push Docker Image") {
             steps {
-                sh "echo ${dckr_pat_ZvAq9o6m4mmeMhtcphOp10XBi-g} | docker login -u badredinedhaoui --password-stdin" 
+                sh "echo ${dockerhub_token} | docker login -u badredinedhaoui --password-stdin" 
                 sh "docker push badredinedhaoui/tp-foyer:5.0.0"
             }
         }
