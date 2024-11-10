@@ -118,7 +118,7 @@ pipeline {
                 ])
 
                 // Archive the artifacts
-                archiveArtifacts artifacts: 'zap_results/*.html', allowEmptyArchive: true  // Relative path after confirming the files exist
+                archiveArtifacts artifacts: '/var/lib/jenkins/workspace/nmap/zap_results/active_scan_report.html,/var/lib/jenkins/workspace/nmap/zap_results/baseline_scan_report.html', allowEmptyArchive: true  // Relative path after confirming the files exist
             }
         }
 
