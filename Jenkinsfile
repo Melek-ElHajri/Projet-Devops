@@ -1,23 +1,5 @@
 pipeline {
     agent any
-
-    environment {
-        dockerhub_token = credentials('dockerhub_token')
-        notify_token = credentials('NOTIFY_TOKEN')
-    }
-
-    tools {
-        jdk 'JAVA_HOME'
-        maven 'M2_HOME'
-    }
-
-    stages {
-        stage('GIT') {
-            steps {
-                git branch: 'Rjeibi-Hazem',
-                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
-            }
-        }
         stages {
 		stage( 'Hello') {
 			steps {
