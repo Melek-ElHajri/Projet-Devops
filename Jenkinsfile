@@ -1,15 +1,15 @@
 pipeline {
     agent any
-
-  /*  environment {
-        // Uncomment and use if necessary
-        // SONAR_TOKEN = 'your-sonar-token'
-        // dockerhub_token = credentials('dockerhub_token')
+  /*  
+    environment {
+        SONAR_TOKEN = 'squ_65eb01a1246ad720ee511a4d5d0bce064014'
+       // SONAR_TOKEN = credentials('SONAR_TEXT')
+       // dockerhub_token = credentials('dockerhub_token')
     }*/
-
+    
     tools {
-        jdk 'JAVA_HOME'  // Ensure JAVA_HOME is set in Jenkins
-        maven 'M2_HOME'  // Ensure M2_HOME is set in Jenkins
+        jdk 'JAVA_HOME'
+        maven 'M2_HOME'
     }
 
     stages {
@@ -22,34 +22,16 @@ pipeline {
         
         stage('Build') {
             steps {
-                echo "Running Maven clean install and compile"
                 sh 'mvn clean install compile'
             }
         }
-        
         stage('JUnit/Mockito Tests') {
             steps {
-                echo "Running JUnit/Mockito tests"
                 sh 'mvn test' 
             }
         }
 
-        // JaCoCo Code Coverage Stage
-        stage('Code Coverage with JaCoCo') {
-            steps {
-                echo "Running JaCoCo code coverage"
-                sh 'mvn jacoco:report'  // This will generate the JaCoCo report
-            }
-            post {
-                always {
-                    // Archive the JaCoCo report as Jenkins artifact
-                    archiveArtifacts artifacts: 'target/site/jacoco/jacoco.xml', allowEmptyArchive: true
-                    echo "JaCoCo report has been archived."
-                }
-            }
-        }
-
-        // Nmap Security Scan
+        // Quick Nmap Scan stage targeting google.com
         stage('Quick Nmap Scan') {
             steps {
                 script {
@@ -69,12 +51,11 @@ pipeline {
                 }
             }
         }
-
-        // FindSecurityBugs Scan
+                // FindSecurityBugs Scan Stage
         stage('Security Scan with FindSecurityBugs') {
             steps {
                 echo "Running security scan using FindSecurityBugs..."
-                sh 'mvn spotbugs:check'  // Runs the SpotBugs plugin
+                sh 'mvn clean compile spotbugs:check'  // Runs the FindSecurityBugs plugin
             }
             post {
                 always {
@@ -84,5 +65,7 @@ pipeline {
                 }
             }
         }
+
+    
     }
 }
