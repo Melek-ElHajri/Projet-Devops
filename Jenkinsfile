@@ -1,13 +1,23 @@
-/*pipeline {
+pipeline {
     agent any
-        stages {
-		stage( 'Hello') {
-			steps {
-				echo 'Hello World'
-			}
-		}
-	}
-/*        
+    
+   /* environment {
+        SONAR_TOKEN = 'squ_a92c5a8ed72df820dbf9f1988e0a3704fac3dbd4'
+    }*/
+    
+    tools {
+        jdk 'JAVA_HOME'
+        maven 'M2_HOME'
+    }
+
+    stages {
+        stage('GIT') {
+            steps {
+                git branch: 'Rjeibi-Hazem',
+                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+            }
+        }
+        
         stage('Build') {
             steps {
                 sh 'mvn clean install compile'
@@ -23,9 +33,9 @@
             steps {
                 // Check if the SonarQube container is running, start it if not
                 sh '''
-                    if ! docker ps | grep 656251e296fb > /dev/null; then
+                    if ! docker ps | grep 055ccab75690 > /dev/null; then
                         echo "SonarQube container is not running. Starting SonarQube container..."
-                        docker start 656251e296fb
+                        docker start 5dc45f66b119
                         sleep 20  # Wait for the container to be fully up
                     else
                         echo "SonarQube container is already running."
@@ -34,18 +44,18 @@
                 
                 // Run the SonarQube scan
                 withSonarQubeEnv('sq') {
-                    sh 'mvn sonar:sonar'
+                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
             }
         }
         
-        stage('Deploy to Nexus') {
+        /*stage('Deploy to Nexus') {
             steps {
                 // Check if the container is running, start it if not
                 sh '''
-                    if ! docker ps | grep a5b6a466786c > /dev/null; then
+                    if ! docker ps | grep 4f5ed7dc04f8 > /dev/null; then
                         echo "Container is not running. Starting container..."
-                        docker start a5b6a466786c
+                        docker start 4f5ed7dc04f8
                         sleep 30  # Wait for the container to be fully up
                     else
                         echo "Container is already running."
@@ -54,11 +64,11 @@
                 
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
-        }
+        }*/
 
         // Uncomment these stages if you want to generate and push a Docker image
         
-        stage("Generate Docker Image") {
+        /*stage("Generate Docker Image") {
             steps {
                 //sudo chmod 666 /var/run/docker.sock
                 sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
@@ -84,8 +94,8 @@
                 sh 'docker start cf099f77ec8b'
             }
         }
-    }
-*/
+    }*/
+
     // Uncomment the post block if you want notifications
     /*
     post {
@@ -104,15 +114,5 @@
         }
     }
     */
-pipeline {
-	agent any
-	
-	stages {
-		stage( 'Hello') {
-			steps {
-				echo 'Hello World'
-			}
-		}
-	}
+    }
 }
-
