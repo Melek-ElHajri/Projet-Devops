@@ -13,44 +13,135 @@ pipeline {
             }
         }
 
-       
-        
-        stage('Nmap Scan Attack') {
+        stage('Clean') {
+            steps {
+                sh 'mvn clean'
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'mvn test'
+                sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
+            }
+        }
+
+        stage('JaCoCo Report') {
             steps {
                 script {
-                    // Run Gauntlt Nmap attack and redirect output to a file
-                    sh 'gauntlt nmap.attack > nmap_output.txt'
-                    
-                    // Archive the output file
-                    archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
+                    // Publish the JaCoCo code coverage report to Jenkins
+                    jacoco(
+                        execPattern: '**/target/jacoco.exec', // Path to JaCoCo exec file
+                        classPattern: '**/target/classes',    // Path to compiled classes
+                        sourcePattern: '**/src/main/java'     // Path to source code
+                    )
                 }
             }
         }
 
-        stage('SQL Injection Attack (Gauntlt)') {
+        stage('Dependency Check') {
             steps {
-                script {
-                    // Run Gauntlt SQL Injection attack and redirect output to a file
-                    sh 'gauntlt sql_in.attack > sql_injection_output.txt'
-                    
-                    // Archive the output file
-                    archiveArtifacts artifacts: 'sql_injection_output.txt', allowEmptyArchive: true
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out reports/ --noupdate', 
+                               odcInstallation: 'Dependency-Check'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+
+        stage('Sonar') {
+            steps {
+                withSonarQubeEnv('sq1') {
+                    sh 'mvn sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
                 }
             }
         }
 
-        stage('SQL Injection Test (SQLmap)') {
+        // Uncomment the following stages if needed for Docker operations
+        /*
+        stage('Build Docker Image') {
+            steps {
+                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
+            }
+        }
+
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                sh '''
+                    sudo docker login -u rymasd29 -p 223JFT4309
+                    sudo docker push rymasd29/tp-foyer:5.0.0
+                '''
+            }
+        }
+
+        stage('Run Docker Compose') {
             steps {
                 script {
-                    // Run SQLmap for deeper SQL injection testing and redirect output to a file
-                    sh 'python3 sqlmap.py -u "http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant" --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" --batch --level=5 --risk=3 --tamper=space2comment > sqlmap_output.txt'
-                    
-                    // Archive the output file
-                    archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
+                    sh '''
+                        sudo docker-compose down 
+                        sudo docker-compose up -d
+                    '''
                 }
             }
+        }
+
+        stage('Check and Start Prometheus') {
+            steps {
+                script {
+                    def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
+                    if (prometheusRunning) {
+                        echo 'Prometheus is already running.'
+                    } else {
+                        echo 'Starting Prometheus container...'
+                        sh 'docker start prometheus'
+                    }
+                }
+            }
+        }
+
+        stage('Check and Start Grafana') {
+            steps {
+                script {
+                    def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
+                    if (grafanaRunning) {
+                        echo 'Grafana is already running.'
+                    } else {
+                        echo 'Starting Grafana container...'
+                        sh 'docker start grafana'
+                    }
+                }
+            }
+        }
+
+        stage('Validate Setup') {
+            steps {
+                script {
+                    echo 'Validating Prometheus and Grafana setup...'
+                    sh 'curl -f http://localhost:9090/ || echo "Prometheus is not accessible"'
+                    sh 'curl -f http://localhost:3000/ || echo "Grafana is not accessible"'
+                }
+            }
+        }
+        */
+    }
+
+    post {
+        always {
+            // Publish the Dependency-Check results using the absolute file path
+            dependencyCheckPublisher(
+                pattern: '**/reports/dependency-check-report.xml',  // Adjusted to a relative path
+                unstableTotalLow: '5',  // Corrected parameter name
+                unstableNewHigh: '3'    // Corrected parameter name
+            )
         }
     }
-  
-
 }
