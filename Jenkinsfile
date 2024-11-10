@@ -53,6 +53,26 @@ pipeline {
         }
 
 
+                // Gauntlt Attack Stage
+        stage('Gauntlt Attack Tests') {
+            steps {
+                script {
+                    echo "Running Gauntlt security tests..."
+                    
+                    // Run Gauntlt against all attack files in gauntlt_attacks directory
+                    sh 'gauntlt gauntlt_attacks/*.attack > gauntlt_report.txt'
+                }
+            }
+            post {
+                always {
+                    // Archive Gauntlt report
+                    archiveArtifacts artifacts: 'gauntlt_report.txt', allowEmptyArchive: true
+                    echo "Gauntlt report has been archived."
+                }
+            }
+        }
+    }
+
     
     }
 }
