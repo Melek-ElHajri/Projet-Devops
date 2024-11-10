@@ -36,24 +36,14 @@ pipeline {
     }
 } 
 
- stage('Pre-commit Security Hooks') {
-            steps {
-                script {
-                    sh '''
-                    if ! command -v pre-commit &> /dev/null
-                    then
-                        echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
-                        python3 -m venv venv
-                        . venv/bin/activate
-                        pip install pre-commit
-                    fi
-                    git config --unset-all core.hooksPath
-                    pre-commit install
-                    pre-commit run --all-files
-                    '''
-                }
-            }
+stage('Security Scan: Trivy') {
+    steps {
+        retry(3) {
+            echo "Scanning Docker image for vulnerabilities using Trivy..."
+            sh 'trivy image --no-progress --severity CRITICAL gabsirim/alpine'
         }
+    }
+}
 /**
          stage('Mockito Tests') {
             steps {
