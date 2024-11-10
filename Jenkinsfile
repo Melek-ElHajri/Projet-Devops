@@ -18,7 +18,7 @@ pipeline {
                     url: 'https://github.com/Rjeibi-Hazem/Projet-Devops.git'
             }
         }
-        
+/*        
         stage('Build') {
             steps {
                 sh 'mvn clean install compile'
@@ -96,7 +96,7 @@ pipeline {
             }
         }
     }
-
+*/
     // Uncomment the post block if you want notifications
     /*
     post {
