@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         SMTP_USERNAME = 'rim.gabsi.zg@gmail.com'  // replace with your Gmail address
-        SMTP_PASSWORD = 'ktoy bqxt hgcu rimf'    // replace with your Gmail App password
+        SMTP_PASSWORD = 'ufpt qsvd dvib kijw'    // replace with your Gmail App password
     }
     tools {
         jdk 'JAVA_HOME'
