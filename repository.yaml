@@ -1,0 +1,21 @@
+repoVisibility: public  
+
+secrets:
+  - name: secret-pattern
+    pattern: "(?i)(password|key|token|apikey)"
+    description: "Detects common secret patterns such as passwords, keys, and API tokens"
+    files:
+      - "*.txt"
+      - "*.env"
+      - "*.pem"
+      - "*.key"
+      - "*.log"
+
+filenames:
+  - name: sensitive-file-pattern
+    pattern: "(?i).*(secret|password|key|pem|env|token|log)$"
+    description: "Detects files with names indicating secrets like .key, .pem, .env, etc."
+
+exclude:
+  - "README.md"
+  - "config.json"
