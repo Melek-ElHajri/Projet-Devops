@@ -44,6 +44,18 @@ stage('Security Scan: Trivy') {
         }
     }
 }
+
+stage('System Security Check - Lynis') {
+    steps {
+        script {
+            // Run system security audit with Lynis
+            sh 'lynis audit system | tee lynis_audit_output.txt'
+            
+            // Archive the output for later review
+            archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
+        }
+    }
+}
 /**
          stage('Mockito Tests') {
             steps {
