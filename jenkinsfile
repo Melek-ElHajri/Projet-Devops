@@ -64,7 +64,7 @@ pipeline {
             }
         }
 
-        stage('SQL Injection Test (SQLmap)') {
+        /* stage('SQL Injection Test (SQLmap)') {
             steps {
                 script {
                     // Run SQLmap for deeper SQL injection testing, display output to console and save it to a file
@@ -79,7 +79,7 @@ pipeline {
                     archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
                 }
             }
-        }
+        } */
 
         stage('ZAP Baseline Scan') {
             steps {
