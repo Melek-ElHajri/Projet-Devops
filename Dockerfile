@@ -1,5 +1,5 @@
 # Use OpenJDK 17 as the base image
-FROM openjdk:17-jdk-alpine
+FROM openjdk:17-jdk-slim
 
 # Expose the application port
 EXPOSE 8089
