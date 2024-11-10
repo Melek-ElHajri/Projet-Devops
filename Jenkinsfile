@@ -1,11 +1,6 @@
 pipeline {
     agent any
     
-    environment {
-        dockerhub_token = credentials('dockerhub_token')
-        notify_token = credentials('NOTIFY_TOKEN')
-    }
-    
     tools {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
