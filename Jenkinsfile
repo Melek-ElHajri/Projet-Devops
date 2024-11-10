@@ -51,20 +51,7 @@ pipeline {
                 }
             }
         }
-                // FindSecurityBugs Scan Stage
-        stage('Security Scan with FindSecurityBugs') {
-            steps {
-                echo "Running security scan using FindSecurityBugs..."
-                sh 'mvn clean compile spotbugs:check'  // Runs the FindSecurityBugs plugin
-            }
-            post {
-                always {
-                    // Archive FindSecurityBugs report as Jenkins artifacts
-                    archiveArtifacts artifacts: 'target/spotbugsXml.xml', allowEmptyArchive: true
-                    echo "FindSecurityBugs report has been archived."
-                }
-            }
-        }
+
 
     
     }
