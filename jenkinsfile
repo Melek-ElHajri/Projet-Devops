@@ -125,7 +125,7 @@ pipeline {
         }
 
         // Uncomment and adjust if you plan to use SQL Injection tests
-        /*
+        
         stage('SQL Injection Test (SQLmap)') {
             steps {
                 script {
@@ -142,7 +142,7 @@ pipeline {
                 }
             }
         }
-        */
+        
     }
 
     /* Post actions commented out
