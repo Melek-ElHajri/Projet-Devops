@@ -1,11 +1,11 @@
 pipeline {
     agent any
-
+    
     environment {
         SONAR_TOKEN = credentials('SONAR_TOKEN')
         dockerhub_token = credentials('dockerhub_token')
     }
-
+    
     tools {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
@@ -18,7 +18,7 @@ pipeline {
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-
+        
         stage('Build') {
             steps {
                 sh 'mvn clean install compile'
@@ -42,13 +42,14 @@ pipeline {
                         echo "SonarQube container is already running."
                     fi
                 '''
-
+                
                 // Run the SonarQube scan
                 withSonarQubeEnv('snrq') {
                     sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
+                }
             }
         }
-
+        
         /*stage('Deploy to Nexus') {
             steps {
                 // Check if the container is running, start it if not
@@ -67,26 +68,28 @@ pipeline {
         }*/
 
         // Uncomment these stages if you want to generate and push a Docker image
-
-        /*stage("Generate Docker Image") {
+        
+        stage("Generate Docker Image") {
             steps {
                 //sudo chmod 666 /var/run/docker.sock
-                sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
+                sh 'docker build -t badredinedhaoui/tp-foyer:5.0.0 .'
             }
         }
+
         stage("Push Docker Image") {
             steps {
-                sh "echo ${dockerhub_token} | docker login -u m2l2k --password-stdin" 
-                sh "docker push m2l2k/tp-foyer:5.0.0"
+                sh "echo ${dockerhub_token} | docker login -u badredinedhaoui --password-stdin" 
+                sh "docker push badredinedhaoui/tp-foyer:5.0.0"
             }
         }
+
         stage('Docker Compose') {
             steps {
                 sh 'docker compose up -d'
             }
         }
         
-        stage('Start Monitoring Containers') {
+        /*stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 4223e0421a91'
                 sh 'docker start cf099f77ec8b'
