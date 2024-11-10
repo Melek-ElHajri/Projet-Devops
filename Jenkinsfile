@@ -43,7 +43,7 @@ pipeline {
                 '''
                 
                 // Run the SonarQube scan
-                withSonarQubeEnv('sq') {
+                withSonarQubeEnv('sonarj') {
                     sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
             }
