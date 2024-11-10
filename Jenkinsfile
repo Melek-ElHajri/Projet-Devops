@@ -1,11 +1,11 @@
 pipeline {
     agent any
-  /*  
+
     environment {
-        SONAR_TOKEN = 'squ_65eb01a1246ad720ee511a4d5d0bce064014'
-       // SONAR_TOKEN = credentials('SONAR_TEXT')
-       // dockerhub_token = credentials('dockerhub_token')
-    }*/
+        // Uncomment and set the necessary environment variables if needed
+        // SONAR_TOKEN = 'squ_65eb01a1246ad720ee511a4d5d0bce064014'
+        // dockerhub_token = credentials('dockerhub_token')
+    }
     
     tools {
         jdk 'JAVA_HOME'
@@ -25,9 +25,10 @@ pipeline {
                 sh 'mvn clean install compile'
             }
         }
+
         stage('JUnit/Mockito Tests') {
             steps {
-                sh 'mvn test' 
+                sh 'mvn test'
             }
         }
 
@@ -51,7 +52,8 @@ pipeline {
                 }
             }
         }
-                // FindSecurityBugs Scan Stage
+
+        // Security Scan with FindSecurityBugs (Only one instance needed)
         stage('Security Scan with FindSecurityBugs') {
             steps {
                 echo "Running security scan using FindSecurityBugs..."
@@ -65,19 +67,27 @@ pipeline {
                 }
             }
         }
+    }
 
-        // FindSecurityBugs Scan Stage
-        stage('Security Scan with FindSecurityBugs') {
-            steps {
-                echo "Running security scan using FindSecurityBugs..."
-                sh 'mvn clean compile spotbugs:check'  // Runs the FindSecurityBugs plugin
+    post {
+        success {
+            script {
+                emailext (
+                    subject: "Build Success: ${currentBuild.fullDisplayName}",
+                    body: "Le build a réussi ! Consultez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'rim.gabsi.zg@gmail.com, rim.gabsi@esprit.tn'
+                )
             }
-            post {
-                always {
-                    // Archive FindSecurityBugs report as Jenkins artifacts
-                    archiveArtifacts artifacts: 'target/spotbugsXml.xml', allowEmptyArchive: true
-                    echo "FindSecurityBugs report has been archived."
-                }
+        }
+        failure {
+            script {
+                emailext (
+                    subject: "Build Failure: ${currentBuild.fullDisplayName}",
+                    body: "Le build a échoué ! Vérifiez les détails à ${env.BUILD_URL}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']],
+                    to: 'rim.gabsi.zg@gmail.com, rim.gabsi@esprit.tn'
+                )
             }
         }
     }
