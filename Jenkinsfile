@@ -34,6 +34,23 @@ pipeline {
         }
     }
 
+    stage('Deploy to Nexus') {
+            steps {
+                // Check if the container is running, start it if not
+                sh '''
+                    if ! docker ps | grep a5b6a466786c > /dev/null; then
+                        echo "Container is not running. Starting container..."
+                        docker start a5b6a466786c
+                        sleep 30  # Wait for the container to be fully up
+                    else
+                        echo "Container is already running."
+                    fi
+                '''
+                
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
+            }
+        }
+
     post {
         always {
             echo "======always======"
