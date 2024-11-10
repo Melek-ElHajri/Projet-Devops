@@ -127,7 +127,7 @@ stage('ZAP Baseline Scan') {
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
-                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Absolute path
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
                     reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
                     reportName: 'ZAP Reports'
                 ])
