@@ -18,10 +18,9 @@
     <description>tp-foyer</description>
 
     <properties>
-    <java.version>17</java.version>
-    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
-</properties>
-
+        <java.version>17</java.version>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -110,31 +109,32 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                            <!-- Optional goal for creating a report -->
+                            <goal>spotbugs</goal>
+                        </goals>
+                        <configuration>
+                            <effort>Max</effort> <!-- Set to Max for better analysis -->
+                            <threshold>Low</threshold> <!-- Low threshold to catch more issues -->
+                            <plugins>
+                                <plugin>
+                                    <groupId>com.h3xstream.findsecbugs</groupId>
+                                    <artifactId>findsecbugs-plugin</artifactId>
+                                    <version>1.10.0</version> <!-- Check for the latest version -->
+                                </plugin>
+                            </plugins>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-             <plugin>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-maven-plugin</artifactId>
-            <version>4.0.0</version> <!-- Check for the latest version -->
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>check</goal>
-                        <!-- Optional goal for creating a report -->
-                        <goal>spotbugs</goal>
-                    </goals>
-                    <configuration>
-                        <effort>Max</effort> <!-- Set to Max for better analysis -->
-                        <threshold>Low</threshold> <!-- Low threshold to catch more issues -->
-                        <plugins>
-                            <plugin>
-                                <groupId>com.h3xstream.findsecbugs</groupId>
-                                <artifactId>findsecbugs-plugin</artifactId>
-                                <version>1.10.0</version> <!-- Check for the latest version -->
-                            </plugin>
-                        </plugins>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
     </build>
 </project>
