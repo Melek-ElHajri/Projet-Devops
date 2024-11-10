@@ -31,26 +31,23 @@ pipeline {
             }
         }
 
-        // Nmap Scan stage targeting google.com
-        stage('Nmap Scan') {
+        // Quick Nmap Scan stage targeting google.com
+        stage('Quick Nmap Scan') {
             steps {
                 script {
                     def targetHost = 'google.com'  // Scanning google.com
                     
-                    echo "Running Nmap scan on ${targetHost}"
+                    echo "Running quick Nmap scan on ${targetHost}"
                     
-                    // Basic Nmap port scan across all ports
-                    sh "nmap -p 1-65535 ${targetHost} -oN nmap_scan_report.txt"
-                    
-                    // Detailed Nmap scan (service version and OS detection)
-                    sh "nmap -sV -O ${targetHost} -oN nmap_detailed_report.txt"
+                    // Quick scan (first 1000 ports)
+                    sh "nmap -p 1-1000 -T4 -n -Pn ${targetHost} -oN nmap_quick_scan_report.txt"
                 }
             }
             post {
                 always {
                     // Archive the Nmap scan results as Jenkins artifacts
-                    archiveArtifacts artifacts: 'nmap_*.txt', allowEmptyArchive: true
-                    echo "Nmap scan reports have been archived."
+                    archiveArtifacts artifacts: 'nmap_quick_scan_report.txt', allowEmptyArchive: true
+                    echo "Quick Nmap scan report has been archived."
                 }
             }
         }
