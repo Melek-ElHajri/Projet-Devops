@@ -110,14 +110,19 @@ pipeline {
             }
         }
 
-publishHTML(target: [
-    allowMissing: false,
-    alwaysLinkToLastBuild: false,
-    keepAll: true,
-    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
-    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
-    reportName: 'ZAP Reports'
-])
+        stage('Publish ZAP Reports') {
+            steps {
+                // Publish both the baseline and active scan reports
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
+                    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
+                    reportName: 'ZAP Reports'
+                ])
+            }
+        }
 
         // Uncomment and adjust if you plan to use SQL Injection tests
         /*
@@ -140,8 +145,7 @@ publishHTML(target: [
         */
     }
 
-    // Post block commented out as requested
-    /*
+    /* Post actions commented out
     post {
         success {
             script {
@@ -149,7 +153,7 @@ publishHTML(target: [
                              token: env.notify_token
             }
         }
-        
+
         failure {
             script {
                 notifyEvents message: "<b>Build Failed</b> - Job: ${env.JOB_NAME}, Build Number: ${env.BUILD_NUMBER}", 
