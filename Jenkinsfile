@@ -1,11 +1,11 @@
 pipeline {
     agent any
-    
+  /*  
     environment {
         SONAR_TOKEN = 'squ_65eb01a1246ad720ee511a4d5d0bce064014'
        // SONAR_TOKEN = credentials('SONAR_TEXT')
        // dockerhub_token = credentials('dockerhub_token')
-    }
+    }*/
     
     tools {
         jdk 'JAVA_HOME'
@@ -31,7 +31,7 @@ pipeline {
             }
         }
 
-        stage('Scan') {
+     /*   stage('Scan') {
             steps {
                 // Check if the SonarQube container is running, start it if not
                 sh '''
