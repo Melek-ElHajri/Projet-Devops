@@ -1,40 +1,51 @@
 pipeline {
-    agent any  // Utilisez soit "agent any" soit le bloc suivant si vous voulez spécifier un nœud avec un label :
-    // agent {
-    //     node {
-    //         label 'build'
-    //     }
-    // }
-
+    agent any
+    
     tools {
+        jdk 'JAVA_HOME'
         maven 'M2_HOME'
     }
 
-    options {
-        // Timeout counter starts after agent is allocated
-        timeout(time: 5, unit: 'MINUTES')
-    }
-
-    environment {
-        APP_ENV = "DEV"
-    }
-
     stages {
-        stage('Code Checkout') {
+        stage('GIT') {
             steps {
-                git branch: 'Dhaoui-Badreddine',
+                git branch: 'ElHedi-Melek-Elhajri',
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-
-        stage('Code Build') {
+        
+        stage('Build') {
             steps {
-                sh 'mvn install -Dmaven.test.skip=true'
+                sh 'mvn clean install compile'
             }
         }
-    }
-
-    stage('Deploy to Nexus') {
+        stage('JUnit/Mockito Tests') {
+            steps {
+                sh 'mvn test' 
+            }
+        }
+/*
+        stage('Scan') {
+            steps {
+                // Check if the SonarQube container is running, start it if not
+                sh '''
+                    if ! docker ps | grep 656251e296fb > /dev/null; then
+                        echo "SonarQube container is not running. Starting SonarQube container..."
+                        docker start 656251e296fb
+                        sleep 20  # Wait for the container to be fully up
+                    else
+                        echo "SonarQube container is already running."
+                    fi
+                '''
+                
+                // Run the SonarQube scan
+                withSonarQubeEnv('sq') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }*/
+        
+        stage('Deploy to Nexus') {
             steps {
                 // Check if the container is running, start it if not
                 sh '''
@@ -51,15 +62,52 @@ pipeline {
             }
         }
 
+        // Uncomment these stages if you want to generate and push a Docker image
+        
+        /*stage("Generate Docker Image") {
+            steps {
+                //sudo chmod 666 /var/run/docker.sock
+                sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
+            }
+        }
+
+        stage("Push Docker Image") {
+            steps {
+                sh "echo ${dockerhub_token} | docker login -u m2l2k --password-stdin" 
+                sh "docker push m2l2k/tp-foyer:5.0.0"
+            }
+        }
+
+        stage('Docker Compose') {
+            steps {
+                sh 'docker compose up -d'
+            }
+        }
+        
+        stage('Start Monitoring Containers') {
+            steps {
+                sh 'docker start 4223e0421a91'
+                sh 'docker start cf099f77ec8b'
+            }
+        }
+    }*/
+
+    // Uncomment the post block if you want notifications
+    /*
     post {
-        always {
-            echo "======always======"
-        }
         success {
-            echo "=====pipeline executed successfully ====="
+            script {
+                notifyEvents message: "<b>Build Success</b> - Job: ${env.JOB_NAME}, Build Number: ${env.BUILD_NUMBER}", 
+                             token: env.notify_token
+            }
         }
+        
         failure {
-            echo "======pipeline execution failed======"
+            script {
+                notifyEvents message: "<b>Build Failed</b> - Job: ${env.JOB_NAME}, Build Number: ${env.BUILD_NUMBER}", 
+                             token: env.notify_token
+            }
         }
     }
+    */
 }
