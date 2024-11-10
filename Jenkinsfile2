@@ -43,7 +43,7 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
- stage('Deploy to Nexus') {
+        stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.56.10:8081/repository/maven-releases/'
             }
@@ -104,19 +104,30 @@ pipeline {
                     }
                 }
 
+       stage('Security Scan : Nmap') {
+            steps {
+                script {
+                    echo "Starting Nmap Security Scan..."
+                    sh 'sudo nmap -sS -p 1-65535 -v localhost'
+                }
+            }
+        }
+      
       stage('Email Notification') {
             steps {
                 mail bcc: '',
-                     body: '''
-Final Report: The pipeline has completed successfully. No action required.
-''',
-                     cc: '',
-                     from: '',
-                     replyTo: '',
-                     subject: 'Pipeline DevOps Project exécutée avec succès',
-                     to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
+                body: '''
+                Final Report: The pipeline has completed successfully. No action required.
+                ''',
+                    cc: '',
+                    from: '',
+                    replyTo: '',
+                    subject: 'Pipeline DevOps Project exécutée avec succès',
+                    to: 'nourhenechammakhi2000@gmail.com, nourhene.chammakhi@esprit.tn'
             }
         }
+
+       
     }
 
     post {
@@ -152,15 +163,6 @@ Final Report: The pipeline has completed successfully. No action required.
         }
     }
 
+}
 
-  stage('Security Scan : Nmap') {
-    steps {
-        script {
-            echo "Starting Nmap Security Scan..."
-            sh 'sudo nmap -sS -p 1-65535 -v localhost'
-        }
-    }
-}
-}
-}
 
