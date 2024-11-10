@@ -13,6 +13,38 @@ pipeline {
             }
         }
 
+        stage('ZAP Baseline Scan') {
+            steps {
+                script {
+                    // Run ZAP Baseline scan and save the report to the desired path
+                    sh 'sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html'
+                }
+            }
+        }
+
+        stage('ZAP Active Scan') {
+            steps {
+                script {
+                    // Run ZAP Active scan and save the report to the desired path
+                    sh 'sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html'
+                }
+            }
+        }
+
+        stage('Publish ZAP Reports') {
+            steps {
+                // Publish both the baseline and active scan reports
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: '/var/lib/jenkins/workspace/sonar/zap_results',
+                    reportFiles: 'baseline_scan_report.html, active_scan_report.html',
+                    reportName: 'ZAP Reports'
+                ])
+            }
+        }
+
         stage('Nmap Scan Attack') {
             steps {
                 script {
