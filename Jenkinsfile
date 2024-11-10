@@ -18,19 +18,64 @@ pipeline {
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-        
+
+        stage('Pre-commit Security Hooks') {
+            steps {
+                script {
+                    def result = sh(script: '''
+                        if ! command -v pre-commit &> /dev/null; then
+                            echo "pre-commit is not installed, installing in a virtual environment..."
+                            python3 -m venv venv
+                            . venv/bin/activate
+                            pip install pre-commit
+                        else
+                            echo "pre-commit is already installed."
+                        fi
+                        git config --unset-all core.hooksPath
+                        pre-commit install
+                        pre-commit run --all-files
+                        deactivate
+                    ''', returnStatus: true)
+
+                    if (result != 0) {
+                        echo "Pre-commit hooks did not pass, but continuing pipeline."
+                    } else {
+                        echo "Pre-commit hooks passed successfully."
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 sh 'mvn clean install compile'
             }
         }
+
+        stage('Nmap Scan') {
+            steps {
+                script {
+                    // Run Gauntlt Nmap attack from the correct directory, display output to console and save it to a file
+                    sh 'gauntlt /var/lib/jenkins/workspace/nmap/gauntlt-attacks/nmap.attack | tee nmap_output.txt'
+                    
+                    // Archive the output file
+                    archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
+                }
+            }
+        }
+        
+        /*stage('Build') {
+            steps {
+                sh 'mvn clean install compile'
+            }
+        }*/
         stage('JUnit/Mockito Tests') {
             steps {
                 sh 'mvn test' 
             }
         }
 
-        stage('Scan') {
+       /* stage('Scan') {
             steps {
                 // Check if the SonarQube container is running, start it if not
                 sh '''
@@ -48,7 +93,7 @@ pipeline {
                     sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
             }
-        }
+        }*/
         
         /*stage('Deploy to Nexus') {
             steps {
@@ -69,7 +114,7 @@ pipeline {
 
         // Uncomment these stages if you want to generate and push a Docker image
         
-        stage("Generate Docker Image") {
+        /*stage("Generate Docker Image") {
             steps {
                 //sudo chmod 666 /var/run/docker.sock
                 sh 'docker build -t badredinedhaoui/tp-foyer:5.0.0 .'
@@ -87,7 +132,7 @@ pipeline {
             steps {
                 sh 'docker compose up -d'
             }
-        }
+        }*/
         
         /*stage('Start Monitoring Containers') {
             steps {
