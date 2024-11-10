@@ -52,6 +52,26 @@ pipeline {
             }
         }
 
+
+           stage("Generate Docker Image") {
+            steps {
+                //sudo chmod 666 /var/run/docker.sock
+                sh 'docker build -t rh1337/tp-foyer:5.0.0 .'
+            }
+        }
+
+        stage("Push Docker Image") {
+            steps {
+                sh "echo ${dockerhub_token} | docker login -u rh1337 --password-stdin" 
+                sh "docker push rh1337/tp-foyer:5.0.0"
+            }
+        }
+
+        stage('Docker Compose') {
+            steps {
+                sh 'docker compose up -d'
+            }
+        }
     
 
     
