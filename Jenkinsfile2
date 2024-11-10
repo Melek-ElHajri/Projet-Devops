@@ -40,7 +40,7 @@ stage('Security Scan: Trivy') {
     steps {
         retry(3) {
             echo "Scanning Docker image for vulnerabilities using Trivy..."
-            sh 'trivy image --no-progress --severity CRITICAL gabsirim/alpine'
+            sh 'trivy image --no-progress --severity CRITICAL gabsirim/alpine:1.0.0'
         }
     }
 }
