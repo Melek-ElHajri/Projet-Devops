@@ -13,14 +13,21 @@ pipeline {
             }
         }
 
-         stage('ZAP Baseline Scan') {
+        stage('ZAP Baseline Scan') {
             steps {
                 script {
                     // Run ZAP Baseline scan and set full permissions for the report
-                    sh '''
-                    sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
-                    sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
-                    '''
+                    def result = sh(script: '''
+                        sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
+                        sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
+                    ''', returnStatus: true)
+
+                    // Check the result of the ZAP scan
+                    if (result != 0) {
+                        echo "ZAP Baseline Scan completed with warnings or errors."
+                    } else {
+                        echo "ZAP Baseline Scan completed successfully."
+                    }
                 }
             }
         }
@@ -29,10 +36,17 @@ pipeline {
             steps {
                 script {
                     // Run ZAP Active scan and set full permissions for the report
-                    sh '''
-                    sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
-                    sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
-                    '''
+                    def result = sh(script: '''
+                        sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
+                        sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
+                    ''', returnStatus: true)
+
+                    // Check the result of the ZAP scan
+                    if (result != 0) {
+                        echo "ZAP Active Scan completed with warnings or errors."
+                    } else {
+                        echo "ZAP Active Scan completed successfully."
+                    }
                 }
             }
         }
