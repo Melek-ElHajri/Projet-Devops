@@ -51,7 +51,7 @@ pipeline {
 
         stage('SonarQube') {
             steps {
-                Run SonarQube analysis using Maven
+               
                 sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=201JFT3926nourhene*'
             }
         }
