@@ -35,7 +35,7 @@ pipeline {
         stage('Quick Nmap Scan') {
             steps {
                 script {
-                    def targetHost = 'http://192.168.23.133:9000'  // Scanning google.com
+                    def targetHost = 'http://192.168.23.133:8080'  // Scanning google.com
                     
                     echo "Running quick Nmap scan on ${targetHost}"
                     
