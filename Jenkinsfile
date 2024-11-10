@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        SONAR_TOKEN = 'squ_a92c5a8ed72df820dbf9f1988e0a3704fac3dbd4'
-        dockerhub_token = 'dckr_pat_ZvAq9o6m4mmeMhtcphOp10XBi-g'
+        SONAR_TOKEN = credentials('SONAR_TOKEN')
+        dockerhub_token = credentials('dockerhub_token')
     }
     
     tools {
