@@ -1,11 +1,11 @@
 pipeline {
     agent any
 
-    environment {
+  /*  environment {
         // Uncomment and use if necessary
         // SONAR_TOKEN = 'your-sonar-token'
         // dockerhub_token = credentials('dockerhub_token')
-    }
+    }*/
 
     tools {
         jdk 'JAVA_HOME'  // Ensure JAVA_HOME is set in Jenkins
