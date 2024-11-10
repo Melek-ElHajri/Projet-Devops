@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     // Run Gauntlt Nmap attack from the correct directory and redirect output to a file
-                    sh 'gauntlt /var/lib/jenkins/workspace/sonar/gauntlt-attacks/nmap.attack > nmap_output.txt'
+                    sh 'sudo gauntlt /var/lib/jenkins/workspace/sonar/gauntlt-attacks/nmap.attack > nmap_output.txt'
                     
                     // Archive the output file
                     archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
