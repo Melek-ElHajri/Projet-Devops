@@ -59,7 +59,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean package' This will create the JAR in the target directory
+                sh 'mvn clean package' 
             }
         }
 
