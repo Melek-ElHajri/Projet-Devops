@@ -86,8 +86,8 @@ pipeline {
                 script {
                     // Run ZAP Baseline scan and set full permissions for the report
                     def result = sh(script: '''
-                        sudo docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
-                        sudo chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
+                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
                     ''', returnStatus: true)
 
                     // Check the result of the ZAP scan
@@ -105,8 +105,8 @@ pipeline {
                 script {
                     // Run ZAP Active scan and set full permissions for the report
                     def result = sh(script: '''
-                        sudo docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
-                        sudo chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
+                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
                     ''', returnStatus: true)
 
                     // Check the result of the ZAP scan
