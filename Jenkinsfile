@@ -52,14 +52,22 @@ pipeline {
             }
         }
 
-        stage('Nmap Scan') {
+        stage('Quick Nmap Scan') {
             steps {
                 script {
-                    // Run Gauntlt Nmap attack from the correct directory, display output to console and save it to a file
-                    sh 'gauntlt /var/lib/jenkins/workspace/nmap/gauntlt-attacks/nmap.attack | tee nmap_output.txt'
-                    
-                    // Archive the output file
-                    archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
+                    def targetHost = '192.168.10.2'  // Scanning 192.168.10.2
+
+                    echo "Running quick Nmap scan on ${targetHost}:8089"
+
+                    // Quick scan on the specified IP and port 8089
+                    sh "nmap -p 8089 -T4 -n -Pn ${targetHost} -oN nmap_quick_scan_report.txt"
+                }
+            }
+            post {
+                always {
+                    // Archive the Nmap scan results as Jenkins artifacts
+                    archiveArtifacts artifacts: 'nmap_quick_scan_report.txt', allowEmptyArchive: true
+                    echo "Quick Nmap scan report has been archived."
                 }
             }
         }
