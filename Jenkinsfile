@@ -18,6 +18,13 @@ pipeline {
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
+        stages {
+		stage( 'Hello') {
+			steps {
+				echo 'Hello World'
+			}
+		}
+	}
 /*        
         stage('Build') {
             steps {
