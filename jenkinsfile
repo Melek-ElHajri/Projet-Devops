@@ -52,7 +52,7 @@ pipeline {
             }
         }
 
-        stage('Quick Nmap Scan') {
+        stage('Nmap Scan') {
             steps {
                 script {
                     def targetHost = '192.168.10.2'  // Scanning 192.168.10.2
