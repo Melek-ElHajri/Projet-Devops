@@ -30,25 +30,31 @@ pipeline {
 stage('Pre-commit Security Hooks') {
     steps {
         script {
-            // Vérifier si pre-commit est installé, sinon l'installer
+            // Install necessary packages including python3-venv
             sh '''
+            sudo apt-get update
+            sudo apt-get install -y python3-venv
+
+            # Check if pre-commit is installed, otherwise install it in a virtual environment
             if ! command -v pre-commit &> /dev/null
             then
                 echo "pre-commit n'est pas installé, installation dans un environnement virtuel..."
                 python3 -m venv venv
-                . venv/bin/activate  # Use dot instead of source if source is not found
+                . venv/bin/activate
                 pip install pre-commit
             fi
-            # Désactiver les hooks Git existants pour éviter les conflits
+
+            # Disable existing Git hooks to avoid conflicts
             git config --unset-all core.hooksPath
-            # Installer les hooks de pre-commit
+
+            # Install and run the pre-commit hooks
             pre-commit install
-            # Exécuter les hooks de pre-commit pour vérifier tous les fichiers
             pre-commit run --all-files
             '''
         }
     }
-} 
+}
+
 /**
          stage('Mockito Tests') {
             steps {
