@@ -35,7 +35,7 @@ pipeline {
         }
     }
 }
-/**
+
 stage('Pre-commit Security Hooks') {
     steps {
         script {
@@ -57,7 +57,7 @@ stage('Pre-commit Security Hooks') {
             '''
         }
     }
-}**/
+}
 
 /**
          stage('Mockito Tests') {
