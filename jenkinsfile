@@ -52,6 +52,20 @@ pipeline {
             }
         }
 
+        stage('JUnit/Mockito Tests') {
+            steps {
+                // Exécuter les tests et enregistrer les résultats dans un fichier
+                sh 'mvn test > test_results.log'
+            }
+        }
+
+        stage('Archiver les résultats de tests') {
+            steps {
+                // Archiver le fichier de résultats
+                archiveArtifacts artifacts: 'test_results.log', allowEmptyArchive: true
+            }
+        }
+
         stage('Nmap Scan') {
             steps {
                 script {
@@ -125,7 +139,6 @@ pipeline {
         }
 
         // Uncomment and adjust if you plan to use SQL Injection tests
-        
         stage('SQL Injection Test (SQLmap)') {
             steps {
                 script {
@@ -142,10 +155,10 @@ pipeline {
                 }
             }
         }
-        
     }
 
-    /* Post actions commented out
+    // Post actions are commented out
+    /*
     post {
         success {
             script {
