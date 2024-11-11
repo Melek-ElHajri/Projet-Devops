@@ -148,22 +148,6 @@ pipeline {
                 }
             }
         }
-        stage('ZAP Active Scan') {
-            steps {
-                script {
-                    def result = sh(script: '''
-                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
-                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
-                    ''', returnStatus: true)
-
-                    if (result != 0) {
-                        echo "ZAP Active Scan completed with warnings or errors."
-                    } else {
-                        echo "ZAP Active Scan completed successfully."
-                    }
-                }
-            }
-        }
 
         stage('Publish ZAP Reports') {
             steps {
@@ -171,8 +155,8 @@ pipeline {
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
-                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
-                    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',
+                    reportFiles: 'baseline_scan_report.html',  
                     reportName: 'ZAP Reports'
                 ])
             }
