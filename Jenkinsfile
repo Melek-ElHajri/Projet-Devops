@@ -46,6 +46,14 @@ pipeline {
                 }
             }
         }
+        stage('Security Scan: OWASP Dependency-Check') {
+            steps {
+                script {
+                    echo "Starting OWASP Dependency-Check..."
+                    sh 'mvn org.owasp:dependency-check-maven:check'
+                }
+            }
+        }
 
         stage('Scan') {
             steps {
