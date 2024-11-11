@@ -35,14 +35,15 @@ pipeline {
             }
         }
 
-        stage('JaCoCo coverage report') {
+       stage('Testing - JaCoCo Report Generation') {
             steps {
-                step([$class: 'JacocoPublisher',
-                      execPattern: '**/target/jacoco.exec',
-                      classPattern: '**/classes',
-                      sourcePattern: '**/src',
-                      exclusionPattern: '*/target/**/,**/*Test*,**/*_javassist/**'
-                ])
+                script {
+                    jacoco(
+                        execPattern: '**/target/jacoco.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: '**/src/main/java'
+                    )
+                }
             }
         }
 
