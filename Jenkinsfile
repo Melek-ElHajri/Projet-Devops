@@ -53,7 +53,7 @@ pipeline {
                 dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
                                odcInstallation: 'Dependency-Check'
             }
-        }*/
+        }
         stage('Testing - OWASP Dependency-Check Vulnerabilities') {
             steps {
                     dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
