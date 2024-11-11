@@ -16,6 +16,13 @@ pipeline {
             }
         }
 
+         stage('Testing - OWASP Dependency-Check Vulnerabilities') {
+            steps {
+                    dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
+                               odcInstallation: 'Dependency-Check'
+                    dependencyCheckPublisher pattern: 'target/dependency-check-report/dependency-check-report.xml'
+    }
+}
 
 
        stage('Deployment - Deploy to Nexus') {
