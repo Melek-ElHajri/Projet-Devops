@@ -18,7 +18,7 @@ services:
       retries: 5
 
   app-tpfoyer:
-    image: m2l2k/tp-foyer:5.0.0
+    image: rymasd29/tp-foyer:5.0.0
     depends_on:
       mysqldb:
         condition: service_healthy
