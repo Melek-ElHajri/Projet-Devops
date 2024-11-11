@@ -246,21 +246,7 @@ pipeline {
             }
         }
 
-        stage('Notification - Success Notification') {
-            steps {
-                script {
-                    if (currentBuild.result == 'SUCCESS') {
-                        mail(
-                            to: "${EMAIL_RECIPIENTS}",
-                            subject: "${SUCCESS_SUBJECT}",
-                            body: "${SUCCESS_BODY}"
-                        )
-                        notifyEvents message: "<b>Build Success</b> - Job: ${JOB_NAME}, Build Number: ${BUILD_NUMBER}", 
-                                     token: "${NOTIFY_TOKEN}"
-                    }
-                }
-            }
-        }
+       
     }
 
     
