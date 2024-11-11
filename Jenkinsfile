@@ -127,7 +127,7 @@ pipeline {
                 }
             }
         }
-
+/**
 
         stage('Build') {
             steps {
@@ -135,12 +135,12 @@ pipeline {
                 sh 'ls target'
             }
         } 
-
+**/
         stage('Build Docker Image') {
             steps {  
                 sh "docker build -t gabsirim/alpine:1.0.0 ."
             }
-        }
+        } 
 
         stage('Push Docker Image') {
             steps {
