@@ -5,7 +5,8 @@ pipeline {
         jdk 'JAVA_HOME'  // Adjust if necessary
         maven 'M2_HOME'  // Adjust if necessary
     }
-  environment {
+
+    environment {
         EMAIL_RECIPIENTS = 'nouha.sedraoui@esprit.tn'
         PRE_BUILD_SUBJECT = "Pre-Build Notification - ${JOB_NAME} #${BUILD_NUMBER}"
         PRE_BUILD_BODY = """
@@ -99,7 +100,7 @@ Jenkins Automation
     }
 
     stages {
-         stage('Error Handling') {
+        stage('Development - Error Handling') {
             steps {
                 script {
                     try {
@@ -116,7 +117,7 @@ Jenkins Automation
             }
         }
 
-        stage('Pre-Build Notification') {
+        stage('Development - Pre-Build Notification') {
             steps {
                 script {
                     mail(
@@ -130,30 +131,32 @@ Jenkins Automation
             }
         }
 
-        stage('GIT') {
+        stage('Development - GIT Checkout') {
             steps {
                 git branch: 'NouhaSedraoui', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-         stage('Clean') {
+
+        stage('Development - Clean') {
             steps {
                 sh 'mvn clean'
             }
         }
-         stage('Compile') {
+
+        stage('Development - Compile') {
             steps {
                 sh 'mvn compile'
             }
         }
 
-        stage('Run Junit/Mockito|Jacoco Tests') {
+        stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
                 sh 'mvn test'
                 sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
             }
         }
 
-        stage('JaCoCo Report') {
+        stage('Testing - JaCoCo Report Generation') {
             steps {
                 script {
                     jacoco(
@@ -165,14 +168,7 @@ Jenkins Automation
             }
         }
 
-       /* stage('Dependency Check') {
-            steps {
-                dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
-                               odcInstallation: 'Dependency-Check'
-            }
-        }*/
-    
-        stage ('OWASP Dependency-Check Vulnerabilities') {
+        stage('Testing - OWASP Dependency-Check Vulnerabilities') {
             steps {
                 dependencyCheck additionalArguments: ''' 
                     -o "./" 
@@ -182,11 +178,9 @@ Jenkins Automation
 
                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
             }
-        }     
-    
+        }
 
-
-        stage('Publish Dependency-Check Report') {
+        stage('Testing - Publish Dependency-Check Report') {
             steps {
                 script {
                     publishHTML([ 
@@ -199,8 +193,8 @@ Jenkins Automation
                 }
             }
         }
-        
-         stage('Sonar Analysis') {
+
+        stage('Testing - Sonar Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
@@ -208,26 +202,25 @@ Jenkins Automation
             }
         }
 
-        stage('Package') {
+        stage('Deployment - Package') {
             steps {
                 sh 'mvn package'
             }
         }
 
-       
- stage('Deploy to Nexus') {
+        stage('Deployment - Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
 
- stage('Build Docker Image') {
+        stage('Deployment - Build Docker Image') {
             steps {
                 sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
             }
         }
 
-        stage('Push Docker Image to DockerHub') {
+        stage('Deployment - Push Docker Image to DockerHub') {
             steps {
                 sh '''
                     sudo docker login -u rymasd29 -p 223JFT4309
@@ -235,7 +228,8 @@ Jenkins Automation
                 '''
             }
         }
-stage('Run Docker Compose') {
+
+        stage('Deployment - Run Docker Compose') {
             steps {
                 script {
                     sh '''
@@ -245,7 +239,9 @@ stage('Run Docker Compose') {
                 }
             }
         }
-        stage('Check and Start Prometheus') {
+
+        // Operate: Monitor Phase
+        stage('Operate: Monitor - Check and Start Prometheus') {
             steps {
                 script {
                     def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
@@ -259,7 +255,7 @@ stage('Run Docker Compose') {
             }
         }
 
-        stage('Check and Start Grafana') {
+        stage('Operate: Monitor - Check and Start Grafana') {
             steps {
                 script {
                     def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
@@ -273,7 +269,7 @@ stage('Run Docker Compose') {
             }
         }
 
-        stage('Validate Setup') {
+        stage('Operate: Monitor - Validate Setup') {
             steps {
                 script {
                     echo 'Validating Prometheus and Grafana setup...'
@@ -283,17 +279,14 @@ stage('Run Docker Compose') {
             }
         }
 
-
-        stage('ZAP Baseline Scan') {
+        stage('Security Testing - ZAP Baseline Scan') {
             steps {
                 script {
-                    // Run ZAP Baseline scan and set full permissions for the report
                     def result = sh(script: '''
                         sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
                         sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
                     ''', returnStatus: true)
 
-                    // Check the result of the ZAP scan
                     if (result != 0) {
                         echo "ZAP Baseline Scan completed with warnings or errors."
                     } else {
@@ -303,16 +296,14 @@ stage('Run Docker Compose') {
             }
         }
 
-        stage('ZAP Active Scan') {
+        stage('Security Testing - ZAP Active Scan') {
             steps {
                 script {
-                    // Run ZAP Active scan and set full permissions for the report
                     def result = sh(script: '''
                         sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
                         sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
                     ''', returnStatus: true)
 
-                    // Check the result of the ZAP scan
                     if (result != 0) {
                         echo "ZAP Active Scan completed with warnings or errors."
                     } else {
@@ -322,9 +313,8 @@ stage('Run Docker Compose') {
             }
         }
 
-        stage('Publish ZAP Reports') {
+        stage('Security Testing - Publish ZAP Reports') {
             steps {
-                // Publish both the baseline and active scan reports
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
@@ -336,42 +326,34 @@ stage('Run Docker Compose') {
             }
         }
 
-        stage('Nmap Scan Attack') {
+        stage('Security Testing - Nmap Scan Attack') {
             steps {
                 script {
-                    // Run Gauntlt Nmap attack from the correct directory and redirect output to a file
                     sh 'sudo gauntlt /var/lib/jenkins/workspace/sonar/gauntlt-attacks/nmap.attack > nmap_output.txt'
-                    
-                    // Archive the output file
                     archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
                 }
             }
         }
 
-        stage('SQL Injection Attack (Gauntlt)') {
+        stage('Security Testing - SQL Injection Attack (Gauntlt)') {
             steps {
                 script {
-                    // Run Gauntlt SQL Injection attack from the correct directory and redirect output to a file
                     sh 'gauntlt /var/lib/jenkins/workspace/sonar/gauntlt-attacks/sql_in.attack > sql_injection_output.txt'
-                    
-                    // Archive the output file
                     archiveArtifacts artifacts: 'sql_injection_output.txt', allowEmptyArchive: true
                 }
             }
         }
 
-        stage('SQL Injection Test (SQLmap)') {
+        stage('Security Testing - SQL Injection Test (SQLmap)') {
             steps {
                 script {
-                    // Run SQLmap for deeper SQL injection testing and redirect output to a file
                     sh 'python3 /var/lib/jenkins/workspace/sonar/gauntlt-attacks/sqlmap/sqlmap.py -u "http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant" --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" --batch --level=5 --risk=3 --tamper=space2comment > sqlmap_output.txt'
-                    
-                    // Archive the output file
                     archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
                 }
             }
         }
-         stage('Success Notification') {
+
+        stage('Notification - Success Notification') {
             steps {
                 script {
                     if (currentBuild.result == 'SUCCESS') {
@@ -386,10 +368,9 @@ stage('Run Docker Compose') {
                 }
             }
         }
-
-
     }
-   post {
+
+    post {
         always {
             script {
                 mail(
@@ -422,5 +403,4 @@ stage('Run Docker Compose') {
             }
         }
     }
-  
 }
