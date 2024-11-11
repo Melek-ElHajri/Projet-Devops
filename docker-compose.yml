@@ -15,10 +15,10 @@ services:
   app-achat:
     depends_on:
       - mysqldb
-    image: nourhenenc/alpine:1.0.0  # Update to your Docker image
+    image: nourhenenc/alpine:1.0.0 
     restart: on-failure
     ports:
-      - 8089:8089  # Use the port specified in your application.properties
+      - 8089:8089  
     environment:
       SPRING_APPLICATION_JSON: >-
         {
