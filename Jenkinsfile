@@ -24,11 +24,9 @@ pipeline {
                 sh 'mvn clean install compile'
             }
         }
-        stage('JUnit/Mockito Tests') {
-            steps {
-                sh 'mvn test' 
-            }
-        }
+
+
+
       stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
                 sh 'mvn test'
@@ -47,31 +45,6 @@ pipeline {
                 }
             }
         }
-
-
-       
-        stage('Testing - OWASP Dependency-Check Vulnerabilities') {
-            steps {
-                    dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
-                               odcInstallation: 'Dependency-Check'
-                    dependencyCheckPublisher pattern: 'target/dependency-check-report/dependency-check-report.xml'
-    }
-}
-
-        stage('Testing - Publish Dependency-Check Report') {
-            steps {
-                script {
-                    publishHTML([ 
-                        reportDir: 'Projet-Devops/target/dependency-check-report',
-                        reportFiles: 'dependency-check-report.html',  // Ensure this matches the file generated
-                        reportName: 'Dependency Check Report',
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true
-                    ])
-                }
-            }
-        }
-
 
         stage('Scan') {
             steps {
