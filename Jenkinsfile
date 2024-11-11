@@ -59,13 +59,11 @@ pipeline {
 
                     echo "Running quick Nmap scan on ${targetHost}:8089"
 
-                    // Quick scan on the specified IP and port 8089
                     sh "nmap -p 8089 -T4 -n -Pn ${targetHost} -oN nmap_quick_scan_report.txt"
                 }
             }
             post {
                 always {
-                    // Archive the Nmap scan results as Jenkins artifacts
                     archiveArtifacts artifacts: 'nmap_quick_scan_report.txt', allowEmptyArchive: true
                     echo "Quick Nmap scan report has been archived."
                 }
@@ -77,48 +75,24 @@ pipeline {
             }
         }
 
-       /* stage('Scan') {
+        stage('Scan') {
             steps {
-                // Check if the SonarQube container is running, start it if not
-                sh '''
-                    if ! docker ps | grep 5dc45f66b119 > /dev/null; then
-                        echo "SonarQube container is not running. Starting SonarQube container..."
-                        docker start 5dc45f66b119
-                        sleep 20  # Wait for the container to be fully up
-                    else
-                        echo "SonarQube container is already running."
-                    fi
-                '''
-                
-                // Run the SonarQube scan
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
             }
-        }*/
+        }
         
         /*stage('Deploy to Nexus') {
             steps {
-                // Check if the container is running, start it if not
-                sh '''
-                    if ! docker ps | grep 4f5ed7dc04f8 > /dev/null; then
-                        echo "Container is not running. Starting container..."
-                        docker start 4f5ed7dc04f8
-                        sleep 30  # Wait for the container to be fully up
-                    else
-                        echo "Container is already running."
-                    fi
-                '''
-                
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
         }*/
 
-        // Uncomment these stages if you want to generate and push a Docker image
+        
         
         stage("Generate Docker Image") {
             steps {
-                //sudo chmod 666 /var/run/docker.sock
                 sh 'docker build -t badredinedhaoui/tp-foyer:5.0.0 .'
             }
         }
@@ -138,29 +112,10 @@ pipeline {
         
         /*stage('Start Monitoring Containers') {
             steps {
-                sh 'docker start 4223e0421a91'
-                sh 'docker start cf099f77ec8b'
+                sh 'docker start 951fdb0907b5'
+                sh 'docker start d8b1e80d7f3a'
             }
         }
     }*/
-
-    // Uncomment the post block if you want notifications
-    /*
-    post {
-        success {
-            script {
-                notifyEvents message: "<b>Build Success</b> - Job: ${env.JOB_NAME}, Build Number: ${env.BUILD_NUMBER}", 
-                             token: env.notify_token
-            }
-        }
-        
-        failure {
-            script {
-                notifyEvents message: "<b>Build Failed</b> - Job: ${env.JOB_NAME}, Build Number: ${env.BUILD_NUMBER}", 
-                             token: env.notify_token
-            }
-        }
-    }
-    */
     }
 }
