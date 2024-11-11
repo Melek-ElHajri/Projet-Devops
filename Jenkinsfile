@@ -37,7 +37,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean package' // This will create the JAR in the target directory
+                sh 'mvn clean package' 
             }
         }
 
@@ -62,7 +62,7 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    sh 'ls -la' // Confirm files are in the right directory
+                    sh 'ls -la' 
                     sh 'docker compose -f ./docker-compose.yml up -d'
                 }
             } 
