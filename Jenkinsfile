@@ -139,16 +139,40 @@ pipeline {
     
     post {
         success {
-            twilioSend(
-                message: "Build SUCCESSFUL! Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}",
-                to: '+21692395932'
-            )
+            script {
+                // Send success message with build details
+                sh """
+                    curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+                    --data-urlencode 'To=+21692395932' \
+                    --data-urlencode 'From=+19292961290' \
+                    --data-urlencode 'Body=Build SUCCESSFUL! Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}' \
+                    -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
+                """
+            }
         }
         failure {
-            twilioSend(
-                message: "Build FAILED. Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}",
-                to: '+21692395932'
-            )
+            script {
+                // Send failure message with build details
+                sh """
+                    curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+                    --data-urlencode 'To=+21692395932' \
+                    --data-urlencode 'From=+19292961290' \
+                    --data-urlencode 'Body=Build FAILED. Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}' \
+                    -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
+                """
+            }
+        }
+        always {
+            script {
+                // Send a notification regardless of build status
+                sh """
+                    curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+                    --data-urlencode 'To=+21692395932' \
+                    --data-urlencode 'From=+19292961290' \
+                    --data-urlencode 'Body=Build ${env.BUILD_NUMBER} - ${env.JOB_NAME} completed with status: ${currentBuild.currentResult}' \
+                    -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
+                """
+            }
         }
     }
 }
