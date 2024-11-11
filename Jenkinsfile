@@ -16,24 +16,6 @@ pipeline {
             }
         }
 
-         stage('Clean and Install') {
-            steps {
-                script {
-                    // Run the clean install command
-                    sh 'mvn clean -Dautoupdate=false'
-                }
-            }
-        }
-          stage('Development - Compile') {
-            steps {
-                sh 'mvn compile'
-            }
-        }
-         stage('Deployment - Package') {
-            steps {
-                sh 'mvn package'
-            }
-        }
 
 
        stage('Deployment - Deploy to Nexus') {
