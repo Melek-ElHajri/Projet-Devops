@@ -170,7 +170,7 @@ stage('Scan') {
 
 
 
-                stage('Deploy to Nexus') {
+          /*      stage('Deploy to Nexus') {
             steps {
                 // Check if the container is running, start it if not
                 sh '''
@@ -185,7 +185,37 @@ stage('Scan') {
                 
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.23.133:8081/repository/maven-releases/'
             }
+        }*/
+
+
+stage('Deploy to Nexus') {
+            steps {
+                nexusArtifactUploader(
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    nexusUrl: '192.168.23.133:8081',
+                    groupId: 'tn.esprit',
+                    version: '5.0.0',
+                    repository: 'maven-releases',
+                    artifacts: [
+                        [
+                            artifactId: 'tp-foyer',
+                            classifier: '',
+                            file: 'target/tp-foyer-5.0.0.jar',
+                            type: 'jar'
+                        ],
+                        [
+                            artifactId: 'tp-foyer',
+                            classifier: '',
+                            file: 'pom.xml',
+                            type: 'pom'
+                        ]
+                    ]
+                )
+            }
         }
+
+        
         
         
 
