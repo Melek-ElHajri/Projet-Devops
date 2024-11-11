@@ -151,42 +151,37 @@ pipeline {
             }
         }
     }
+ 
   post {
     success {
         script {
-            // Success message
             sh """
                 curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
                 --data-urlencode 'To=+21692395932' \
                 --data-urlencode 'From=+19292961290' \
-                --data-urlencode 'Body=Congratulations! Build #${env.BUILD_NUMBER} was successful! Let's proceed to the next step in the pipeline. Job: ${env.JOB_NAME}' \
+                --data-urlencode 'Body=Congratulations! Build #${env.BUILD_NUMBER} was successful!' \
                 -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
             """
         }
     }
     failure {
         script {
-            // Failure message
             sh """
                 curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
                 --data-urlencode 'To=+21692395932' \
                 --data-urlencode 'From=+19292961290' \
-                --data-urlencode 'Body=Oops! An error occurred during build #${env.BUILD_NUMBER}. Please verify the code or check the logs for details. Job: ${env.JOB_NAME}' \
+                --data-urlencode 'Body=Oops! An error occurred during build #${env.BUILD_NUMBER}.' \
                 -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
             """
         }
     }
     always {
         script {
-            // Get the current time in a readable format
-            def currentTime = new Date().format('yyyy-MM-dd HH:mm:ss')
-
-            // Build status report (whether successful or failed)
             sh """
                 curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
                 --data-urlencode 'To=+21692395932' \
                 --data-urlencode 'From=+19292961290' \
-                --data-urlencode 'Body=Build Report: Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}, Status: ${currentBuild.currentResult}, Duration: ${currentBuild.durationString}, Timestamp: ${currentTime}' \
+                --data-urlencode 'Body=Build Report: Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}, Status: ${currentBuild.currentResult}, Duration: ${currentBuild.durationString}' \
                 -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
             """
         }
