@@ -32,11 +32,11 @@ pipeline {
         stage('Pre-commit Security Hooks') {
             steps {
                 script {
-                    // Création du rapport de pre-commit
+                    
                     def reportFile = 'pre_commit_report.log'
-
+                    
+                   
                     def result = sh(script: """
-                        // Vérification et installation de pre-commit
                         if ! command -v pre-commit &> /dev/null; then
                             echo "pre-commit is not installed, installing in a virtual environment..." >> ${reportFile}
                             python3 -m venv venv
@@ -51,14 +51,14 @@ pipeline {
                         deactivate >> ${reportFile}
                     """, returnStatus: true)
 
-                    // Affichage des résultats du pre-commit
+                    
                     if (result != 0) {
                         echo "Pre-commit hooks did not pass, but continuing pipeline."
                     } else {
                         echo "Pre-commit hooks passed successfully."
                     }
 
-                    // Archivage du rapport de pre-commit
+                    
                     archiveArtifacts artifacts: reportFile, allowEmptyArchive: true
                 }
             }
