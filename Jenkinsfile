@@ -91,7 +91,64 @@ pipeline {
                 }
             }
         }
-    
+
+
+stages {
+        stage('ZAP Baseline Scan') {
+            steps {
+                script {
+                    // Run ZAP Baseline scan and set full permissions for the report
+                    def result = sh(script: '''
+                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.23.133:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
+                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                    ''', returnStatus: true)
+
+                    // Check the result of the ZAP scan
+                    if (result != 0) {
+                        echo "ZAP Baseline Scan completed with warnings or errors."
+                    } else {
+                        echo "ZAP Baseline Scan completed successfully."
+                    }
+                }
+            }
+        }
+
+        stage('ZAP Active Scan') {
+            steps {
+                script {
+                    // Run ZAP Active scan and set full permissions for the report
+                    def result = sh(script: '''
+                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.23.133:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
+                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                    ''', returnStatus: true)
+
+                    // Check the result of the ZAP scan
+                    if (result != 0) {
+                        echo "ZAP Active Scan completed with warnings or errors."
+                    } else {
+                        echo "ZAP Active Scan completed successfully."
+                    }
+                }
+            }
+        }
+
+        stage('Publish ZAP Reports') {
+            steps {
+                // Publish both the baseline and active scan reports
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
+                    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
+                    reportName: 'ZAP Reports'
+                ])
+            }
+        }
+    }
+
+
+        
 
     
     }
