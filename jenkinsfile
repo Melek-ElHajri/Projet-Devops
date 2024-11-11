@@ -1,149 +1,175 @@
 pipeline {
     agent any
 
-    environment {
-        dockerhub_token = credentials('dockerhub_token')
-        notify_token = credentials('NOTIFY_TOKEN')
+    tools {
+        jdk 'JAVA_HOME'  // Adjust if necessary
+        maven 'M2_HOME'  // Adjust if necessary
     }
 
-    tools {
-        jdk 'JAVA_HOME'
-        maven 'M2_HOME'
-    }
+   
 
     stages {
-        stage('GIT') {
+       
+        stage('Development - GIT Checkout') {
             steps {
-                git branch: 'ElHedi-Melek-Elhajri',
-                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+                git branch: 'NouhaSedraoui', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
 
-        stage('Pre-commit Security Hooks') {
+    /*  stage('Development - Clean') {
             steps {
-                script {
-                    // Définir un fichier de rapport pour les résultats
-                    def reportFile = 'pre_commit_report.log'
-                    
-                    // Exécuter les hooks de pré-commit et rediriger la sortie dans le fichier
-                    def result = sh(script: """
-                        if ! command -v pre-commit &> /dev/null; then
-                            echo "pre-commit is not installed, installing in a virtual environment..." >> ${reportFile}
-                            python3 -m venv venv
-                            . venv/bin/activate
-                            pip install pre-commit
-                        else
-                            echo "pre-commit is already installed." >> ${reportFile}
-                        fi
-                        git config --unset-all core.hooksPath >> ${reportFile}
-                        pre-commit install >> ${reportFile}
-                        pre-commit run --all-files >> ${reportFile} 2>&1
-                        deactivate >> ${reportFile}
-                    """, returnStatus: true)
-
-                    // Vérification du résultat des hooks
-                    if (result != 0) {
-                        echo "Pre-commit hooks did not pass, but continuing pipeline."
-                    } else {
-                        echo "Pre-commit hooks passed successfully."
-                    }
-
-                    // Archiver les résultats du rapport
-                    archiveArtifacts artifacts: reportFile, allowEmptyArchive: true
-                }
+                sh 'mvn clean'
             }
         }
 
-        stage('Build') {
+        stage('Development - Compile') {
             steps {
-                sh 'mvn clean install compile'
+                sh 'mvn compile'
             }
-        }
+        }*/
 
-        stage('Scan') {
-            steps {
-                // Check if the SonarQube container is running, start it if not
-                sh '''
-                    if ! docker ps | grep 656251e296fb > /dev/null; then
-                        echo "SonarQube container is not running. Starting SonarQube container..."
-                        docker start 656251e296fb
-                        sleep 30  # Wait for the container to be fully up
-                    else
-                        echo "SonarQube container is already running."
-                    fi
-                '''
-                
-                // Run the SonarQube scan
-                withSonarQubeEnv('sq') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('JUnit/Mockito Tests') {
+      /*  stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
                 sh 'mvn test'
+                sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
             }
         }
 
-        stage("Generate Docker Image") {
+       
+
+       /* stage('Testing - OWASP Dependency-Check Vulnerabilities') {
             steps {
-                sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
-            }
-        }
+                dependencyCheck additionalArguments: ''' 
+                    -o "./" 
+                    -s "./"
+                    -f "ALL" 
+                    --prettyPrint''', odcInstallation: 'Dependency-Check'
 
-        stage("Push Docker Image") {
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+            }
+        }*/
+       /* stage('Testing - OWASP Dependency-Check Vulnerabilities') {
             steps {
-                sh "echo ${dockerhub_token} | docker login -u m2l2k --password-stdin" 
-                sh "docker push m2l2k/tp-foyer:5.0.0"
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
+                               odcInstallation: 'Dependency-Check'
             }
         }
-
-        
-        stage('Docker Compose') {
+        stage('Testing - OWASP Dependency-Check Vulnerabilities') {
             steps {
-                sh 'docker compose up -d'
-            }
-        }
-        
+                    dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
+                               odcInstallation: 'Dependency-Check'
+                    dependencyCheckPublisher pattern: 'target/dependency-check-report/dependency-check-report.xml'
+    }
+}
 
-        stage('Start Monitoring Containers') {
-            steps {
-                sh 'docker start 4223e0421a91'
-                sh 'docker start cf099f77ec8b'
-            }
-        }
-
-        stage('Nmap Scan') {
+        stage('Testing - Publish Dependency-Check Report') {
             steps {
                 script {
-                    def targetHost = '192.168.10.2'  // Scanning 192.168.10.2
-
-                    echo "Running quick Nmap scan on ${targetHost}:8089"
-
-                    // Quick scan on the specified IP and port 8089
-                    sh "nmap -p 8089 -T4 -n -Pn ${targetHost} -oN nmap_quick_scan_report.txt"
-                }
-            }
-            post {
-                always {
-                    // Archive the Nmap scan results as Jenkins artifacts
-                    archiveArtifacts artifacts: 'nmap_quick_scan_report.txt', allowEmptyArchive: true
-                    echo "Quick Nmap scan report has been archived."
+                    publishHTML([ 
+                        reportDir: 'Projet-Devops/target/dependency-check-report',
+                        reportFiles: 'dependency-check-report.html',  // Ensure this matches the file generated
+                        reportName: 'Dependency Check Report',
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true
+                    ])
                 }
             }
         }
 
-        stage('ZAP Baseline Scan') {
+        stage('Testing - Sonar Analysis') {
+            steps {
+                withSonarQubeEnv('sq1') {
+                    sh 'mvn sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
+                }
+            }
+        }*/
+
+       stage('Deployment - Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+
+      /* stage('Deployment - Deploy to Nexus') {
+            steps {
+                // Deploy to Nexus repository
+                sh 'mvn deploy -DskipTests -Dautoupdate=false -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
+            }
+        }*/
+
+        stage('Deployment - Build Docker Image') {
+            steps {
+                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
+            }
+        }
+
+        stage('Deployment - Push Docker Image to DockerHub') {
+            steps {
+                sh '''
+                    sudo docker login -u rymasd29 -p 223JFT4309
+                    sudo docker push rymasd29/tp-foyer:5.0.0
+                '''
+            }
+        }
+
+        stage('Deployment - Run Docker Compose') {
             steps {
                 script {
-                    // Run ZAP Baseline scan and set full permissions for the report
+                    sh '''
+                        sudo docker-compose down 
+                        sudo docker-compose up -d
+                    '''
+                }
+            }
+        }
+
+     /*   // Operate: Monitor Phase
+        stage('Operate: Monitor - Check and Start Prometheus') {
+            steps {
+                script {
+                    def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
+                    if (prometheusRunning) {
+                        echo 'Prometheus is already running.'
+                    } else {
+                        echo 'Starting Prometheus container...'
+                        sh 'docker start prometheus'
+                    }
+                }
+            }
+        }
+
+        stage('Operate: Monitor - Check and Start Grafana') {
+            steps {
+                script {
+                    def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
+                    if (grafanaRunning) {
+                        echo 'Grafana is already running.'
+                    } else {
+                        echo 'Starting Grafana container...'
+                        sh 'docker start grafana'
+                    }
+                }
+            }
+        }
+
+        stage('Operate: Monitor - Validate Setup') {
+            steps {
+                script {
+                    echo 'Validating Prometheus and Grafana setup...'
+                    sh 'curl -f http://localhost:9090/ || echo "Prometheus is not accessible"'
+                    sh 'curl -f http://localhost:3000/ || echo "Grafana is not accessible"'
+                }
+            }
+        }
+
+        stage('Security Testing - ZAP Baseline Scan') {
+            steps {
+                script {
                     def result = sh(script: '''
-                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
-                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                        sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
+                        sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
                     ''', returnStatus: true)
 
-                    // Check the result of the ZAP scan
                     if (result != 0) {
                         echo "ZAP Baseline Scan completed with warnings or errors."
                     } else {
@@ -153,16 +179,14 @@ pipeline {
             }
         }
 
-        stage('ZAP Active Scan') {
+        stage('Security Testing - ZAP Active Scan') {
             steps {
                 script {
-                    // Run ZAP Active scan and set full permissions for the report
                     def result = sh(script: '''
-                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
-                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                        sudo docker run --rm -v /var/lib/jenkins/workspace/sonar/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
+                        sudo chmod -R 777 /var/lib/jenkins/workspace/sonar/zap_results
                     ''', returnStatus: true)
 
-                    // Check the result of the ZAP scan
                     if (result != 0) {
                         echo "ZAP Active Scan completed with warnings or errors."
                     } else {
@@ -172,55 +196,48 @@ pipeline {
             }
         }
 
-        stage('Publish ZAP Reports') {
+        stage('Security Testing - Publish ZAP Reports') {
             steps {
-                // Publish both the baseline and active scan reports
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
-                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
-                    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
+                    reportDir: '/var/lib/jenkins/workspace/sonar/zap_results',
+                    reportFiles: 'baseline_scan_report.html, active_scan_report.html',
                     reportName: 'ZAP Reports'
                 ])
             }
         }
 
-        // Uncomment and adjust if you plan to use SQL Injection tests
-        stage('SQL Injection Test (SQLmap)') {
+        stage('Security Testing - Nmap Scan Attack') {
             steps {
                 script {
-                    // Run SQLmap for deeper SQL injection testing, display output to console and save it to a file
-                    sh '''
-                        python3 /var/lib/jenkins/workspace/nmap/gauntlt-attacks/sqlmap/sqlmap.py \
-                        -u "http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant" \
-                        --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" \
-                        --batch --level=5 --risk=3 --tamper=space2comment | tee sqlmap_output.txt
-                    '''
-                    
-                    // Archive the output file
-                    archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
+                    sh 'sudo gauntlt /var/lib/jenkins/workspace/sonar/gauntlt-attacks/nmap.attack > nmap_output.txt'
+                    archiveArtifacts artifacts: 'nmap_output.txt', allowEmptyArchive: true
                 }
             }
         }
-    }
 
-    // Post actions are commented out
-    /*
-    post {
-        success {
-            script {
-                notifyEvents message: "<b>Build Success</b> - Job: ${env.JOB_NAME}, Build Number: ${env.BUILD_NUMBER}", 
-                             token: env.notify_token
+        stage('Security Testing - SQL Injection Attack (Gauntlt)') {
+            steps {
+                script {
+                    sh 'gauntlt /var/lib/jenkins/workspace/sonar/gauntlt-attacks/sql_in.attack > sql_injection_output.txt'
+                    archiveArtifacts artifacts: 'sql_injection_output.txt', allowEmptyArchive: true
+                }
             }
         }
 
-        failure {
-            script {
-                notifyEvents message: "<b>Build Failed</b> - Job: ${env.JOB_NAME}, Build Number: ${env.BUILD_NUMBER}", 
-                             token: env.notify_token
+        stage('Security Testing - SQL Injection Test (SQLmap)') {
+            steps {
+                script {
+                    sh 'python3 /var/lib/jenkins/workspace/sonar/gauntlt-attacks/sqlmap/sqlmap.py -u "http://192.168.33.10:8089/tpfoyer/etudiant/add-etudiant" --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" --batch --level=5 --risk=3 --tamper=space2comment > sqlmap_output.txt'
+                    archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
+                }
             }
-        }
+        }*/
+
+       
     }
-    */
+
+    
 }
