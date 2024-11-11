@@ -22,10 +22,10 @@ pipeline {
         stage('Pre-commit Security Hooks') {
             steps {
                 script {
-                    // Définir un fichier de rapport pour les résultats
+                    
                     def reportFile = 'pre_commit_report.log'
                     
-                    // Exécuter les hooks de pré-commit et rediriger la sortie dans le fichier
+                   
                     def result = sh(script: """
                         if ! command -v pre-commit &> /dev/null; then
                             echo "pre-commit is not installed, installing in a virtual environment..." >> ${reportFile}
@@ -41,14 +41,14 @@ pipeline {
                         deactivate >> ${reportFile}
                     """, returnStatus: true)
 
-                    // Vérification du résultat des hooks
+                    
                     if (result != 0) {
                         echo "Pre-commit hooks did not pass, but continuing pipeline."
                     } else {
                         echo "Pre-commit hooks passed successfully."
                     }
 
-                    // Archiver les résultats du rapport
+                    
                     archiveArtifacts artifacts: reportFile, allowEmptyArchive: true
                 }
             }
@@ -62,7 +62,7 @@ pipeline {
 
         stage('Scan') {
             steps {
-                // Check if the SonarQube container is running, start it if not
+                
                 sh '''
                     if ! docker ps | grep 656251e296fb > /dev/null; then
                         echo "SonarQube container is not running. Starting SonarQube container..."
@@ -73,7 +73,7 @@ pipeline {
                     fi
                 '''
                 
-                // Run the SonarQube scan
+                
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
@@ -117,17 +117,17 @@ pipeline {
         stage('Nmap Scan') {
             steps {
                 script {
-                    def targetHost = '192.168.10.2'  // Scanning 192.168.10.2
+                    def targetHost = '192.168.10.2'  
 
                     echo "Running quick Nmap scan on ${targetHost}:8089"
 
-                    // Quick scan on the specified IP and port 8089
+                    
                     sh "nmap -p 8089 -T4 -n -Pn ${targetHost} -oN nmap_quick_scan_report.txt"
                 }
             }
             post {
                 always {
-                    // Archive the Nmap scan results as Jenkins artifacts
+                    
                     archiveArtifacts artifacts: 'nmap_quick_scan_report.txt', allowEmptyArchive: true
                     echo "Quick Nmap scan report has been archived."
                 }
@@ -137,13 +137,13 @@ pipeline {
         stage('ZAP Baseline Scan') {
             steps {
                 script {
-                    // Run ZAP Baseline scan and set full permissions for the report
+                    
                     def result = sh(script: '''
                         docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
                         chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
                     ''', returnStatus: true)
 
-                    // Check the result of the ZAP scan
+                    
                     if (result != 0) {
                         echo "ZAP Baseline Scan completed with warnings or errors."
                     } else {
@@ -156,13 +156,13 @@ pipeline {
         stage('ZAP Active Scan') {
             steps {
                 script {
-                    // Run ZAP Active scan and set full permissions for the report
+                    
                     def result = sh(script: '''
                         docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
                         chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
                     ''', returnStatus: true)
 
-                    // Check the result of the ZAP scan
+                    
                     if (result != 0) {
                         echo "ZAP Active Scan completed with warnings or errors."
                     } else {
@@ -174,23 +174,23 @@ pipeline {
 
         stage('Publish ZAP Reports') {
             steps {
-                // Publish both the baseline and active scan reports
+                
                 publishHTML(target: [
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
-                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
-                    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  
+                    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  
                     reportName: 'ZAP Reports'
                 ])
             }
         }
 
-        // Uncomment and adjust if you plan to use SQL Injection tests
+        
         stage('SQL Injection Test (SQLmap)') {
             steps {
                 script {
-                    // Run SQLmap for deeper SQL injection testing, display output to console and save it to a file
+                    
                     sh '''
                         python3 /var/lib/jenkins/workspace/nmap/gauntlt-attacks/sqlmap/sqlmap.py \
                         -u "http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant" \
@@ -198,14 +198,14 @@ pipeline {
                         --batch --level=5 --risk=3 --tamper=space2comment | tee sqlmap_output.txt
                     '''
                     
-                    // Archive the output file
+                    
                     archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
                 }
             }
         }
     }
 
-    // Post actions are commented out
+
     /*
     post {
         success {
