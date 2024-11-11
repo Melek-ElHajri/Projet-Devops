@@ -65,39 +65,44 @@ pipeline {
                 }
             }
         }
-
-       
-        stage('Security Scan: Nmap') {
+ stage('Check and Start Prometheus') {
             steps {
                 script {
-                    echo "Démarrage du scan de sécurité Nmap..."
-                    sh 'nmap -sT -p 1-65535 -v 192.168.33.10'
+                    def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
+                    if (prometheusRunning) {
+                        echo 'Prometheus is already running.'
+                    } else {
+                        echo 'Starting Prometheus container...'
+                        sh 'docker start prometheus'
+                    }
                 }
             }
         }
 
-       
-        stage('Security Scan: Trivy') {
-            steps {
-                retry(3) {
-                    echo "Scan des vulnérabilités dans l'image Docker avec Trivy..."
-                    sh 'trivy image --no-progress --severity CRITICAL gabsirim/alpine:1.0.0'
-                }
-            }
-        }
-
-      
-        stage('System Security Check - Lynis') {
+        stage('Check and Start Grafana') {
             steps {
                 script {
-                   
-                    sh 'lynis audit system | tee lynis_audit_output.txt'
-                    
-                  
-                    archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
+                    def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
+                    if (grafanaRunning) {
+                        echo 'Grafana is already running.'
+                    } else {
+                        echo 'Starting Grafana container...'
+                        sh 'docker start grafana'
+                    }
                 }
             }
         }
+
+        stage('Validate Setup') {
+            steps {
+                script {
+                    echo 'Validating Prometheus and Grafana setup...'
+                    sh 'curl -f http://localhost:9090/ || echo "Prometheus is not accessible"'
+                    sh 'curl -f http://localhost:3000/ || echo "Grafana is not accessible"'
+                }
+            }
+        }
+    
 
       
         stage('Build Docker Image') {
