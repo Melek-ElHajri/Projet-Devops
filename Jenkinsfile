@@ -168,6 +168,24 @@ stage('Scan') {
             }
     }
 
+
+
+                stage('Deploy to Nexus') {
+            steps {
+                // Check if the container is running, start it if not
+                sh '''
+                    if ! docker ps | grep f30f1bfe980e > /dev/null; then
+                        echo "Container is not running. Starting container..."
+                        docker start f30f1bfe980e
+                        sleep 35  # Wait for the container to be fully up
+                    else
+                        echo "Container is already running."
+                    fi
+                '''
+                
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.23.133:8081/repository/maven-releases/'
+            }
+        }
         
         
 
