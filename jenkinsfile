@@ -22,26 +22,34 @@ pipeline {
         stage('Pre-commit Security Hooks') {
             steps {
                 script {
-                    def result = sh(script: '''
+                    // Définir un fichier de rapport pour les résultats
+                    def reportFile = 'pre_commit_report.log'
+                    
+                    // Exécuter les hooks de pré-commit et rediriger la sortie dans le fichier
+                    def result = sh(script: """
                         if ! command -v pre-commit &> /dev/null; then
-                            echo "pre-commit is not installed, installing in a virtual environment..."
+                            echo "pre-commit is not installed, installing in a virtual environment..." >> ${reportFile}
                             python3 -m venv venv
                             . venv/bin/activate
                             pip install pre-commit
                         else
-                            echo "pre-commit is already installed."
+                            echo "pre-commit is already installed." >> ${reportFile}
                         fi
-                        git config --unset-all core.hooksPath
-                        pre-commit install
-                        pre-commit run --all-files
-                        deactivate
-                    ''', returnStatus: true)
+                        git config --unset-all core.hooksPath >> ${reportFile}
+                        pre-commit install >> ${reportFile}
+                        pre-commit run --all-files >> ${reportFile} 2>&1
+                        deactivate >> ${reportFile}
+                    """, returnStatus: true)
 
+                    // Vérification du résultat des hooks
                     if (result != 0) {
                         echo "Pre-commit hooks did not pass, but continuing pipeline."
                     } else {
                         echo "Pre-commit hooks passed successfully."
                     }
+
+                    // Archiver les résultats du rapport
+                    archiveArtifacts artifacts: reportFile, allowEmptyArchive: true
                 }
             }
         }
@@ -78,7 +86,6 @@ pipeline {
             }
         }
 
-
         stage("Generate Docker Image") {
             steps {
                 sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
@@ -91,13 +98,15 @@ pipeline {
                 sh "docker push m2l2k/tp-foyer:5.0.0"
             }
         }
-/*
+
+        /*
         stage('Docker Compose') {
             steps {
                 sh 'docker compose up -d'
             }
         }
-*/
+        */
+
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 4223e0421a91'
