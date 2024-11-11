@@ -20,44 +20,44 @@ pipeline {
                           userRemoteConfigs: [[url: 'https://github.com/Melek-ElHajri/Projet-Devops.git']]])
             }
         }
-    
+
         stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
             }
         }
 
- stage('Security Scan : Nmap') {
-    steps {
-        script {
-            echo "Starting Nmap Security Scan..."
-            sh 'nmap -sT -p 1-65535 -v localhost'
+        stage('Security Scan: Nmap') {
+            steps {
+                script {
+                    echo "Starting Nmap Security Scan..."
+                    sh 'nmap -sT -p 1-65535 -v localhost'
+                }
+            }
         }
-    }
-} 
 
-stage('Security Scan: Trivy') {
-    steps {
-        retry(3) {
-            echo "Scanning Docker image for vulnerabilities using Trivy..."
-            sh 'trivy image --no-progress --severity CRITICAL gabsirim/alpine:1.0.0'
+        stage('Security Scan: Trivy') {
+            steps {
+                retry(3) {
+                    echo "Scanning Docker image for vulnerabilities using Trivy..."
+                    sh 'trivy image --no-progress --severity CRITICAL gabsirim/alpine:1.0.0'
+                }
+            }
         }
-    }
-}
 
-stage('System Security Check - Lynis') {
-    steps {
-        script {
-            // Run system security audit with Lynis
-            sh 'lynis audit system | tee lynis_audit_output.txt'
-            
-            // Archive the output for later review
-            archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
+        stage('System Security Check - Lynis') {
+            steps {
+                script {
+                    // Run system security audit with Lynis
+                    sh 'lynis audit system | tee lynis_audit_output.txt'
+                    
+                    // Archive the output for later review
+                    archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
+                }
+            }
         }
-    }
-}
 
-  stage('Pre-commit Security Hooks') {
+        stage('Pre-commit Security Hooks') {
             steps {
                 script {
                     sh '''
@@ -76,19 +76,18 @@ stage('System Security Check - Lynis') {
             }
         }
 
-         stage('Mockito Tests') {
+        stage('Mockito Tests') {
             steps {
-                sh 'mvn test' 
+                sh 'mvn test'
             }
         }
-        **/
-/**
+
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
-        
+
         stage('Scan') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -96,6 +95,7 @@ stage('System Security Check - Lynis') {
                 }
             }
         }
+
         stage("Quality Gate") {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
@@ -103,7 +103,8 @@ stage('System Security Check - Lynis') {
                 }
             }
         }
-         stage('Check and Start Prometheus') {
+
+        stage('Check and Start Prometheus') {
             steps {
                 script {
                     def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
@@ -140,7 +141,6 @@ stage('System Security Check - Lynis') {
                 }
             }
         }
-    
 
         stage('Build') {
             steps {
@@ -178,6 +178,6 @@ stage('System Security Check - Lynis') {
                     '''
                 }
             }
-        } **/
+        }
     }
 }
