@@ -111,6 +111,7 @@ pipeline {
                     groupId: 'tn.esprit',
                     version: '5.0.0',
                     repository: 'maven-releases',
+                    credentialsId: 'DummyCredentials',
                     artifacts: [
                         [
                             artifactId: 'tp-foyer',
