@@ -59,8 +59,6 @@ pipeline {
             }
         }
 
-
-
       stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
                 sh 'mvn test'
