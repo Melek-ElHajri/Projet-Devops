@@ -82,18 +82,12 @@ pipeline {
                 }
             }
         }
-
-        stage('DETECT NEXUS') {
-      steps {
-        sh 'mvn clean deploy -Dmaven.test.skip=true'
-      }
-    }
         
-        /*stage('Deploy to Nexus') {
+        stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.10.2:8081/repository/maven-releases/'
             }
-        }*/
+        }
 
         
         
