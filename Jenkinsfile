@@ -132,13 +132,13 @@ pipeline {
                 }
             }
         }
-
+/**
         // Étape de démarrage des conteneurs en surveillance
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start be79135ec1cc'
             }
-        }
+        }**/
 
         // Étape d'envoi de notification par email à la fin du pipeline
         stage('Email Notification') {
