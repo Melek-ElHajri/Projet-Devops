@@ -197,6 +197,7 @@ stage('Deploy to Nexus') {
                     groupId: 'tn.esprit',
                     version: '5.0.0',
                     repository: 'maven-releases',
+                    credentialsId: 'nexuscred',
                     artifacts: [
                         [
                             artifactId: 'tp-foyer',
