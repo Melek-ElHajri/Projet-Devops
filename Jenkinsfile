@@ -55,15 +55,15 @@ pipeline {
     }
 }
 
-        stage('Testing - Publish Dependency-Check Report') {
+      stage('Testing - Publish Dependency-Check Report') {
     steps {
         script {
             publishHTML([ 
-                reportDir: 'DevSecOps',             
-                reportFiles: 'dependency-check-report.html',  
-                reportName: 'Dependency Check Report',       
-                alwaysLinkToLastBuild: true,      
-                keepAll: true                     
+                reportDir: '.',                     // Current directory (DevSecOps)
+                reportFiles: 'dependency-check-report.html',  // The report file
+                reportName: 'Dependency Check Report',        // Title of the report
+                alwaysLinkToLastBuild: true,       // Always link to the last build
+                keepAll: true                      // Keep all reports
             ])
         }
     }
