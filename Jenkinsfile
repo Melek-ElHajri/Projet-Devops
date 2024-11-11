@@ -16,11 +16,11 @@ pipeline {
             }
         }
 
-        stage('Development - Clean') {
+       /* stage('Development - Clean') {
             steps {
                 sh 'mvn clean'
             }
-        }
+        }*/
 
         stage('Development - Compile') {
             steps {
