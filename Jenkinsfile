@@ -177,16 +177,19 @@ pipeline {
             }
         }
         always {
-            script {
-                // Build status report (whether successful or failed)
-                sh """
-                    curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
-                    --data-urlencode 'To=+21692395932' \
-                    --data-urlencode 'From=+19292961290' \
-                    --data-urlencode 'Body=Build Report: Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}, Status: ${currentBuild.currentResult}, Duration: ${currentBuild.durationString}, Timestamp: ${currentBuild.timestamp}' \
-                    -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
-                """
-            }
-        }
+    script {
+        // Get the current time in a readable format
+        def currentTime = new Date().format('yyyy-MM-dd HH:mm:ss')
+        
+        // Build status report (whether successful or failed)
+        sh """
+            curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+            --data-urlencode 'To=+21692395932' \
+            --data-urlencode 'From=+19292961290' \
+            --data-urlencode 'Body=Build Report: Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}, Status: ${currentBuild.currentResult}, Duration: ${currentBuild.durationString}, Timestamp: ${currentTime}' \
+            -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
+        """
+    }
+}
     }
 }
