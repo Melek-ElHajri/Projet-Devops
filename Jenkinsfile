@@ -35,17 +35,7 @@ pipeline {
             }
         }
 
-        stage('Testing - JaCoCo Report Generation') {
-            steps {
-                script {
-                    jacoco(
-                        execPattern: '**/target/jacoco.exec',
-                        classPattern: '**/target/classes',
-                        sourcePattern: '**/src/main/java'
-                    )
-                }
-            }
-        }
+       
 
        /* stage('Testing - OWASP Dependency-Check Vulnerabilities') {
             steps {
