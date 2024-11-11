@@ -43,7 +43,7 @@ pipeline {
             }
         }
 
-        stage('Scan') {
+        stage('Sonarqube') {
             steps {
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar'
@@ -97,6 +97,38 @@ pipeline {
             }
         }
 
+        
+        stage('Security Scan: Nmap') {
+            steps {
+                script {
+                    echo "Starting Nmap Security Scan..."
+                    sh 'nmap -sT -p 1-65535 -v localhost'
+                }
+            }
+        }
+
+        stage('Security Scan: Trivy') {
+            steps {
+                retry(3) {
+                    echo "Scanning Docker image for vulnerabilities using Trivy..."
+                    sh 'trivy image --no-progress --severity CRITICAL gabsirim/alpine:1.0.0'
+                }
+            }
+        }
+
+        stage('System Security Check - Lynis') {
+            steps {
+                script {
+                    // Run system security audit with Lynis
+                    sh 'lynis audit system | tee lynis_audit_output.txt'
+                    
+                    // Archive the output for later review
+                    archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
+                }
+            }
+        }
+
+
         stage('Build') {
             steps {
                 sh 'mvn clean package'
@@ -132,6 +164,12 @@ pipeline {
                         docker-compose ps
                     '''
                 }
+            }
+        }
+
+         stage('Start Monitoring Containers') {
+            steps {
+                sh 'docker start be79135ec1cc'
             }
         }
 
