@@ -146,7 +146,22 @@ pipeline {
                 }
             }
         }
-
+post {
+        success {
+            // Send SMS on successful build
+            twilioSend(
+                message: "Build SUCCESSFUL! Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}",
+                to: '+21692395932'
+            )
+        }
+        failure {
+            // Send SMS on failed build
+            twilioSend(
+                message: "Build FAILED. Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}",
+                to: '+21692395932'
+            )
+        }
+    }
 
     }
   
