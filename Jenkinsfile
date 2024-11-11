@@ -29,6 +29,14 @@ pipeline {
                 sh 'mvn test' 
             }
         }
+        stage('Security Scan: OWASP Dependency-Check') {
+            steps {
+                script {
+                    echo "Starting OWASP Dependency-Check..."
+                    sh 'mvn org.owasp:dependency-check-maven:check'
+                }
+            }
+        }
         stage('JaCoCo Report') {
             steps {
                 sh 'mvn jacoco:report'
@@ -46,14 +54,7 @@ pipeline {
                 }
             }
         }
-        stage('Security Scan: OWASP Dependency-Check') {
-            steps {
-                script {
-                    echo "Starting OWASP Dependency-Check..."
-                    sh 'mvn org.owasp:dependency-check-maven:check'
-                }
-            }
-        }
+
 
         stage('Scan') {
             steps {
