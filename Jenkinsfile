@@ -180,7 +180,7 @@ stage('Scan') {
             fi
         '''
         
-        withSonarQubeEnv('snrq') {
+        withSonarQubeEnv('SONART') {
             // Specify SonarQube Maven plugin version (e.g., 4.0.0.4121)
             sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dsonar.maven.plugin.version=4.0.0.4121'
         }
