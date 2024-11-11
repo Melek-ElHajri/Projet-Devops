@@ -41,13 +41,6 @@ pipeline {
             }
         }
 
-        // Étape de déploiement du projet vers Nexus
-        stage('Deploy to Nexus') {
-            steps {
-                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
-            }
-        }
-
         // Étape d'analyse de la qualité du code avec SonarQube
         stage('Sonarqube') {
             steps {
@@ -104,7 +97,7 @@ pipeline {
             steps {  
                 sh "docker build -t gabsirim/alpine:1.0.0 ."
             }
-        } 
+        }
 
         // Étape de push de l'image Docker vers Docker Hub
         stage('Push Docker Image') {
@@ -115,6 +108,13 @@ pipeline {
                     }
                     sh 'docker push gabsirim/alpine:1.0.0'
                 }
+            }
+        }
+
+        // Étape de déploiement du projet vers Nexus
+        stage('Deploy to Nexus') {
+            steps {
+                sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
 
@@ -132,13 +132,6 @@ pipeline {
                 }
             }
         }
-/**
-        // Étape de démarrage des conteneurs en surveillance
-        stage('Start Monitoring Containers') {
-            steps {
-                sh 'docker start be79135ec1cc'
-            }
-        }**/
 
         // Étape d'envoi de notification par email à la fin du pipeline
         stage('Email Notification') {
