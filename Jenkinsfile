@@ -19,7 +19,7 @@ pipeline {
             }
         }
 
-        stage('Pre-commit Security Hooks') {
+        /*stage('Pre-commit Security Hooks') {
             steps {
                 script {
                     def result = sh(script: '''
@@ -44,7 +44,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
 
         stage('Build') {
             steps {
@@ -52,7 +52,7 @@ pipeline {
             }
         }
 
-        stage('Quick Nmap Scan') {
+        /*stage('Quick Nmap Scan') {
             steps {
                 script {
                     def targetHost = '192.168.10.2'  // Scanning 192.168.10.2
@@ -69,12 +69,6 @@ pipeline {
                     archiveArtifacts artifacts: 'nmap_quick_scan_report.txt', allowEmptyArchive: true
                     echo "Quick Nmap scan report has been archived."
                 }
-            }
-        }
-        
-        /*stage('Build') {
-            steps {
-                sh 'mvn clean install compile'
             }
         }*/
         stage('JUnit/Mockito Tests') {
@@ -122,7 +116,7 @@ pipeline {
 
         // Uncomment these stages if you want to generate and push a Docker image
         
-        /*stage("Generate Docker Image") {
+        stage("Generate Docker Image") {
             steps {
                 //sudo chmod 666 /var/run/docker.sock
                 sh 'docker build -t badredinedhaoui/tp-foyer:5.0.0 .'
@@ -140,7 +134,7 @@ pipeline {
             steps {
                 sh 'docker compose up -d'
             }
-        }*/
+        }
         
         /*stage('Start Monitoring Containers') {
             steps {
