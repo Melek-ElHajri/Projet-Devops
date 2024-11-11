@@ -132,6 +132,19 @@ pipeline {
                 }
             }
         }
+         stage('Check and Start Grafana') {
+            steps {
+                script {
+                    def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
+                    if (grafanaRunning) {
+                        echo 'Grafana is already running.'
+                    } else {
+                        echo 'Starting Grafana container...'
+                        sh 'docker start grafana'
+                    }
+                }
+            }
+        }
 
         // Étape d'envoi de notification par email à la fin du pipeline
         stage('Email Notification') {
