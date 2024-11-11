@@ -97,26 +97,26 @@
                     </execution>
                 </executions>
             </plugin>
-                  <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>11.1.0</version> <!-- Use the latest version -->
-                <configuration>
-                    <downloadUpdates>false</downloadUpdates>
-                    <!-- Set fail threshold for vulnerabilities -->
-                    <failBuildOnCVSS>0</failBuildOnCVSS>
-                    <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
-                    <outputDirectory>${project.build.directory}/dependency-check-report</outputDirectory>
-                    <format>HTML</format> <!-- Specify the report format as HTML -->
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+                <plugin>
+    <groupId>org.owasp</groupId>
+    <artifactId>dependency-check-maven</artifactId>
+    <version>11.1.0</version> <!-- Ensure you're using the latest version -->
+    <configuration>
+        <downloadUpdates>false</downloadUpdates>
+        <failBuildOnCVSS>0</failBuildOnCVSS> <!-- Set fail threshold for vulnerabilities -->
+        <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory> <!-- Directory for DB -->
+        <outputDirectory>${project.build.directory}/dependency-check-report</outputDirectory> <!-- Report directory -->
+        <format>HTML</format> <!-- Report format -->
+        <purgeOnStartup>true</purgeOnStartup> <!-- Purge old data on each run -->
+    </configuration>
+    <executions>
+        <execution>
+            <goals>
+                <goal>check</goal> <!-- Perform the dependency check -->
+            </goals>
+        </execution>
+    </executions>
+</plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
