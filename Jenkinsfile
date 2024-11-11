@@ -176,7 +176,7 @@ pipeline {
                 """
             }
         }
-       always {
+     always {
     script {
         // Get the current time in a readable format
         def currentTime = new Date().format('yyyy-MM-dd HH:mm:ss')
