@@ -29,17 +29,10 @@ pipeline {
                 sh 'mvn test' 
             }
         }
-        stage('Security Scan: OWASP Dependency-Check') {
+      stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
-                script {
-                    echo "Starting OWASP Dependency-Check..."
-                    sh 'mvn org.owasp:dependency-check-maven:check'
-                }
-            }
-        }
-        stage('JaCoCo Report') {
-            steps {
-                sh 'mvn jacoco:report'
+                sh 'mvn test'
+                sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
             }
         }
 
@@ -51,6 +44,30 @@ pipeline {
                         classPattern: '**/target/classes',
                         sourcePattern: '**/src/main/java'
                     )
+                }
+            }
+        }
+
+
+       
+        stage('Testing - OWASP Dependency-Check Vulnerabilities') {
+            steps {
+                    dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
+                               odcInstallation: 'Dependency-Check'
+                    dependencyCheckPublisher pattern: 'target/dependency-check-report/dependency-check-report.xml'
+    }
+}
+
+        stage('Testing - Publish Dependency-Check Report') {
+            steps {
+                script {
+                    publishHTML([ 
+                        reportDir: 'Projet-Devops/target/dependency-check-report',
+                        reportFiles: 'dependency-check-report.html',  // Ensure this matches the file generated
+                        reportName: 'Dependency Check Report',
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true
+                    ])
                 }
             }
         }
