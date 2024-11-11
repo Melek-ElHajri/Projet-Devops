@@ -166,7 +166,7 @@ stage('Scan') {
                     sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
             }
-        }
+        
 
         
         
