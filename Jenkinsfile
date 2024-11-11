@@ -6,7 +6,7 @@ pipeline {
         maven 'M2_HOME'  // Adjust if necessary
     }
 
-    environment {
+    
         stages {
             stage('Development - GIT Checkout') {
             steps {
@@ -19,4 +19,4 @@ pipeline {
                                odcInstallation: 'Dependency-Check'
             }
         }
-        }}}
+        }}
