@@ -107,6 +107,7 @@
         <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory> <!-- Directory for DB -->
         <outputDirectory>${project.build.directory}/dependency-check-report</outputDirectory> <!-- Report directory -->
         <format>HTML</format> <!-- Report format -->
+        <purge>true</purge>
         <purgeOnStartup>true</purgeOnStartup> <!-- Purge old data on each run -->
     </configuration>
     <executions>
