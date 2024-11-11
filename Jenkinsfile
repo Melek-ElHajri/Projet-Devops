@@ -2,37 +2,48 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JAVA_HOME'
-        maven 'M2_HOME'
+        jdk 'JAVA_HOME'  // Adjust if necessary
+        maven 'M2_HOME'  // Adjust if necessary
     }
 
     stages {
         stage('GIT') {
             steps {
-                git branch: 'nourhene-chammakhi',
-                    url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+                git branch: 'NouhaSedraoui', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
+
+       
         
-        stage('Compile Stage') {   // Move the compile stage before the scan
+        stage('Build Docker Image') {
             steps {
-                sh 'mvn clean compile'
+                sh 'sudo docker build -t rymasd29/tp-foyers:1.0.0 .'
             }
         }
-         stage('Deploy to Nexus') {  // Add the deployment stage
+
+        stage('Push Docker Image to DockerHub') {
             steps {
-                sh 'mvn deploy'
+                sh '''
+                    sudo docker login -u rymasd29 -p 223JFT4309
+                    sudo docker push rymasd29/tp-foyer:5.0.0
+                '''
             }
         }
-        stage('Scan') {
+
+        stage('Run Docker Compose') {
             steps {
-                withSonarQubeEnv('sq1') {
-                    // Add sonar.java.binaries property to point to compiled classes
-                    sh 'mvn sonar:sonar'
+                script {
+                    sh '''
+                        sudo docker-compose down 
+                        sudo docker-compose up -d
+                    '''
                 }
             }
         }
 
-        
+
+
     }
+  
+
 }

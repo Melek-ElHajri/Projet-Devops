@@ -1,0 +1,4 @@
+*.jar filter=lfs diff=lfs merge=lfs -text
+*.mv.db filter=lfs diff=lfs merge=lfs -text
+target/tp-foyer-5.0.0.jar filter=lfs diff=lfs merge=lfs -text
+target/dependency-check-data/odc.mv.db filter=lfs diff=lfs merge=lfs -text
