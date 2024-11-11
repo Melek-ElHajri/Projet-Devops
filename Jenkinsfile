@@ -93,8 +93,7 @@ pipeline {
         }
 
 
-stages {
-        stage('ZAP Baseline Scan') {
+stage('ZAP Baseline Scan') {
             steps {
                 script {
                     // Run ZAP Baseline scan and set full permissions for the report
@@ -145,7 +144,6 @@ stages {
                 ])
             }
         }
-    
 
 
         
