@@ -55,14 +55,14 @@ pipeline {
         stage('JUnit/Mockito Tests') {
             steps {
                 // Exécuter les tests et enregistrer les résultats dans un fichier
-                sh 'mvn test > test_results.log'
+                sh 'mvn test > test_results.txt'
             }
         }
 
         stage('Archiver les résultats de tests') {
             steps {
                 // Archiver le fichier de résultats
-                archiveArtifacts artifacts: 'test_results.log', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'test_results.txt', allowEmptyArchive: true
             }
         }
 
