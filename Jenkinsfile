@@ -56,18 +56,18 @@ pipeline {
 }
 
         stage('Testing - Publish Dependency-Check Report') {
-            steps {
-                script {
-                    publishHTML([ 
-                        reportDir: 'Projet-Devops/target/dependency-check-report',
-                        reportFiles: 'dependency-check-report.html',  
-                        reportName: 'Dependency Check Report',
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true
-                    ])
-                }
-            }
+    steps {
+        script {
+            publishHTML([ 
+                reportDir: 'DevSecOps',             
+                reportFiles: 'dependency-check-report.html',  
+                reportName: 'Dependency Check Report',       
+                alwaysLinkToLastBuild: true,      
+                keepAll: true                     
+            ])
         }
+    }
+}
 
 
          stage('Testing - Sonar Analysis') {
