@@ -12,7 +12,7 @@ pipeline {
        
         stage('Development - GIT Checkout') {
             steps {
-                git branch: 'NouhaSedraoui', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
+                git branch: 'NouhaSD', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
 
