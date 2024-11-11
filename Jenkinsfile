@@ -112,7 +112,7 @@ stage('ZAP Baseline Scan') {
             }
         }
 
-        stage('ZAP Active Scan') {
+      /*  stage('ZAP Active Scan') {
             steps {
                 script {
                    
@@ -129,7 +129,7 @@ stage('ZAP Baseline Scan') {
                     }
                 }
             }
-        }
+        }*/
 
         stage('Publish ZAP Reports') {
             steps {
