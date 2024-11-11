@@ -65,7 +65,54 @@ pipeline {
                 }
             }
         }
+        
+        stage('Deploy to Nexus') {
+            steps {
+                nexusArtifactUploader(
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    nexusUrl: '192.168.10.2:8081',
+                    groupId: 'tn.esprit',
+                    version: '5.0.0',
+                    repository: 'maven-releases',
+                    credentialsId: 'DummyCredentials',
+                    artifacts: [
+                        [
+                            artifactId: 'tp-foyer',
+                            classifier: '',
+                            file: 'target/tp-foyer-5.0.0.jar',
+                            type: 'jar'
+                        ],
+                        [
+                            artifactId: 'tp-foyer',
+                            classifier: '',
+                            file: 'pom.xml',
+                            type: 'pom'
+                        ]
+                    ]
+                )
+            }
+        }
+        
+        stage("Generate Docker Image") {
+            steps {
+                sh 'docker build -t badredinedhaoui/tp-foyer:5.0.0 .'
+            }
+        }
 
+        stage("Push Docker Image") {
+            steps {
+                sh "echo ${dockerhub_token} | docker login -u badredinedhaoui --password-stdin" 
+                sh "docker push badredinedhaoui/tp-foyer:5.0.0"
+            }
+        }
+
+        stage('Docker Compose') {
+            steps {
+                sh 'docker compose up -d'
+            }
+        }
+        
         stage('Quick Nmap Scan') {
             steps {
                 script {
@@ -144,53 +191,6 @@ pipeline {
                     
                     archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
                 }
-            }
-        }
-        
-        stage("Generate Docker Image") {
-            steps {
-                sh 'docker build -t badredinedhaoui/tp-foyer:5.0.0 .'
-            }
-        }
-
-        stage("Push Docker Image") {
-            steps {
-                sh "echo ${dockerhub_token} | docker login -u badredinedhaoui --password-stdin" 
-                sh "docker push badredinedhaoui/tp-foyer:5.0.0"
-            }
-        }
-
-        stage('Docker Compose') {
-            steps {
-                sh 'docker compose up -d'
-            }
-        }
-
-        stage('Deploy to Nexus') {
-            steps {
-                nexusArtifactUploader(
-                    nexusVersion: 'nexus3',
-                    protocol: 'http',
-                    nexusUrl: '192.168.10.2:8081',
-                    groupId: 'tn.esprit',
-                    version: '5.0.0',
-                    repository: 'maven-releases',
-                    credentialsId: 'DummyCredentials',
-                    artifacts: [
-                        [
-                            artifactId: 'tp-foyer',
-                            classifier: '',
-                            file: 'target/tp-foyer-5.0.0.jar',
-                            type: 'jar'
-                        ],
-                        [
-                            artifactId: 'tp-foyer',
-                            classifier: '',
-                            file: 'pom.xml',
-                            type: 'pom'
-                        ]
-                    ]
-                )
             }
         }
         
