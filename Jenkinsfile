@@ -162,7 +162,7 @@ stage('Scan') {
                 '''
                 
                
-                withSonarQubeEnv('snrq') {
+                withSonarQubeEnv('SONART') {
                     sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                 }
             }
