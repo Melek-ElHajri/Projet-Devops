@@ -166,12 +166,12 @@ pipeline {
                 }
             }
         }
-
+/**
          stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start be79135ec1cc'
             }
-        }
+        } **/
 
         stage('Email Notification') {
             steps {
