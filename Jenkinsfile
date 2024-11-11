@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JAVA_HOME'  // Adjust if necessary
-        maven 'M2_HOME'  // Adjust if necessary
+        jdk 'JAVA_HOME'  
+        maven 'M2_HOME' 
     }
 
     stages {
@@ -47,6 +47,29 @@ pipeline {
                 }
             }
         }
+         stage('Testing - OWASP Dependency-Check Vulnerabilities') {
+            steps {
+                    dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
+                               odcInstallation: 'Dependency-Check'
+                    dependencyCheckPublisher pattern: 'target/dependency-check-report/dependency-check-report.xml'
+    }
+}
+
+        stage('Testing - Publish Dependency-Check Report') {
+            steps {
+                script {
+                    publishHTML([ 
+                        reportDir: 'Projet-Devops/target/dependency-check-report',
+                        reportFiles: 'dependency-check-report.html',  
+                        reportName: 'Dependency Check Report',
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true
+                    ])
+                }
+            }
+        }
+
+
          stage('Testing - Sonar Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
