@@ -78,7 +78,7 @@ pipeline {
         stage('SQL Injection Test (SQLmap)') {
             steps {
                 script {
-                    /
+                    
                     sh '''
                         python3 /var/lib/jenkins/workspace/nmap/gauntlt-attacks/sqlmap/sqlmap.py \
                         -u "http://192.168.23.133:8089/tpfoyer/etudiant/add-etudiant" \
