@@ -51,6 +51,7 @@ pipeline {
                 sh 'mvn clean install compile'
             }
         }
+
         stage('Scan') {
             steps {
                 // Check if the SonarQube container is running, start it if not
@@ -82,6 +83,32 @@ pipeline {
             steps {
                 // Archiver le fichier de résultats
                 archiveArtifacts artifacts: 'test_results.txt', allowEmptyArchive: true
+            }
+        }
+
+        stage("Generate Docker Image") {
+            steps {
+                sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
+            }
+        }
+
+        stage("Push Docker Image") {
+            steps {
+                sh "echo ${dockerhub_token} | docker login -u m2l2k --password-stdin" 
+                sh "docker push m2l2k/tp-foyer:5.0.0"
+            }
+        }
+
+        stage('Docker Compose') {
+            steps {
+                sh 'docker compose up -d'
+            }
+        }
+
+        stage('Start Monitoring Containers') {
+            steps {
+                sh 'docker start 4223e0421a91'
+                sh 'docker start cf099f77ec8b'
             }
         }
 
