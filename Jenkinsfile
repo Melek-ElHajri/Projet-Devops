@@ -26,18 +26,7 @@ pipeline {
                 git branch: 'NouhaSedraouii', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-        preBuild {
-        script {
-            // Pre-build message (e.g., build start)
-            sh """
-                curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
-                --data-urlencode 'To=+21692395932' \
-                --data-urlencode 'From=+19292961290' \
-                --data-urlencode 'Body=Starting build process... Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}' \
-                -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
-            """
-        }
-    }
+       
         stage('Development - Clean') {
             steps {
                 sh 'mvn clean'
