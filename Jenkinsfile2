@@ -57,7 +57,7 @@ stage('System Security Check - Lynis') {
     }
 }
 
-stage('Pre-commit Security Hooks') {
+  stage('Pre-commit Security Hooks') {
             steps {
                 script {
                     sh '''
@@ -76,7 +76,6 @@ stage('Pre-commit Security Hooks') {
             }
         }
 
-/**
          stage('Mockito Tests') {
             steps {
                 sh 'mvn test' 
