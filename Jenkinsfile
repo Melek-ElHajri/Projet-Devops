@@ -72,7 +72,26 @@ pipeline {
                 sh 'docker compose up -d'
             }
         }
-    
+            
+        
+        
+        stage('SQL Injection Test (SQLmap)') {
+            steps {
+                script {
+                    // Run SQLmap for deeper SQL injection testing, display output to console and save it to a file
+                    sh '''
+                        python3 /var/lib/jenkins/workspace/nmap/gauntlt-attacks/sqlmap/sqlmap.py \
+                        -u "http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant" \
+                        --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" \
+                        --batch --level=5 --risk=3 --tamper=space2comment | tee sqlmap_output.txt
+                    '''
+                    
+                    // Archive the output file
+                    archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
+                }
+            }
+        }
+    }
 
     
     }
