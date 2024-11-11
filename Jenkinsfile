@@ -58,6 +58,7 @@ pipeline {
                 }
             }
         }
+        /**
 
         stage('Prometheus') {
             steps {
@@ -96,7 +97,7 @@ pipeline {
                 }
             }
         }
-
+**/
         
         stage('Security Scan: Nmap') {
             steps {
