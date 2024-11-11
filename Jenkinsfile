@@ -84,12 +84,12 @@ pipeline {
             }
         }*/
 
-       stage('Deployment - Package') {
+      /* stage('Deployment - Package') {
             steps {
                 sh 'mvn package'
             }
         }
-
+*/
       /* stage('Deployment - Deploy to Nexus') {
             steps {
                 // Deploy to Nexus repository
