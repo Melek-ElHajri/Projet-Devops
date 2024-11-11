@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        SMTP_USERNAME = 'rim.gabsi.zg@gmail.com'  // remplacez par votre adresse Gmail
-        SMTP_PASSWORD = 'ufpt qsvd dvib kijw'    // remplacez par votre mot de passe d'application Gmail
+        SMTP_USERNAME = 'rim.gabsi.zg@gmail.com' 
+        SMTP_PASSWORD = 'ufpt qsvd dvib kijw'    
     }
     tools {
         jdk 'JAVA_HOME'
@@ -11,7 +11,7 @@ pipeline {
     }
 
     stages {
-        // Étape de récupération du code source
+      
         stage('GIT') {
             steps {
                 git branch: 'Gabsi-Rim',
@@ -19,7 +19,7 @@ pipeline {
             }
         }
 
-        // Étape de vérification du code source à partir du dépôt Git
+       
         stage('Checkout') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/Gabsi-Rim']], 
@@ -27,28 +27,28 @@ pipeline {
             }
         }
 
-        // Étape de compilation du projet
+       
         stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
             }
         }
 
-        // Étape d'exécution des tests unitaires avec Mockito
+     
         stage('Mockito Tests') {
             steps {
                 sh 'mvn test' 
             }
         }
 
-        // Étape de déploiement du projet vers Nexus
+     
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
 
-        // Étape d'analyse de la qualité du code avec SonarQube
+      
         stage('Sonarqube') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -57,7 +57,7 @@ pipeline {
             }
         }
 
-        // Étape de validation de la qualité du code avec Quality Gate
+       
         stage("Quality Gate") {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
@@ -66,7 +66,7 @@ pipeline {
             }
         }
 
-        // Étape de scan de sécurité avec Nmap
+       
         stage('Security Scan: Nmap') {
             steps {
                 script {
@@ -76,7 +76,7 @@ pipeline {
             }
         }
 
-        // Étape de scan de sécurité avec Trivy (pour les images Docker)
+       
         stage('Security Scan: Trivy') {
             steps {
                 retry(3) {
@@ -86,27 +86,27 @@ pipeline {
             }
         }
 
-        // Étape de vérification de la sécurité système avec Lynis
+      
         stage('System Security Check - Lynis') {
             steps {
                 script {
-                    // Exécution de l'audit de sécurité système avec Lynis
+                   
                     sh 'lynis audit system | tee lynis_audit_output.txt'
                     
-                    // Archivage des résultats pour consultation ultérieure
+                  
                     archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
                 }
             }
         }
 
-        // Étape de création de l'image Docker
+      
         stage('Build Docker Image') {
             steps {  
                 sh "docker build -t gabsirim/alpine:1.0.0 ."
             }
         } 
 
-        // Étape de push de l'image Docker vers Docker Hub
+       
         stage('Push Docker Image') {
             steps {
                 script {
@@ -118,7 +118,7 @@ pipeline {
             }
         }
 
-        // Étape de démarrage de Docker Compose pour la gestion des conteneurs
+      
         stage('Run Docker Compose') {
             steps {
                 script {
@@ -140,7 +140,7 @@ pipeline {
             }
         }**/
 
-        // Étape d'envoi de notification par email à la fin du pipeline
+      
         stage('Email Notification') {
             steps {
                 mail bcc: '',
