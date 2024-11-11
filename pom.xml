@@ -97,7 +97,26 @@
                     </execution>
                 </executions>
             </plugin>
-
+                  <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>11.1.0</version> <!-- Use the latest version -->
+                <configuration>
+                    <downloadUpdates>false</downloadUpdates>
+                    <!-- Set fail threshold for vulnerabilities -->
+                    <failBuildOnCVSS>0</failBuildOnCVSS>
+                    <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
+                    <outputDirectory>${project.build.directory}/dependency-check-report</outputDirectory>
+                    <format>HTML</format> <!-- Specify the report format as HTML -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
