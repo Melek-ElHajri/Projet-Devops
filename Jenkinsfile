@@ -12,7 +12,7 @@ pipeline {
                 git branch: 'NouhaSedraouii', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-          stage('Development - Clean') {
+        stage('Development - Clean') {
             steps {
                 sh 'mvn clean'
             }
@@ -23,20 +23,18 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-         stage('Deployment - Package') {
+        stage('Deployment - Package') {
             steps {
                 sh 'mvn package'
             }
         }
-       
         stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
                 sh 'mvn test'
                 sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
             }
         }
-
-       stage('Testing - JaCoCo Report Generation') {
+        stage('Testing - JaCoCo Report Generation') {
             steps {
                 script {
                     jacoco(
@@ -47,40 +45,35 @@ pipeline {
                 }
             }
         }
-         stage('Testing - OWASP Dependency-Check Vulnerabilities') {
+        stage('Testing - OWASP Dependency-Check Vulnerabilities') {
             steps {
-                    dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
+                dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
                                odcInstallation: 'Dependency-Check'
-                    dependencyCheckPublisher pattern: 'target/dependency-check-report/dependency-check-report.xml'
-    }
-}
-
-      stage('Testing - Publish Dependency-Check Report') {
-    steps {
-        script {
-            publishHTML([ 
-                reportDir: '.',                     // Current directory (DevSecOps)
-                reportFiles: 'dependency-check-report.html',  // The report file
-                reportName: 'Dependency Check Report',        // Title of the report
-                alwaysLinkToLastBuild: true,       // Always link to the last build
-                keepAll: true                      // Keep all reports
-            ])
+                dependencyCheckPublisher pattern: 'target/dependency-check-report/dependency-check-report.xml'
+            }
         }
-    }
-}
-
-
-         stage('Testing - Sonar Analysis') {
+        stage('Testing - Publish Dependency-Check Report') {
+            steps {
+                script {
+                    publishHTML([ 
+                        reportDir: '.', 
+                        reportFiles: 'dependency-check-report.html', 
+                        reportName: 'Dependency Check Report', 
+                        alwaysLinkToLastBuild: true, 
+                        keepAll: true 
+                    ])
+                }
+            }
+        }
+        stage('Testing - Sonar Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
                     sh 'mvn sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
                 }
             }
         }
-
-         stage('Deployment - Deploy to Nexus') {
+        stage('Deployment - Deploy to Nexus') {
             steps {
-                // Deploy to Nexus repository
                 sh 'mvn deploy -DskipTests -Dautoupdate=false -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
@@ -89,7 +82,6 @@ pipeline {
                 sh 'sudo docker build -t rymasd29/tp-foyers:1.0.0 .'
             }
         }
-
         stage('Push Docker Image to DockerHub') {
             steps {
                 sh '''
@@ -98,7 +90,6 @@ pipeline {
                 '''
             }
         }
-
         stage('Run Docker Compose') {
             steps {
                 script {
@@ -109,8 +100,7 @@ pipeline {
                 }
             }
         }
-
-         stage('Operate: Monitor - Check and Start Prometheus') {
+        stage('Operate: Monitor - Check and Start Prometheus') {
             steps {
                 script {
                     def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
@@ -136,7 +126,6 @@ pipeline {
                 }
             }
         }
-
         stage('Operate: Monitor - Validate Setup') {
             steps {
                 script {
@@ -146,24 +135,20 @@ pipeline {
                 }
             }
         }
-post {
+    }
+    
+    post {
         success {
-            // Send SMS on successful build
             twilioSend(
                 message: "Build SUCCESSFUL! Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}",
                 to: '+21692395932'
             )
         }
         failure {
-            // Send SMS on failed build
             twilioSend(
                 message: "Build FAILED. Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}",
                 to: '+21692395932'
             )
         }
     }
-
-    }
-  
-
 }
