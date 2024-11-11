@@ -4,7 +4,6 @@ pipeline {
     environment {
         SONAR_TOKEN = credentials('SONAR_TOKEN')
         dockerhub_token = credentials('dockerhub_token')
-        Nexus_cr = ('NEXUS_CREDENTIALS_ID')
     }
     
     tools {
@@ -112,7 +111,6 @@ pipeline {
                     groupId: 'tn.esprit',
                     version: '5.0.0',
                     repository: 'maven-releases',
-                    credentialsId: "${Nexus_cr}",
                     artifacts: [
                         [
                             artifactId: 'tp-foyer',
