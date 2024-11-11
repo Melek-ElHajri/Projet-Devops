@@ -82,6 +82,12 @@ pipeline {
                 }
             }
         }
+
+        stage('DETECT NEXUS') {
+      steps {
+        sh 'mvn clean deploy -Dmaven.test.skip=true'
+      }
+    }
         
         /*stage('Deploy to Nexus') {
             steps {
