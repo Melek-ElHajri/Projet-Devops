@@ -7,11 +7,37 @@ pipeline {
     }
 
     stages {
+        stage('Pre-Build Notification') {
+            steps {
+                script {
+                    // Pre-build message (e.g., build start)
+                    sh """
+                        curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+                        --data-urlencode 'To=+21692395932' \
+                        --data-urlencode 'From=+19292961290' \
+                        --data-urlencode 'Body=Starting build process... Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}' \
+                        -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
+                    """
+                }
+            }
+        }
         stage('GIT') {
             steps {
                 git branch: 'NouhaSedraouii', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
+        preBuild {
+        script {
+            // Pre-build message (e.g., build start)
+            sh """
+                curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+                --data-urlencode 'To=+21692395932' \
+                --data-urlencode 'From=+19292961290' \
+                --data-urlencode 'Body=Starting build process... Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}' \
+                -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
+            """
+        }
+    }
         stage('Development - Clean') {
             steps {
                 sh 'mvn clean'
@@ -126,7 +152,7 @@ pipeline {
                 }
             }
         }
-        stage('Operate: Monitor - Validate Setup') {
+    stage('Operate: Monitor - Validate Setup') {
             steps {
                 script {
                     echo 'Validating Prometheus and Grafana setup...'
@@ -136,40 +162,39 @@ pipeline {
             }
         }
     }
-    
-    post {
+  post {
         success {
             script {
-                // Send success message with build details
+                // Success message
                 sh """
                     curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
                     --data-urlencode 'To=+21692395932' \
                     --data-urlencode 'From=+19292961290' \
-                    --data-urlencode 'Body=Build SUCCESSFUL! Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}' \
+                    --data-urlencode 'Body=Congratulations! Build #${env.BUILD_NUMBER} was successful! Let's proceed to the next step in the pipeline. Job: ${env.JOB_NAME}' \
                     -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
                 """
             }
         }
         failure {
             script {
-                // Send failure message with build details
+                // Failure message
                 sh """
                     curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
                     --data-urlencode 'To=+21692395932' \
                     --data-urlencode 'From=+19292961290' \
-                    --data-urlencode 'Body=Build FAILED. Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}' \
+                    --data-urlencode 'Body=Oops! An error occurred during build #${env.BUILD_NUMBER}. Please verify the code or check the logs for details. Job: ${env.JOB_NAME}' \
                     -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
                 """
             }
         }
         always {
             script {
-                // Send a notification regardless of build status
+                // Build status report (whether successful or failed)
                 sh """
                     curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
                     --data-urlencode 'To=+21692395932' \
                     --data-urlencode 'From=+19292961290' \
-                    --data-urlencode 'Body=Build ${env.BUILD_NUMBER} - ${env.JOB_NAME} completed with status: ${currentBuild.currentResult}' \
+                    --data-urlencode 'Body=Build Report: Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}, Status: ${currentBuild.currentResult}, Duration: ${currentBuild.durationString}, Timestamp: ${currentBuild.timestamp}' \
                     -u ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf
                 """
             }
