@@ -16,7 +16,7 @@ pipeline {
             }
         }
 
-      /* stage('Development - Clean') {
+       stage('Development - Clean') {
             steps {
                 sh 'mvn clean'
             }
@@ -26,34 +26,29 @@ pipeline {
             steps {
                 sh 'mvn compile'
             }
-        }*/
+        }
 
-      /*  stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
+      stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
                 sh 'mvn test'
                 sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
             }
         }
 
-       
-
-       /* stage('Testing - OWASP Dependency-Check Vulnerabilities') {
+       stage('Testing - JaCoCo Report Generation') {
             steps {
-                dependencyCheck additionalArguments: ''' 
-                    -o "./" 
-                    -s "./"
-                    -f "ALL" 
-                    --prettyPrint''', odcInstallation: 'Dependency-Check'
-
-                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-            }
-        }*/
-       /* stage('Testing - OWASP Dependency-Check Vulnerabilities') {
-            steps {
-                dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
-                               odcInstallation: 'Dependency-Check'
+                script {
+                    jacoco(
+                        execPattern: '**/target/jacoco.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: '**/src/main/java'
+                    )
+                }
             }
         }
+
+
+       
         stage('Testing - OWASP Dependency-Check Vulnerabilities') {
             steps {
                     dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
@@ -82,7 +77,7 @@ pipeline {
                     sh 'mvn sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
                 }
             }
-        }*/
+        }
 
        stage('Deployment - Package') {
             steps {
@@ -90,40 +85,15 @@ pipeline {
             }
         }
 
-      /* stage('Deployment - Deploy to Nexus') {
+       stage('Deployment - Deploy to Nexus') {
             steps {
                 // Deploy to Nexus repository
                 sh 'mvn deploy -DskipTests -Dautoupdate=false -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
-        }*/
-
-        stage('Deployment - Build Docker Image') {
-            steps {
-                sh 'sudo docker build -t rymasd29/tp-foyer:5.0.0 .'
-            }
         }
 
-        stage('Deployment - Push Docker Image to DockerHub') {
-            steps {
-                sh '''
-                    sudo docker login -u rymasd29 -p 223JFT4309
-                    sudo docker push rymasd29/tp-foyer:5.0.0
-                '''
-            }
-        }
-
-        stage('Deployment - Run Docker Compose') {
-            steps {
-                script {
-                    sh '''
-                        sudo docker-compose down 
-                        sudo docker-compose up -d
-                    '''
-                }
-            }
-        }
-
-     /*   // Operate: Monitor Phase
+        
+       // Operate: Monitor Phase
         stage('Operate: Monitor - Check and Start Prometheus') {
             steps {
                 script {
@@ -234,7 +204,7 @@ pipeline {
                     archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
                 }
             }
-        }*/
+        }
 
        
     }
