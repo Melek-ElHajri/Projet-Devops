@@ -12,7 +12,22 @@ pipeline {
                 git branch: 'NouhaSedraouii', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
+          stage('Development - Clean') {
+            steps {
+                sh 'mvn clean'
+            }
+        }
 
+        stage('Development - Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+         stage('Deployment - Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
        
         
         stage('Build Docker Image') {
