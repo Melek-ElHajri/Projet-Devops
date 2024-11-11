@@ -91,13 +91,13 @@ pipeline {
                 sh "docker push m2l2k/tp-foyer:5.0.0"
             }
         }
-
+/*
         stage('Docker Compose') {
             steps {
                 sh 'docker compose up -d'
             }
         }
-
+*/
         stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start 4223e0421a91'
