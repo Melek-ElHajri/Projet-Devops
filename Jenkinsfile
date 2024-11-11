@@ -16,7 +16,7 @@ pipeline {
             }
         }
 
-       stage('Development - Clean') {
+      /* stage('Development - Clean') {
             steps {
                 sh 'mvn clean'
             }
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 sh 'mvn compile'
             }
-        }
+        }*/
 
       /*  stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
@@ -84,11 +84,11 @@ pipeline {
             }
         }*/
 
-        stage('Deployment - Package') {
+      /*  stage('Deployment - Package') {
             steps {
                 sh 'mvn package'
             }
-        }
+        }*/
 
       /* stage('Deployment - Deploy to Nexus') {
             steps {
