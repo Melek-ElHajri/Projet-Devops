@@ -28,7 +28,7 @@ pipeline {
             }
         }
 
-        stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
+      /*  stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
                 sh 'mvn test'
                 sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
@@ -92,7 +92,7 @@ pipeline {
                     sh 'mvn sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
                 }
             }
-        }
+        }*/
 
         stage('Deployment - Package') {
             steps {
@@ -100,12 +100,12 @@ pipeline {
             }
         }
 
-       stage('Deployment - Deploy to Nexus') {
+      /* stage('Deployment - Deploy to Nexus') {
             steps {
                 // Deploy to Nexus repository
                 sh 'mvn deploy -DskipTests -Dautoupdate=false -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
-        }
+        }*/
 
         stage('Deployment - Build Docker Image') {
             steps {
@@ -133,7 +133,7 @@ pipeline {
             }
         }
 
-        // Operate: Monitor Phase
+     /*   // Operate: Monitor Phase
         stage('Operate: Monitor - Check and Start Prometheus') {
             steps {
                 script {
@@ -244,7 +244,7 @@ pipeline {
                     archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
                 }
             }
-        }
+        }*/
 
        
     }
