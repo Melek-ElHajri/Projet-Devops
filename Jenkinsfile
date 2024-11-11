@@ -71,7 +71,7 @@ pipeline {
             steps {
                 script {
                     echo "Démarrage du scan de sécurité Nmap..."
-                    sh 'nmap -sT -p 1-65535 -v localhost'
+                    sh 'nmap -sT -p 1-65535 -v 192.168.33.10'
                 }
             }
         }
