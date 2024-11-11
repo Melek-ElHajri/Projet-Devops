@@ -7,6 +7,7 @@ repos:
     -   id: trailing-whitespace
     -   id: check-json
     -   id: check-xml
+
 -   repo: https://github.com/hmrc/security-git-hooks
     rev: v1.0.0-beta9
     hooks:
@@ -17,3 +18,30 @@ repos:
     -   id: hooks_version_check
         name: Checking local hooks against latest releases
         verbose: true
+
+# Ajout de la vérification des fichiers Java avec Checkstyle
+-   repo: https://github.com/pre-commit/mirrors-checkstyle
+    rev: v10.0
+    hooks:
+    -   id: checkstyle
+        files: \.java$
+        args:
+        - -c
+        - /google_checks.xml  # Chemin vers votre configuration Checkstyle
+
+# Ajout de la vérification des fichiers Java avec PMD
+-   repo: https://github.com/pre-commit/mirrors-pmd
+    rev: v6.40.0
+    hooks:
+    -   id: pmd
+        files: \.java$
+        args:
+        - -d
+        - .
+
+# Ajout de la vérification des fichiers Java avec SpotBugs
+-   repo: https://github.com/pre-commit/mirrors-spotbugs
+    rev: v4.0.0
+    hooks:
+    -   id: spotbugs
+        files: \.java$
