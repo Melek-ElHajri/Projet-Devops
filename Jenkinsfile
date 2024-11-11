@@ -19,7 +19,7 @@ pipeline {
             }
         }
 
-        /*stage('Pre-commit Security Hooks') {
+        stage('Pre-commit Security Hooks') {
             steps {
                 script {
                     def result = sh(script: '''
@@ -44,15 +44,29 @@ pipeline {
                     }
                 }
             }
-        }*/
+        }
 
         stage('Build') {
             steps {
                 sh 'mvn clean install compile'
             }
         }
+        
+        stage('JUnit/Mockito Tests') {
+            steps {
+                sh 'mvn test' 
+            }
+        }
 
-        /*stage('Quick Nmap Scan') {
+        stage('Scan') {
+            steps {
+                withSonarQubeEnv('sq') {
+                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
+                }
+            }
+        }
+
+        stage('Quick Nmap Scan') {
             steps {
                 script {
                     def targetHost = '192.168.10.2'  // Scanning 192.168.10.2
@@ -68,17 +82,67 @@ pipeline {
                     echo "Quick Nmap scan report has been archived."
                 }
             }
-        }*/
-        stage('JUnit/Mockito Tests') {
+        }
+
+        stage('ZAP Baseline Scan') {
             steps {
-                sh 'mvn test' 
+                script {
+                    
+                    def result = sh(script: '''
+                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
+                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                    ''', returnStatus: true)
+
+                    if (result != 0) {
+                        echo "ZAP Baseline Scan completed with warnings or errors."
+                    } else {
+                        echo "ZAP Baseline Scan completed successfully."
+                    }
+                }
+            }
+        }
+        stage('ZAP Active Scan') {
+            steps {
+                script {
+                    def result = sh(script: '''
+                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-full-scan.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/active_scan_report.html
+                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                    ''', returnStatus: true)
+
+                    if (result != 0) {
+                        echo "ZAP Active Scan completed with warnings or errors."
+                    } else {
+                        echo "ZAP Active Scan completed successfully."
+                    }
+                }
             }
         }
 
-        stage('Scan') {
+        stage('Publish ZAP Reports') {
             steps {
-                withSonarQubeEnv('sq') {
-                    sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  // Correct path
+                    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  // Files to publish
+                    reportName: 'ZAP Reports'
+                ])
+            }
+        }
+
+        stage('SQL Injection Test (SQLmap)') {
+            steps {
+                script {
+                    sh '''
+                        python3 /var/lib/jenkins/workspace/nmap/gauntlt-attacks/sqlmap/sqlmap.py \
+                        -u "http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant" \
+                        --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" \
+                        --batch --level=5 --risk=3 --tamper=space2comment | tee sqlmap_output.txt
+                    '''
+                    
+                    
+                    archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
                 }
             }
         }
