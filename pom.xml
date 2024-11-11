@@ -116,7 +116,7 @@
                 <version>11.1.0</version> <!-- Use the latest version -->
                 <configuration>
                     <!-- Set fail threshold for vulnerabilities -->
-                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                    <failBuildOnCVSS>-1</failBuildOnCVSS>
                     <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory>
                     <outputDirectory>${project.build.directory}/dependency-check-report</outputDirectory>
                     <format>HTML</format> <!-- Specify the report format as HTML -->
