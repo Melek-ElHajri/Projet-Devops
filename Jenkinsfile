@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        SMTP_USERNAME = 'rim.gabsi.zg@gmail.com'  // replace with your Gmail address
-        SMTP_PASSWORD = 'ufpt qsvd dvib kijw'    // replace with your Gmail App password
+        SMTP_USERNAME = 'rim.gabsi.zg@gmail.com'  // remplacez par votre adresse Gmail
+        SMTP_PASSWORD = 'ufpt qsvd dvib kijw'    // remplacez par votre mot de passe d'application Gmail
     }
     tools {
         jdk 'JAVA_HOME'
@@ -11,6 +11,7 @@ pipeline {
     }
 
     stages {
+        // Étape de récupération du code source
         stage('GIT') {
             steps {
                 git branch: 'Gabsi-Rim',
@@ -18,6 +19,7 @@ pipeline {
             }
         }
 
+        // Étape de vérification du code source à partir du dépôt Git
         stage('Checkout') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/Gabsi-Rim']], 
@@ -25,24 +27,28 @@ pipeline {
             }
         }
 
+        // Étape de compilation du projet
         stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
             }
         }
 
+        // Étape d'exécution des tests unitaires avec Mockito
         stage('Mockito Tests') {
             steps {
                 sh 'mvn test' 
             }
         }
 
+        // Étape de déploiement du projet vers Nexus
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
 
+        // Étape d'analyse de la qualité du code avec SonarQube
         stage('Sonarqube') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -51,6 +57,7 @@ pipeline {
             }
         }
 
+        // Étape de validation de la qualité du code avec Quality Gate
         stage("Quality Gate") {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
@@ -58,91 +65,48 @@ pipeline {
                 }
             }
         }
-        /**
 
-        stage('Prometheus') {
-            steps {
-                script {
-                    def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
-                    if (prometheusRunning) {
-                        echo 'Prometheus is already running.'
-                    } else {
-                        echo 'Starting Prometheus container...'
-                        sh 'docker start prometheus'
-                    }
-                }
-            }
-        }
-
-        stage(' Grafana') {
-            steps {
-                script {
-                    def grafanaRunning = sh(script: 'docker ps -q -f name=grafana', returnStdout: true).trim()
-                    if (grafanaRunning) {
-                        echo 'Grafana is already running.'
-                    } else {
-                        echo 'Starting Grafana container...'
-                        sh 'docker start grafana'
-                    }
-                }
-            }
-        }
-
-        stage('Validate Setup') {
-            steps {
-                script {
-                    echo 'Validating Prometheus and Grafana setup...'
-                    sh 'curl -f http://localhost:9090/ || echo "Prometheus is not accessible"'
-                    sh 'curl -f http://localhost:3000/ || echo "Grafana is not accessible"'
-                }
-            }
-        }
-**/
-        
+        // Étape de scan de sécurité avec Nmap
         stage('Security Scan: Nmap') {
             steps {
                 script {
-                    echo "Starting Nmap Security Scan..."
+                    echo "Démarrage du scan de sécurité Nmap..."
                     sh 'nmap -sT -p 1-65535 -v localhost'
                 }
             }
         }
 
+        // Étape de scan de sécurité avec Trivy (pour les images Docker)
         stage('Security Scan: Trivy') {
             steps {
                 retry(3) {
-                    echo "Scanning Docker image for vulnerabilities using Trivy..."
+                    echo "Scan des vulnérabilités dans l'image Docker avec Trivy..."
                     sh 'trivy image --no-progress --severity CRITICAL gabsirim/alpine:1.0.0'
                 }
             }
         }
 
+        // Étape de vérification de la sécurité système avec Lynis
         stage('System Security Check - Lynis') {
             steps {
                 script {
-                    // Run system security audit with Lynis
+                    // Exécution de l'audit de sécurité système avec Lynis
                     sh 'lynis audit system | tee lynis_audit_output.txt'
                     
-                    // Archive the output for later review
+                    // Archivage des résultats pour consultation ultérieure
                     archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
                 }
             }
         }
-/**
 
-        stage('Build') {
-            steps {
-                sh 'mvn clean package'
-                sh 'ls target'
-            }
-        } 
-**/
+        // Étape de création de l'image Docker
         stage('Build Docker Image') {
             steps {  
                 sh "docker build -t gabsirim/alpine:1.0.0 ."
             }
         } 
 
+        // Étape de push de l'image Docker vers Docker Hub
         stage('Push Docker Image') {
             steps {
                 script {
@@ -154,6 +118,7 @@ pipeline {
             }
         }
 
+        // Étape de démarrage de Docker Compose pour la gestion des conteneurs
         stage('Run Docker Compose') {
             steps {
                 script {
@@ -167,17 +132,19 @@ pipeline {
                 }
             }
         }
-/**
-         stage('Start Monitoring Containers') {
+
+        // Étape de démarrage des conteneurs en surveillance
+        stage('Start Monitoring Containers') {
             steps {
                 sh 'docker start be79135ec1cc'
             }
-        } **/
+        }
 
+        // Étape d'envoi de notification par email à la fin du pipeline
         stage('Email Notification') {
             steps {
                 mail bcc: '',
-                     body: 'Final Report: The pipeline has completed successfully. No action required.',
+                     body: 'Rapport final : Le pipeline a été exécuté avec succès. Aucune action requise.',
                      cc: '',
                      from: '',
                      replyTo: '',
