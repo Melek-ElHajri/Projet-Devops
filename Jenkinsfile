@@ -24,6 +24,40 @@ pipeline {
                 sh 'mvn clean install compile'
             }
         }
+        stage('Pre-commit Security Hooks') {
+            steps {
+                script {
+                    
+                    def reportFile = 'pre_commit_report.log'
+                    
+                   
+                    def result = sh(script: """
+                        if ! command -v pre-commit &> /dev/null; then
+                            echo "pre-commit is not installed, installing in a virtual environment..." >> ${reportFile}
+                            python3 -m venv venv
+                            . venv/bin/activate
+                            pip install pre-commit
+                        else
+                            echo "pre-commit is already installed." >> ${reportFile}
+                        fi
+                        git config --unset-all core.hooksPath >> ${reportFile}
+                        pre-commit install >> ${reportFile}
+                        pre-commit run --all-files >> ${reportFile} 2>&1
+                        deactivate >> ${reportFile}
+                    """, returnStatus: true)
+
+                    
+                    if (result != 0) {
+                        echo "Pre-commit hooks did not pass, but continuing pipeline."
+                    } else {
+                        echo "Pre-commit hooks passed successfully."
+                    }
+
+                    
+                    archiveArtifacts artifacts: reportFile, allowEmptyArchive: true
+                }
+            }
+        }
 
 
 
@@ -105,6 +139,77 @@ pipeline {
                 sh 'docker compose up -d'
             }
         }
+        stage('Nmap Scan') {
+            steps {
+                script {
+                    def targetHost = '192.168.10.2'  
+
+                    echo "Running quick Nmap scan on ${targetHost}:8089"
+
+                    
+                    sh "nmap -p 8089 -T4 -n -Pn ${targetHost} -oN nmap_quick_scan_report.txt"
+                }
+            }
+            post {
+                always {
+                    
+                    archiveArtifacts artifacts: 'nmap_quick_scan_report.txt', allowEmptyArchive: true
+                    echo "Quick Nmap scan report has been archived."
+                }
+            }
+        }
+
+        stage('ZAP Baseline Scan') {
+            steps {
+                script {
+                    
+                    def result = sh(script: '''
+                        docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
+                        chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
+                    ''', returnStatus: true)
+
+                    
+                    if (result != 0) {
+                        echo "ZAP Baseline Scan completed with warnings or errors."
+                    } else {
+                        echo "ZAP Baseline Scan completed successfully."
+                    }
+                }
+            }
+        }
+
+        stage('Publish ZAP Reports') {
+            steps {
+                
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: '/var/lib/jenkins/workspace/nmap/zap_results',  
+                    reportFiles: 'baseline_scan_report.html,active_scan_report.html',  
+                    reportName: 'ZAP Reports'
+                ])
+            }
+        }
+
+        
+        stage('SQL Injection Test (SQLmap)') {
+            steps {
+                script {
+                    
+                    sh '''
+                        python3 /var/lib/jenkins/workspace/nmap/gauntlt-attacks/sqlmap/sqlmap.py \
+                        -u "http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant" \
+                        --data="nomEtudiant=Robert&prenomEtudiant=Test&cinEtudiant=123456&dateNaissance=2000-01-01" \
+                        --batch --level=5 --risk=3 --tamper=space2comment | tee sqlmap_output.txt
+                    '''
+                    
+                    
+                    archiveArtifacts artifacts: 'sqlmap_output.txt', allowEmptyArchive: true
+                }
+            }
+        }
+    }
         
         stage('Start Monitoring Containers') {
             steps {
