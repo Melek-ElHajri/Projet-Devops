@@ -99,13 +99,13 @@ pipeline {
             }
         }
 
-        /*
+        
         stage('Docker Compose') {
             steps {
                 sh 'docker compose up -d'
             }
         }
-        */
+        
 
         stage('Start Monitoring Containers') {
             steps {
