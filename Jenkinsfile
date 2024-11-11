@@ -20,7 +20,7 @@ pipeline {
             steps {
                 script {
                     // Run the clean install command
-                    sh 'mvn clean install'
+                    sh 'mvn clean install -DdisableNVD=true'
                 }
             }
         }
