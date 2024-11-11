@@ -102,7 +102,7 @@
     <artifactId>dependency-check-maven</artifactId>
     <version>11.1.0</version> <!-- Ensure you're using the latest version -->
     <configuration>
-        <downloadUpdates>false</downloadUpdates>
+        <disableNVD>true</disableNVD>
         <failBuildOnCVSS>0</failBuildOnCVSS> <!-- Set fail threshold for vulnerabilities -->
         <dataDirectory>${project.build.directory}/dependency-check-data</dataDirectory> <!-- Directory for DB -->
         <outputDirectory>${project.build.directory}/dependency-check-report</outputDirectory> <!-- Report directory -->
