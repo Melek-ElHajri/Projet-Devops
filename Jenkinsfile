@@ -9,14 +9,14 @@ pipeline {
 
     tools {
         
-        jdk 'JAVA_HOME'  
-        maven 'M2_HOME' 
+        jdk 'JAVA_HOME'  // Configuration de JDK
+        maven 'M2_HOME'  // Configuration de Maven
     }
 
     stages {
         stage('GIT') {
             steps {
-                
+               
                 git branch: 'ElHedi-Melek-Elhajri',
                     url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
@@ -24,6 +24,7 @@ pipeline {
         
         stage('Build') {
             steps {
+                
                 sh 'mvn clean install compile'
             }
         }
@@ -63,7 +64,7 @@ pipeline {
             }
         }
 
-        stage('Testing - JUnit, Mockito, and JaCoCo') {
+        stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
                 
                 sh 'mvn test'
@@ -75,6 +76,7 @@ pipeline {
         stage('Testing - JaCoCo Report Generation') {
             steps {
                 script {
+                   
                     jacoco(
                         execPattern: '**/target/jacoco.exec',
                         classPattern: '**/target/classes',
@@ -96,7 +98,7 @@ pipeline {
                         echo "SonarQube container is already running."
                     fi
                 '''
-                
+               
                 withSonarQubeEnv('sq') {
                     sh 'mvn sonar:sonar'
                 }
@@ -105,7 +107,7 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
-                
+             
                 sh '''
                     if ! docker ps | grep a5b6a466786c > /dev/null; then
                         echo "Container is not running. Starting container..."
@@ -122,7 +124,7 @@ pipeline {
 
         stage('Generate Docker Image') {
             steps {
-                
+               
                 sh 'docker build -t m2l2k/tp-foyer:5.0.0 .'
             }
         }
@@ -164,7 +166,7 @@ pipeline {
         stage('ZAP Baseline Scan') {
             steps {
                 script {
-                    
+                   
                     def result = sh(script: '''
                         docker run --rm -v /var/lib/jenkins/workspace/nmap/zap_results:/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t http://192.168.10.2:8089/tpfoyer/etudiant/add-etudiant -g /zap/wrk/gen.conf -r /zap/wrk/baseline_scan_report.html
                         chmod -R 777 /var/lib/jenkins/workspace/nmap/zap_results
