@@ -9,8 +9,8 @@ pipeline {
 
     tools {
         
-        jdk 'JAVA_HOME'  // Configuration de JDK
-        maven 'M2_HOME'  // Configuration de Maven
+        jdk 'JAVA_HOME'  
+        maven 'M2_HOME'  
     }
 
     stages {
