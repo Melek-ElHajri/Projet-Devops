@@ -153,8 +153,32 @@ pipeline {
     }
  
   post {
+    always {
+        script {
+            mail(
+                to: "${EMAIL_RECIPIENTS}",
+                subject: "${POST_BUILD_SUBJECT}",
+                body: "${POST_BUILD_BODY.replace('SUCCESS', currentBuild.result)}"
+            )
+            notifyEvents message: "<b>Post-Build Notification</b> - Job: ${JOB_NAME}, Build Status: ${currentBuild.result ?: 'SUCCESS'}", 
+                         token: "${NOTIFY_TOKEN}"
+
+            sh """
+                curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+                --data-urlencode 'To=+21692395932' \
+                --data-urlencode 'From=+19292961290' \
+                --data-urlencode 'Body=Build Report: Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}, Status: ${currentBuild.currentResult}, Duration: ${currentBuild.durationString}' \
+                -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
+            """
+        }
+    }
     success {
         script {
+            mail(
+                to: "${EMAIL_RECIPIENTS}",
+                subject: "${SUCCESS_SUBJECT}",
+                body: "${SUCCESS_BODY}"
+            )
             sh """
                 curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
                 --data-urlencode 'To=+21692395932' \
@@ -166,22 +190,19 @@ pipeline {
     }
     failure {
         script {
+            mail(
+                to: "${EMAIL_RECIPIENTS}",
+                subject: "${FAILURE_SUBJECT}",
+                body: "${FAILURE_BODY}"
+            )
+            notifyEvents message: "<b>Build Failed</b> - Job: ${JOB_NAME}, Build Number: ${BUILD_NUMBER}", 
+                         token: "${NOTIFY_TOKEN}"
+
             sh """
                 curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
                 --data-urlencode 'To=+21692395932' \
                 --data-urlencode 'From=+19292961290' \
                 --data-urlencode 'Body=Oops! An error occurred during build #${env.BUILD_NUMBER}.' \
-                -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
-            """
-        }
-    }
-    always {
-        script {
-            sh """
-                curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
-                --data-urlencode 'To=+21692395932' \
-                --data-urlencode 'From=+19292961290' \
-                --data-urlencode 'Body=Build Report: Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}, Status: ${currentBuild.currentResult}, Duration: ${currentBuild.durationString}' \
                 -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
             """
         }
