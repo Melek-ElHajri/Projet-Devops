@@ -5,7 +5,8 @@ pipeline {
         jdk 'JAVA_HOME'  
         maven 'M2_HOME' 
     }
-     environment {
+
+    environment {
         EMAIL_RECIPIENTS = 'nouha.sedraoui@esprit.tn'
         PRE_BUILD_SUBJECT = "Pre-Build Notification - ${JOB_NAME} #${BUILD_NUMBER}"
         PRE_BUILD_BODY = """
@@ -97,8 +98,9 @@ Jenkins Automation
 """
         NOTIFY_TOKEN = 'xa_wiujkx3bfrasfrqnzopgeuag659gh' // Add your Notify.Events token here
     }
+
     stages {
-         stage('Notification - Error Handling') {
+        stage('Notification - Error Handling') {
             steps {
                 script {
                     try {
@@ -115,7 +117,6 @@ Jenkins Automation
             }
         }
 
-
         stage('Notification - Pre-Build Notification Mail') {
             steps {
                 script {
@@ -130,7 +131,7 @@ Jenkins Automation
             }
         }
 
-        stage(' Notification - Pre-Build Notification SMS') {
+        stage('Notification - Pre-Build Notification SMS') {
             steps {
                 script {
                     // Pre-build message (e.g., build start)
@@ -144,12 +145,13 @@ Jenkins Automation
                 }
             }
         }
+
         stage('GIT') {
             steps {
                 git branch: 'NouhaSedraouii', url: 'https://github.com/Melek-ElHajri/Projet-Devops.git'
             }
         }
-       
+
         stage('Development - Clean') {
             steps {
                 sh 'mvn clean'
@@ -161,17 +163,20 @@ Jenkins Automation
                 sh 'mvn compile'
             }
         }
+
         stage('Deployment - Package') {
             steps {
                 sh 'mvn package'
             }
         }
+
         stage('Testing - JUnit, Mockito, and JaCoCo Tests') {
             steps {
                 sh 'mvn test'
                 sh 'ls -R target/site/jacoco || echo "JaCoCo report directory not found"'
             }
         }
+
         stage('Testing - JaCoCo Report Generation') {
             steps {
                 script {
@@ -183,6 +188,7 @@ Jenkins Automation
                 }
             }
         }
+
         stage('Testing - OWASP Dependency-Check Vulnerabilities') {
             steps {
                 dependencyCheck additionalArguments: '--failOnCVSS 7 --out target/dependency-check-report --noupdate', 
@@ -190,6 +196,7 @@ Jenkins Automation
                 dependencyCheckPublisher pattern: 'target/dependency-check-report/dependency-check-report.xml'
             }
         }
+
         stage('Testing - Publish Dependency-Check Report') {
             steps {
                 script {
@@ -203,6 +210,7 @@ Jenkins Automation
                 }
             }
         }
+
         stage('Testing - Sonar Analysis') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -210,16 +218,19 @@ Jenkins Automation
                 }
             }
         }
+
         stage('Deployment - Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -Dautoupdate=false -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 sh 'sudo docker build -t rymasd29/tp-foyers:1.0.0 .'
             }
         }
+
         stage('Push Docker Image to DockerHub') {
             steps {
                 sh '''
@@ -228,6 +239,7 @@ Jenkins Automation
                 '''
             }
         }
+
         stage('Run Docker Compose') {
             steps {
                 script {
@@ -238,6 +250,7 @@ Jenkins Automation
                 }
             }
         }
+
         stage('Operate: Monitor - Check and Start Prometheus') {
             steps {
                 script {
@@ -251,6 +264,7 @@ Jenkins Automation
                 }
             }
         }
+
         stage('Operate: Monitor - Check and Start Grafana') {
             steps {
                 script {
@@ -264,7 +278,8 @@ Jenkins Automation
                 }
             }
         }
-    stage('Operate: Monitor - Validate Setup') {
+
+        stage('Operate: Monitor - Validate Setup') {
             steps {
                 script {
                     echo 'Validating Prometheus and Grafana setup...'
@@ -273,7 +288,8 @@ Jenkins Automation
                 }
             }
         }
-         stage('Notification - Success Notification') {
+
+        stage('Notification - Success Notification') {
             steps {
                 script {
                     if (currentBuild.result == 'SUCCESS') {
@@ -288,64 +304,64 @@ Jenkins Automation
                 }
             }
         }
-
     }
- 
-  post {
-    always {
-        script {
-            mail(
-                to: "${EMAIL_RECIPIENTS}",
-                subject: "${POST_BUILD_SUBJECT}",
-                body: "${POST_BUILD_BODY.replace('SUCCESS', currentBuild.result)}"
-            )
-            notifyEvents message: "<b>Post-Build Notification</b> - Job: ${JOB_NAME}, Build Status: ${currentBuild.result ?: 'SUCCESS'}", 
-                         token: "${NOTIFY_TOKEN}"
 
-            sh """
-                curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
-                --data-urlencode 'To=+21692395932' \
-                --data-urlencode 'From=+19292961290' \
-                --data-urlencode 'Body=Build Report: Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}, Status: ${currentBuild.currentResult}, Duration: ${currentBuild.durationString}' \
-                -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
-            """
+    post {
+        always {
+            script {
+                mail(
+                    to: "${EMAIL_RECIPIENTS}",
+                    subject: "${POST_BUILD_SUBJECT}",
+                    body: "${POST_BUILD_BODY.replace('SUCCESS', currentBuild.result)}"
+                )
+                notifyEvents message: "<b>Post-Build Notification</b> - Job: ${JOB_NAME}, Build Status: ${currentBuild.result ?: 'SUCCESS'}", 
+                             token: "${NOTIFY_TOKEN}"
+
+                sh """
+                    curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+                    --data-urlencode 'To=+21692395932' \
+                    --data-urlencode 'From=+19292961290' \
+                    --data-urlencode 'Body=Build Report: Job: ${env.JOB_NAME}, Build: ${env.BUILD_NUMBER}, Status: ${currentBuild.currentResult}, Duration: ${currentBuild.durationString}' \
+                    -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
+                """
+            }
         }
-    }
-    success {
-        script {
-            mail(
-                to: "${EMAIL_RECIPIENTS}",
-                subject: "${SUCCESS_SUBJECT}",
-                body: "${SUCCESS_BODY}"
-            )
-            sh """
-                curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
-                --data-urlencode 'To=+21692395932' \
-                --data-urlencode 'From=+19292961290' \
-                --data-urlencode 'Body=Congratulations! Build #${env.BUILD_NUMBER} was successful!' \
-                -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
-            """
-        }
-    }
-    failure {
-        script {
-            mail(
-                to: "${EMAIL_RECIPIENTS}",
-                subject: "${FAILURE_SUBJECT}",
-                body: "${FAILURE_BODY}"
-            )
-            notifyEvents message: "<b>Build Failed</b> - Job: ${JOB_NAME}, Build Number: ${BUILD_NUMBER}", 
-                         token: "${NOTIFY_TOKEN}"
 
-            sh """
-                curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
-                --data-urlencode 'To=+21692395932' \
-                --data-urlencode 'From=+19292961290' \
-                --data-urlencode 'Body=Oops! An error occurred during build #${env.BUILD_NUMBER}.' \
-                -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
-            """
+        success {
+            script {
+                mail(
+                    to: "${EMAIL_RECIPIENTS}",
+                    subject: "${SUCCESS_SUBJECT}",
+                    body: "${SUCCESS_BODY}"
+                )
+                sh """
+                    curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+                    --data-urlencode 'To=+21692395932' \
+                    --data-urlencode 'From=+19292961290' \
+                    --data-urlencode 'Body=Congratulations! Build #${env.BUILD_NUMBER} was successful!' \
+                    -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
+                """
+            }
+        }
+
+        failure {
+            script {
+                mail(
+                    to: "${EMAIL_RECIPIENTS}",
+                    subject: "${FAILURE_SUBJECT}",
+                    body: "${FAILURE_BODY}"
+                )
+                notifyEvents message: "<b>Build Failed</b> - Job: ${JOB_NAME}, Build Number: ${BUILD_NUMBER}", 
+                             token: "${NOTIFY_TOKEN}"
+
+                sh """
+                    curl -X POST 'https://api.twilio.com/2010-04-01/Accounts/ACcf0b93794273e3d6a04def864f3447b7/Messages.json' \
+                    --data-urlencode 'To=+21692395932' \
+                    --data-urlencode 'From=+19292961290' \
+                    --data-urlencode 'Body=Oops! An error occurred during build #${env.BUILD_NUMBER}.' \
+                    -u 'ACcf0b93794273e3d6a04def864f3447b7:5f7ebacbd05a57fc1691712dc1e16bcf'
+                """
+            }
         }
     }
 }
-}
-
