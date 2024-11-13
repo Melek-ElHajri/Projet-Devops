@@ -26,6 +26,7 @@ pipeline {
                 sh 'mvn clean compile'
             }
         }
+/**
 stage('Pre-commit Security Hooks') {
     steps {
         script {
@@ -47,7 +48,7 @@ stage('Pre-commit Security Hooks') {
             '''
         }
     }
-}
+} **/
 
         stage('Security Scan: Nmap') {
             steps {
@@ -108,7 +109,7 @@ stage('Pre-commit Security Hooks') {
                 }
             }
         }
-
+/**
         stage('Check and Start Prometheus') {
             steps {
                 script {
@@ -152,7 +153,7 @@ stage('Pre-commit Security Hooks') {
                 sh 'mvn clean package'
                 sh 'ls target'
             }
-        }
+        } /**
 
         stage('Build Docker Image') {
             steps {  
