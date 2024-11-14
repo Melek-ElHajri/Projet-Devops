@@ -80,7 +80,7 @@ pipeline {
             }
         }
 
-        // Security Scans (Part of Acceptance Phase)
+       
         stage('Security Scan: Nmap') {
             steps {
                 script {
