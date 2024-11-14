@@ -146,7 +146,7 @@ stage('ZAP Baseline Scan') {
         }
 
 
-*/
+/*
         
 stage('Scan') {
             steps {
@@ -185,7 +185,7 @@ stage('Scan') {
                 
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.23.133:8081/repository/maven-releases/'
             }
-        }*/
+        }
 
 
 stage('Deploy to Nexus') {
@@ -215,8 +215,8 @@ stage('Deploy to Nexus') {
                 )
             }
         }
-*/
-        
+
+        */
         
         
 
