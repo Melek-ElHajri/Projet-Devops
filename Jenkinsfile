@@ -146,7 +146,7 @@ stage('ZAP Baseline Scan') {
         }
 
 
-
+*/
         
 stage('Scan') {
             steps {
@@ -215,7 +215,7 @@ stage('Deploy to Nexus') {
                 )
             }
         }
-
+*/
         
         
         
