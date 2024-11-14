@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         SMTP_USERNAME = 'rim.gabsi.zg@gmail.com' 
-        SMTP_PASSWORD = 'ufpt qsvd dvib kijw'    
+        SMTP_PASSWORD = 'your_password'
     }
     tools {
         jdk 'JAVA_HOME'
@@ -11,7 +11,7 @@ pipeline {
     }
 
     stages {
-      
+        // Development Phase
         stage('GIT') {
             steps {
                 git branch: 'Gabsi-Rim',
@@ -19,7 +19,6 @@ pipeline {
             }
         }
 
-       
         stage('Checkout') {
             steps {
                 checkout([$class: 'GitSCM', branches: [[name: '*/Gabsi-Rim']], 
@@ -27,28 +26,44 @@ pipeline {
             }
         }
 
-       
+        stage('Pre-commit Security Hooks') {
+            steps {
+                script {
+                    sh '''
+                    if ! command -v pre-commit &> /dev/null
+                    then
+                        echo "Installing pre-commit in a virtual environment..."
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install pre-commit
+                    fi
+                    git config --unset-all core.hooksPath
+                    pre-commit install
+                    pre-commit run --all-files
+                    '''
+                }
+            }
+        }
+
         stage('Compile Stage') {   
             steps {
                 sh 'mvn clean compile'
             }
         }
 
-     
+        // Acceptance Phase
         stage('Mockito Tests') {
             steps {
                 sh 'mvn test' 
             }
         }
 
-     
         stage('Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/'
             }
         }
 
-      
         stage('Sonarqube') {
             steps {
                 withSonarQubeEnv('sq1') {
@@ -57,15 +72,44 @@ pipeline {
             }
         }
 
-       
-        stage("Quality Gate") {
+        stage('Quality Gate') {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true 
                 }
             }
         }
- stage('Check and Start Prometheus') {
+
+        // Security Scans (Part of Acceptance Phase)
+        stage('Security Scan: Nmap') {
+            steps {
+                script {
+                    echo "Starting Nmap Security Scan..."
+                    sh 'nmap -sT -p 1-65535 -v localhost'
+                }
+            }
+        }
+
+        stage('Security Scan: Trivy') {
+            steps {
+                retry(3) {
+                    echo "Scanning Docker image for vulnerabilities using Trivy..."
+                    sh 'trivy image --no-progress --severity CRITICAL gabsirim/alpine:1.0.0'
+                }
+            }
+        }
+
+        stage('System Security Check - Lynis') {
+            steps {
+                script {
+                    sh 'lynis audit system | tee lynis_audit_output.txt'
+                    archiveArtifacts artifacts: 'lynis_audit_output.txt', allowEmptyArchive: true
+                }
+            }
+        }
+
+        // Production Phase
+        stage('Check and Start Prometheus') {
             steps {
                 script {
                     def prometheusRunning = sh(script: 'docker ps -q -f name=prometheus', returnStdout: true).trim()
@@ -103,15 +147,13 @@ pipeline {
             }
         }
     
-
-      
+        // Operations Phase
         stage('Build Docker Image') {
             steps {  
                 sh "docker build -t gabsirim/alpine:1.0.0 ."
             }
         } 
 
-       
         stage('Push Docker Image') {
             steps {
                 script {
@@ -123,7 +165,6 @@ pipeline {
             }
         }
 
-      
         stage('Run Docker Compose') {
             steps {
                 script {
@@ -137,15 +178,7 @@ pipeline {
                 }
             }
         }
-/**
-        // Étape de démarrage des conteneurs en surveillance
-        stage('Start Monitoring Containers') {
-            steps {
-                sh 'docker start be79135ec1cc'
-            }
-        }**/
 
-      
         stage('Email Notification') {
             steps {
                 mail bcc: '',
